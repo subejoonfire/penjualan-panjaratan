@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Orders Management - Seller Dashboard')
+@section('title', 'Manajemen Pesanan - Dashboard Penjual')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Orders Management</h1>
-            <p class="mt-2 text-gray-600">Manage orders for your products</p>
+            <h1 class="text-3xl font-bold text-gray-900">Manajemen Pesanan</h1>
+            <p class="mt-2 text-gray-600">Kelola pesanan untuk produk Anda</p>
         </div>
 
         <!-- Filters -->
@@ -16,25 +16,25 @@
             <div class="p-6">
                 <form method="GET" action="{{ route('seller.orders.index') }}" class="flex flex-wrap gap-4">
                     <div class="flex-1 min-w-64">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Orders</label>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Pesanan</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                            placeholder="Search by order number..."
+                            placeholder="Cari berdasarkan nomor pesanan..."
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="min-w-48">
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select name="status" id="status"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">All Status</option>
-                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Pending
+                            <option value="">Semua Status</option>
+                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Menunggu
                             </option>
-                            <option value="confirmed" {{ request('status')==='confirmed' ? 'selected' : '' }}>Confirmed
+                            <option value="confirmed" {{ request('status')==='confirmed' ? 'selected' : '' }}>Dikonfirmasi
                             </option>
-                            <option value="shipped" {{ request('status')==='shipped' ? 'selected' : '' }}>Shipped
+                            <option value="shipped" {{ request('status')==='shipped' ? 'selected' : '' }}>Dikirim
                             </option>
-                            <option value="delivered" {{ request('status')==='delivered' ? 'selected' : '' }}>Delivered
+                            <option value="delivered" {{ request('status')==='delivered' ? 'selected' : '' }}>Diterima
                             </option>
-                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Cancelled
+                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Dibatalkan
                             </option>
                         </select>
                     </div>
@@ -46,7 +46,7 @@
                         @if(request()->hasAny(['search', 'status']))
                         <a href="{{ route('seller.orders.index') }}"
                             class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                            Clear
+                            Bersihkan
                         </a>
                         @endif
                     </div>
@@ -66,7 +66,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Orders</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $orders->total() }}</dd>
                             </dl>
                         </div>
@@ -84,7 +84,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Menunggu</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
                                     'pending')->count() }}</dd>
                             </dl>
@@ -103,7 +103,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Confirmed</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Dikonfirmasi</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
                                     'confirmed')->count() }}</dd>
                             </dl>
@@ -122,7 +122,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Delivered</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Diterima</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
                                     'delivered')->count() }}</dd>
                             </dl>
@@ -141,7 +141,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Revenue</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Pendapatan</dt>
                                 <dd class="text-lg font-medium text-gray-900">
                                     Rp {{ number_format($totalRevenue ?? 0) }}
                                 </dd>
@@ -159,19 +159,19 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Order</th>
+                                Pesanan</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Customer</th>
+                                Pelanggan</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Products</th>
+                                Produk</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Total</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date</th>
+                                Tanggal</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions</th>
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -241,12 +241,12 @@
                                 <div class="flex space-x-2">
                                     <button onclick="viewOrderDetails('{{ $order->id }}')"
                                         class="text-blue-600 hover:text-blue-900">
-                                        View
+                                        Lihat
                                     </button>
                                     @if(in_array($order->status, ['pending', 'confirmed']))
                                     <button onclick="updateOrderStatus('{{ $order->id }}')"
                                         class="text-green-600 hover:text-green-900">
-                                        Update
+                                        Perbarui
                                     </button>
                                     @endif
                                 </div>
@@ -256,8 +256,8 @@
                         <tr>
                             <td colspan="7" class="px-6 py-12 text-center">
                                 <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-4"></i>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
-                                <p class="text-gray-600">No orders match your filter criteria.</p>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pesanan Ditemukan</h3>
+                                <p class="text-gray-600">Tidak ada pesanan yang sesuai dengan kriteria filter Anda.</p>
                             </td>
                         </tr>
                         @endforelse

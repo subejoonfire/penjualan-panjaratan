@@ -48,7 +48,7 @@ class CategoryController extends Controller
         ]);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category created successfully');
+            ->with('success', 'Kategori berhasil dibuat');
     }
 
     /**
@@ -93,7 +93,7 @@ class CategoryController extends Controller
         ]);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category updated successfully');
+            ->with('success', 'Kategori berhasil diperbarui');
     }
 
     /**
@@ -103,14 +103,14 @@ class CategoryController extends Controller
     {
         // Check if category has products
         if ($category->products()->count() > 0) {
-            return back()->with('error', 'Cannot delete category that has products. Please move or delete products first.');
+            return back()->with('error', 'Tidak dapat menghapus kategori yang memiliki produk. Silakan pindahkan atau hapus produk terlebih dahulu.');
         }
 
-        $category = $category->category;
+        $categoryName = $category->category;
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', "Category '{$category}' deleted successfully");
+            ->with('success', "Kategori '{$categoryName}' berhasil dihapus");
     }
 
     /**
@@ -151,11 +151,11 @@ class CategoryController extends Controller
             ->toArray();
 
         if (count($categoriesWithProducts) > 0) {
-            return back()->with('error', 'Cannot delete categories that have products: ' . implode(', ', $categoriesWithProducts));
+            return back()->with('error', 'Tidak dapat menghapus kategori yang memiliki produk: ' . implode(', ', $categoriesWithProducts));
         }
 
         $deletedCount = Category::whereIn('id', $categoryIds)->delete();
 
-        return back()->with('success', "Successfully deleted {$deletedCount} categories");
+        return back()->with('success', "Berhasil menghapus {$deletedCount} kategori");
     }
 }

@@ -70,11 +70,11 @@
                                 <i class="fas fa-exclamation-triangle text-yellow-600"></i>
                             </div>
                             <div class="ml-3">
-                                <h3 class="text-sm font-medium text-yellow-800">Important Notice</h3>
+                                <h3 class="text-sm font-medium text-yellow-800">Pemberitahuan Penting</h3>
                                 <div class="mt-2 text-sm text-yellow-700">
-                                    <p>This category contains {{ $category->products()->count() }} products.
-                                        Changing the category name will affect how these products are categorized and
-                                        displayed.</p>
+                                    <p>Kategori ini berisi {{ $category->products()->count() }} produk.
+                                        Mengubah nama kategori akan mempengaruhi cara produk dikategorikan dan
+                                        ditampilkan.</p>
                                 </div>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
 
                     <!-- Category Statistics -->
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-6">
-                        <h3 class="text-sm font-medium text-gray-900 mb-3">Category Statistics</h3>
+                        <h3 class="text-sm font-medium text-gray-900 mb-3">Statistik Kategori</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-blue-600">{{ $category->products()->count() }}</div>

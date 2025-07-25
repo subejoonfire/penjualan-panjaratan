@@ -51,7 +51,7 @@
                         </a>
                         <a href="{{ route('admin.categories.index') }}"
                             class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                            <i class="fas fa-list mr-2"></i>Categories
+                            <i class="fas fa-list mr-2"></i>Kategori
                         </a>
                         <a href="{{ route('admin.orders.index') }}"
                             class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
