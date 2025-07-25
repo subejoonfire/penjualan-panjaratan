@@ -22,7 +22,7 @@
         <!-- Navigation -->
         @auth
             <nav class="bg-white shadow-lg border-b border-gray-200">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
                     <div class="flex justify-between h-16">
                         <!-- Logo & Brand -->
                         <div class="flex items-center">
@@ -186,7 +186,7 @@
 
         <!-- Footer -->
         <footer class="bg-gray-800 text-white">
-            <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="w-full py-8 px-2 sm:px-4 lg:px-6 xl:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Penjualan Panjaratan</h3>
@@ -222,6 +222,42 @@
         }
         .nav-link.active {
             @apply text-blue-600 bg-blue-50;
+        }
+        
+        /* Prevent horizontal scrolling */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Make sure all containers don't exceed viewport width */
+        .container, .w-full {
+            max-width: 100vw;
+            box-sizing: border-box;
+        }
+        
+        /* Responsive table styling */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Ensure images don't break layout */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Better responsive grid spacing */
+        @media (min-width: 1536px) {
+            .grid-gap-responsive {
+                gap: 1rem;
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .grid-gap-responsive {
+                gap: 0.75rem;
+            }
         }
     </style>
 

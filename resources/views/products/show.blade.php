@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
         <nav class="flex mb-8" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -381,7 +381,7 @@
         @if($relatedProducts->count() > 0)
         <div class="mt-12">
             <h3 class="text-xl font-bold text-gray-900 mb-6">Related Products</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
                 @foreach($relatedProducts as $relatedProduct)
                 <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                     <div class="aspect-w-1 aspect-h-1 bg-gray-200">

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
         <nav class="flex mb-8" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -29,7 +29,7 @@
             <p class="mt-2 text-gray-600">{{ $products->total() }} products found</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6">
             <!-- Sidebar Filters -->
             <div class="lg:col-span-1">
                 <div class="bg-white shadow rounded-lg p-6">
@@ -93,9 +93,9 @@
             </div>
 
             <!-- Products Grid -->
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-4 xl:col-span-5 2xl:col-span-6">
                 @if($products->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     @foreach($products as $product)
                     <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="aspect-w-1 aspect-h-1 bg-gray-200">

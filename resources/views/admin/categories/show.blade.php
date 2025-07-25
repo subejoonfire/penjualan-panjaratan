@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
             <!-- Category Information -->
             <div class="lg:col-span-1">
                 <div class="bg-white shadow rounded-lg">
@@ -135,7 +135,7 @@
             </div>
 
             <!-- Products in this Category -->
-            <div class="lg:col-span-2">
+            <div class="xl:col-span-3">
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <div class="flex items-center justify-between">
@@ -153,7 +153,7 @@
 
                     @if($category->products()->count() > 0)
                     <div class="px-6 py-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                             @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as $product)
                             <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <div class="flex items-center space-x-4">
