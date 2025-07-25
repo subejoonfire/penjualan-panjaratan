@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Product Management - Admin Dashboard')
+@section('title', 'Manajemen Produk - Admin Dashboard')
 
 @section('content')
 <div class="py-6">
@@ -9,12 +9,12 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Product Management</h1>
-                    <p class="mt-2 text-gray-600">Manage all products in the system</p>
+                    <h1 class="text-3xl font-bold text-gray-900">Manajemen Produk</h1>
+                    <p class="mt-2 text-gray-600">Kelola semua produk di sistem</p>
                 </div>
                 <a href="{{ route('admin.categories.index') }}" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
                     <i class="fas fa-list mr-2"></i>
-                    Manage Categories
+                    Kelola Kategori
                 </a>
             </div>
         </div>
@@ -24,15 +24,15 @@
             <div class="p-6">
                 <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-wrap gap-4">
                     <div class="flex-1 min-w-64">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Produk</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                               placeholder="Search by product name..."
+                               placeholder="Cari berdasarkan nama produk..."
                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="min-w-48">
-                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
                         <select name="category" id="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">All Categories</option>
+                            <option value="">Semua Kategori</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                     {{ $category->categoryname }}
@@ -43,9 +43,9 @@
                     <div class="min-w-48">
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">All Status</option>
-                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="">Semua Status</option>
+                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
                         </select>
                     </div>
                     <div class="flex items-end">
@@ -54,7 +54,7 @@
                         </button>
                         @if(request()->hasAny(['search', 'category', 'status']))
                             <a href="{{ route('admin.products.index') }}" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                                Clear
+                                Bersihkan
                             </a>
                         @endif
                     </div>
@@ -74,7 +74,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Products</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Produk</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $products->total() }}</dd>
                             </dl>
                         </div>
@@ -92,7 +92,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Active Products</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Produk Aktif</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $products->where('is_active', true)->count() }}</dd>
                             </dl>
                         </div>
@@ -110,7 +110,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Inactive Products</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Produk Tidak Aktif</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $products->where('is_active', false)->count() }}</dd>
                             </dl>
                         </div>
@@ -128,7 +128,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Low Stock</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Stok Rendah</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $products->where('stock', '<', 10)->count() }}</dd>
                             </dl>
                         </div>
@@ -143,14 +143,14 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penjual</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dibuat</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -199,7 +199,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $product->is_active ? 'Active' : 'Inactive' }}
+                                        {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
