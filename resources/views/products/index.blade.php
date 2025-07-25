@@ -122,9 +122,13 @@
                         <div class="aspect-w-1 aspect-h-1 relative">
                             <a href="{{ route('products.show', $product) }}">
                                 @if($product->primaryImage)
-                                <img src="{{ url($product->primaryImage->image) }}" alt="{{ $product->productname }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                                <img src="{{ url('storage/'.$product->primaryImage->image) }}"
+                                    alt="{{ $product->productname }}"
+                                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                                 @elseif($product->images->count() > 0)
-                                <img src="{{ url($product->images->first()->image) }}" alt="{{ $product->productname }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                                <img src="{{ url('storage/'.$product->images->first()->image) }}"
+                                    alt="{{ $product->productname }}"
+                                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                                 @else
                                 <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                                     <i class="fas fa-image text-gray-400 text-3xl"></i>
