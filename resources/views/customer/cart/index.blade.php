@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Shopping Cart - Penjualan Panjaratan')
+@section('title', 'Keranjang Belanja')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Keranjang</h1>
             <p class="mt-2 text-gray-600">Review your items before checkout</p>
         </div>
 
@@ -180,7 +180,7 @@
                             @else
                                 <a href="{{ route('customer.checkout') }}" 
                                    class="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-700 text-center block">
-                                    Proceed to Checkout
+                                    Pembayaran
                                 </a>
                             @endif
                         </div>

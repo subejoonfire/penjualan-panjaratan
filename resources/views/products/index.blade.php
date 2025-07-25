@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Browse Products - Penjualan Panjaratan')
+@section('title', 'Daftar Produk')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Browse Products</h1>
-            <p class="mt-2 text-gray-600">Discover amazing products from our sellers</p>
+            <h1 class="text-3xl font-bold text-gray-900">Produk</h1>
+            <p class="mt-2 text-gray-600">Temukan produk menarik dari penjual kami</p>
         </div>
 
         <div class="lg:grid lg:grid-cols-4 lg:gap-8">
@@ -30,7 +30,7 @@
                         <div>
                             <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
                             <select name="category" id="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">All Categories</option>
+                                <option value="">Semua Kategori</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                         {{ $category->categoryname }} ({{ $category->products_count }})

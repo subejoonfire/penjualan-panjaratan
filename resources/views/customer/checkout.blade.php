@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Checkout - Penjualan Panjaratan')
+@section('title', 'Pembayaran')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Pembayaran</h1>
             <p class="mt-2 text-gray-600">Review your order and complete your purchase</p>
         </div>
 
@@ -172,7 +172,7 @@
             <!-- Order Summary -->
             <div class="lg:col-span-1">
                 <div class="bg-white shadow rounded-lg p-6 sticky top-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Order Summary</h3>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Ringkasan Pesanan</h3>
                     
                     <div class="space-y-3">
                         <div class="flex justify-between">

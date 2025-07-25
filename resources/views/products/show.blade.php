@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->productname . ' - Penjualan Panjaratan')
+@section('title', 'Detail Produk')
 
 @section('content')
 <div class="py-6">
@@ -69,7 +69,7 @@
             <div class="space-y-6">
                 <!-- Title and Price -->
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $product->productname }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">Detail Produk</h1>
                     <div class="mt-4 flex items-center justify-between">
                         <div>
                             <p class="text-3xl font-bold text-blue-600">Rp {{ number_format($product->price) }}</p>
@@ -154,7 +154,7 @@
                             <button type="submit" 
                                     class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
                                 <i class="fas fa-shopping-cart mr-2"></i>
-                                Add to Cart
+                                Tambah ke Keranjang
                             </button>
                         </form>
                     </div>

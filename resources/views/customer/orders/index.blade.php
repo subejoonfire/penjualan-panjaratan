@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'My Orders - Penjualan Panjaratan')
+@section('title', 'Pesanan Saya')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">My Orders</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Pesanan Saya</h1>
             <p class="mt-2 text-gray-600">Track and manage your orders</p>
         </div>
 

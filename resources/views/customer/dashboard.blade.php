@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Customer Dashboard - Penjualan Panjaratan')
+@section('title', 'Dasbor Pelanggan')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Dasbor</h1>
             <p class="mt-2 text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ?? auth()->user()->username }}!</p>
         </div>
 
@@ -141,7 +141,7 @@
         <div class="bg-white shadow rounded-lg mb-8">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-medium text-gray-900">Recent Orders</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Pesanan Terbaru</h3>
                     <a href="{{ route('customer.orders.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">
                         View all
                     </a>
