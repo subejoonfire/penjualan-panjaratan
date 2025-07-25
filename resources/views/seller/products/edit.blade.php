@@ -12,7 +12,8 @@
                     <h1 class="text-3xl font-bold text-gray-900">Edit Product</h1>
                     <p class="mt-2 text-gray-600">Update your product information</p>
                 </div>
-                <a href="{{ route('seller.products.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="{{ route('seller.products.index') }}"
+                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Back to Products
                 </a>
@@ -24,20 +25,19 @@
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-16 w-16">
                     @if($product->images->count() > 0)
-                        <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}" 
-                             alt="{{ $product->productname }}" 
-                             class="h-16 w-16 rounded-lg object-cover">
+                    <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                        alt="{{ $product->productname }}" class="h-16 w-16 rounded-lg object-cover">
                     @else
-                        <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
-                            <i class="fas fa-image text-gray-400 text-xl"></i>
-                        </div>
+                    <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-image text-gray-400 text-xl"></i>
+                    </div>
                     @endif
                 </div>
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-blue-900">{{ $product->productname }}</h3>
                     <p class="text-sm text-blue-700">
-                        {{ $product->category->categoryname }} • 
-                        Created {{ $product->created_at->format('M d, Y') }} • 
+                        {{ $product->category->categoryname }} •
+                        Created {{ $product->created_at->format('M d, Y') }} •
                         {{ $product->images->count() }} images
                     </p>
                     <div class="mt-1 flex items-center space-x-2">
@@ -51,7 +51,8 @@
             </div>
         </div>
 
-        <form action="{{ route('seller.products.update', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+        <form action="{{ route('seller.products.update', $product) }}" method="POST" enctype="multipart/form-data"
+            class="space-y-8">
             @csrf
             @method('PUT')
 
@@ -66,12 +67,11 @@
                         <label for="productname" class="block text-sm font-medium text-gray-700 mb-2">
                             Product Name <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="productname" id="productname" 
-                               value="{{ old('productname', $product->productname) }}" required
-                               class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                        <input type="text" name="productname" id="productname"
+                            value="{{ old('productname', $product->productname) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                       @error('productname') border-red-300 @enderror">
                         @error('productname')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -80,19 +80,18 @@
                         <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">
                             Category <span class="text-red-500">*</span>
                         </label>
-                        <select name="category_id" id="category_id" required
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                        <select name="category_id" id="category_id" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                        @error('category_id') border-red-300 @enderror">
                             <option value="">Select Category</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" 
-                                        {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                    {{ $category->categoryname }}
-                                </option>
+                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) ==
+                                $category->id ? 'selected' : '' }}>
+                                {{ $category->categoryname }}
+                            </option>
                             @endforeach
                         </select>
                         @error('category_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -101,12 +100,11 @@
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                             Product Description <span class="text-red-500">*</span>
                         </label>
-                        <textarea name="description" id="description" rows="4" required
-                                  class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                        <textarea name="description" id="description" rows="4" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                          @error('description') border-red-300 @enderror"
-                                  placeholder="Describe your product...">{{ old('description', $product->description) }}</textarea>
+                            placeholder="Describe your product...">{{ old('description', $product->description) }}</textarea>
                         @error('description')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -124,13 +122,11 @@
                             <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
                                 Price (Rp) <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="price" id="price" min="0" step="1000" 
-                                   value="{{ old('price', $product->price) }}" required
-                                   class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                          @error('price') border-red-300 @enderror"
-                                   placeholder="0">
-                            @error('price')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <input type="number" name="price" id="price" min="0" step="1000"
+                                value="{{ old('productprice', $product->price) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                          @error('productprice') border-red-300 @enderror" placeholder="0">
+                            @error('productprice')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -139,13 +135,11 @@
                             <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">
                                 Stock Quantity <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="stock" id="stock" min="0" 
-                                   value="{{ old('stock', $product->stock) }}" required
-                                   class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                          @error('stock') border-red-300 @enderror"
-                                   placeholder="0">
+                            <input type="number" name="stock" id="stock" min="0"
+                                value="{{ old('stock', $product->stock) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                          @error('stock') border-red-300 @enderror" placeholder="0">
                             @error('stock')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
@@ -155,15 +149,15 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Product Status</label>
                         <div class="flex items-center space-x-6">
                             <label class="flex items-center">
-                                <input type="radio" name="is_active" value="1" 
-                                       {{ old('is_active', $product->is_active) == 1 ? 'checked' : '' }}
-                                       class="border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input type="radio" name="is_active" value="1" {{ old('is_active', $product->is_active)
+                                == 1 ? 'checked' : '' }}
+                                class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Active</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="is_active" value="0" 
-                                       {{ old('is_active', $product->is_active) == 0 ? 'checked' : '' }}
-                                       class="border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input type="radio" name="is_active" value="0" {{ old('is_active', $product->is_active)
+                                == 0 ? 'checked' : '' }}
+                                class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Inactive</span>
                             </label>
                         </div>
@@ -184,17 +178,17 @@
                 <div class="px-6 py-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         @foreach($product->images as $image)
-                            <div class="relative group">
-                                <img src="{{ asset('storage/' . $image->imageurl) }}" 
-                                     alt="Product Image" 
-                                     class="w-full h-32 object-cover rounded-lg border border-gray-200">
-                                <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button type="button" onclick="deleteImage({{ $image->id }})" 
-                                            class="text-white hover:text-red-300">
-                                        <i class="fas fa-trash text-lg"></i>
-                                    </button>
-                                </div>
+                        <div class="relative group">
+                            <img src="{{ asset('storage/' . $image->imageurl) }}" alt="Product Image"
+                                class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                            <div
+                                class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button type="button" onclick="deleteImage({{ $image->id }})"
+                                    class="text-white hover:text-red-300">
+                                    <i class="fas fa-trash text-lg"></i>
+                                </button>
                             </div>
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -212,11 +206,10 @@
                         <label for="images" class="block text-sm font-medium text-gray-700 mb-2">
                             Product Images
                         </label>
-                        <input type="file" name="images[]" id="images" multiple accept="image/*"
-                               class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                        <input type="file" name="images[]" id="images" multiple accept="image/*" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                       @error('images') border-red-300 @enderror">
                         @error('images')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-sm text-gray-500">
                             Select multiple images (JPG, PNG, max 2MB each)
@@ -231,19 +224,18 @@
             <!-- Form Actions -->
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('products.show', $product) }}" 
-                       class="text-blue-600 hover:text-blue-800 text-sm">
+                    <a href="{{ route('products.show', $product) }}" class="text-blue-600 hover:text-blue-800 text-sm">
                         <i class="fas fa-eye mr-1"></i>
                         Preview Product
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('seller.products.index') }}" 
-                       class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    <a href="{{ route('seller.products.index') }}"
+                        class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
                         Cancel
                     </a>
-                    <button type="submit" 
-                            class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <i class="fas fa-save mr-2"></i>
                         Update Product
                     </button>
@@ -254,7 +246,7 @@
 </div>
 
 <script>
-document.getElementById('images').addEventListener('change', function(e) {
+    document.getElementById('images').addEventListener('change', function(e) {
     const preview = document.getElementById('imagePreview');
     const files = e.target.files;
 

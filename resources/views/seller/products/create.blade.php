@@ -12,16 +12,18 @@
                     <h1 class="text-3xl font-bold text-gray-900">Add New Product</h1>
                     <p class="mt-2 text-gray-600">Create a new product listing for your store</p>
                 </div>
-                <a href="{{ route('seller.products.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                <a href="{{ route('seller.products.index') }}"
+                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Back to Products
                 </a>
             </div>
         </div>
 
-        <form action="{{ route('seller.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+        <form action="{{ route('seller.products.store') }}" method="POST" enctype="multipart/form-data"
+            class="space-y-8">
             @csrf
-            
+
             <!-- Basic Information -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -34,10 +36,10 @@
                             Product Name <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="productname" id="productname" value="{{ old('productname') }}" required
-                               class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                               placeholder="Enter product name">
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="Enter product name">
                         @error('productname')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -47,16 +49,17 @@
                             Category <span class="text-red-500">*</span>
                         </label>
                         <select name="idcategories" id="idcategories" required
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Select a category</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('idcategories') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->categoryname }}
-                                </option>
+                            <option value="{{ $category->id }}" {{ old('idcategories')==$category->id ? 'selected' : ''
+                                }}>
+                                {{ $category->categoryname }}
+                            </option>
                             @endforeach
                         </select>
                         @error('idcategories')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -66,10 +69,10 @@
                             Description <span class="text-red-500">*</span>
                         </label>
                         <textarea name="description" id="description" rows="4" required
-                                  class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                  placeholder="Describe your product in detail...">{{ old('description') }}</textarea>
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="Describe your product in detail...">{{ old('description') }}</textarea>
                         @error('description')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -91,12 +94,13 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-gray-500 sm:text-sm">Rp</span>
                                 </div>
-                                <input type="number" name="price" id="price" value="{{ old('price') }}" required min="0" step="0.01"
-                                       class="w-full pl-12 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                       placeholder="0.00">
+                                <input type="number" name="price" id="price" value="{{ old('productprice') }}" required
+                                    min="0" step="0.01"
+                                    class="w-full pl-12 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    placeholder="0.00">
                             </div>
-                            @error('price')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @error('productprice')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -106,10 +110,10 @@
                                 Stock Quantity <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="stock" id="stock" value="{{ old('stock') }}" required min="0"
-                                   class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   placeholder="0">
+                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="0">
                             @error('stock')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
@@ -120,45 +124,48 @@
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Product Images</h3>
-                    <p class="mt-1 text-sm text-gray-600">Upload product images to showcase your product. First image will be the primary image.</p>
+                    <p class="mt-1 text-sm text-gray-600">Upload product images to showcase your product. First image
+                        will be the primary image.</p>
                 </div>
                 <div class="p-6">
                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
                         <div class="text-center">
                             <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
                             <div class="flex text-sm text-gray-600">
-                                <label for="images" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                <label for="images"
+                                    class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Upload images</span>
-                                    <input id="images" name="images[]" type="file" class="sr-only" multiple accept="image/*">
+                                    <input id="images" name="images[]" type="file" class="sr-only" multiple
+                                        accept="image/*">
                                 </label>
                                 <p class="pl-1">or drag and drop</p>
                             </div>
                             <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB each</p>
                         </div>
                     </div>
-                    
+
                     <!-- Image Preview -->
                     <div id="imagePreview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 hidden">
                         <!-- Images will be previewed here -->
                     </div>
-                    
+
                     @error('images')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                     @error('images.*')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
 
             <!-- Form Actions -->
             <div class="flex items-center justify-end space-x-4">
-                <a href="{{ route('seller.products.index') }}" 
-                   class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <a href="{{ route('seller.products.index') }}"
+                    class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
                     Cancel
                 </a>
-                <button type="submit" 
-                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit"
+                    class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <i class="fas fa-save mr-2"></i>
                     Create Product
                 </button>
@@ -168,7 +175,7 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('images');
     const imagePreview = document.getElementById('imagePreview');
     
@@ -200,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Price formatting
-    const priceInput = document.getElementById('price');
+    const priceInput = document.getElementById('productprice');
     priceInput.addEventListener('input', function(e) {
         let value = e.target.value;
         // Remove any non-numeric characters except decimal point

@@ -58,7 +58,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        $category->load(['products' => function($query) {
+        $category->load(['products' => function ($query) {
             $query->with(['seller', 'images'])->latest()->limit(10);
         }]);
 
@@ -67,7 +67,7 @@ class CategoryController extends Controller
             'total_products' => $category->products()->count(),
             'active_products' => $category->products()->where('is_active', true)->count(),
             'total_stock' => $category->products()->sum('stock'),
-            'avg_price' => $category->products()->avg('price'),
+            'avg_price' => $category->products()->avg('productprice'),
         ];
 
         return view('admin.categories.show', compact('category', 'stats'));
@@ -126,7 +126,7 @@ class CategoryController extends Controller
             ->withCount('products')
             ->orderBy('products_count', 'desc')
             ->get()
-            ->map(function($category) {
+            ->map(function ($category) {
                 return [
                     'name' => $category->categoryname,
                     'products_count' => $category->products_count,
@@ -147,7 +147,7 @@ class CategoryController extends Controller
         ]);
 
         $categoryIds = $request->category_ids;
-        
+
         // Check if any category has products
         $categoriesWithProducts = Category::whereIn('id', $categoryIds)
             ->has('products')

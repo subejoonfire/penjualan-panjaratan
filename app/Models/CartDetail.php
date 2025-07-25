@@ -19,14 +19,14 @@ class CartDetail extends Model
         'idcart',
         'idproduct',
         'quantity',
-        'price',
+        'productprice',
     ];
 
     /**
      * The attributes that should be cast.
      */
     protected $casts = [
-        'price' => 'decimal:2',
+        'productprice' => 'decimal:2',
     ];
 
     // Relasi ke Cart (Many to One)

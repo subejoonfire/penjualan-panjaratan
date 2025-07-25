@@ -28,23 +28,21 @@ class ProductController extends Controller
         if ($request->filled('category')) {
             $query->where('idcategories', $request->category);
         }
-
         // Filter by price range
         if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+            $query->where('productprice', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+            $query->where('productprice', '<=', $request->max_price);
         }
-
         // Sort products
         $sortBy = $request->get('sort', 'latest');
         switch ($sortBy) {
             case 'price_low':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('productprice', 'asc');
                 break;
             case 'price_high':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('productprice', 'desc');
                 break;
             case 'name':
                 $query->orderBy('productname', 'asc');
@@ -66,12 +64,11 @@ class ProductController extends Controller
         // Get price range for filters
         $priceRange = Product::where('is_active', true)
             ->where('stock', '>', 0)
-            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();
-
         return view('products.index', compact(
-            'products', 
-            'categories', 
+            'products',
+            'categories',
             'priceRange',
             'sortBy'
         ));
@@ -122,10 +119,10 @@ class ProductController extends Controller
         $canReview = false;
         if (auth()->check() && auth()->user()->isCustomer()) {
             $hasPurchased = auth()->user()->carts()
-                ->whereHas('order.transaction', function($query) {
+                ->whereHas('order.transaction', function ($query) {
                     $query->where('transactionstatus', 'paid');
                 })
-                ->whereHas('cartDetails', function($query) use ($product) {
+                ->whereHas('cartDetails', function ($query) use ($product) {
                     $query->where('idproduct', $product->id);
                 })
                 ->exists();
@@ -164,20 +161,20 @@ class ProductController extends Controller
 
         // Filter by price range
         if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+            $query->where('productprice', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+            $query->where('productprice', '<=', $request->max_price);
         }
 
         // Sort products
         $sortBy = $request->get('sort', 'latest');
         switch ($sortBy) {
             case 'price_low':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('productprice', 'asc');
                 break;
             case 'price_high':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('productprice', 'desc');
                 break;
             case 'name':
                 $query->orderBy('productname', 'asc');
@@ -200,7 +197,7 @@ class ProductController extends Controller
         $priceRange = $category->products()
             ->where('is_active', true)
             ->where('stock', '>', 0)
-            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();
 
         return view('products.category', compact(
@@ -218,7 +215,7 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $searchTerm = $request->get('q', '');
-        
+
         if (empty($searchTerm)) {
             return redirect()->route('products.index');
         }
@@ -228,9 +225,9 @@ class ProductController extends Controller
             ->where('stock', '>', 0);
 
         // Search in product name and description
-        $query->where(function($q) use ($searchTerm) {
+        $query->where(function ($q) use ($searchTerm) {
             $q->where('productname', 'like', '%' . $searchTerm . '%')
-              ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                ->orWhere('description', 'like', '%' . $searchTerm . '%');
         });
 
         // Filter by category
@@ -240,20 +237,20 @@ class ProductController extends Controller
 
         // Filter by price range
         if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+            $query->where('productprice', '>=', $request->min_price);
         }
         if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+            $query->where('productprice', '<=', $request->max_price);
         }
 
         // Sort products
         $sortBy = $request->get('sort', 'relevance');
         switch ($sortBy) {
             case 'price_low':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('productprice', 'asc');
                 break;
             case 'price_high':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('productprice', 'desc');
                 break;
             case 'name':
                 $query->orderBy('productname', 'asc');
@@ -279,11 +276,11 @@ class ProductController extends Controller
         // Get price range for search results
         $priceRange = Product::where('is_active', true)
             ->where('stock', '>', 0)
-            ->where(function($q) use ($searchTerm) {
+            ->where(function ($q) use ($searchTerm) {
                 $q->where('productname', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('description', 'like', '%' . $searchTerm . '%');
             })
-            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();
 
         return view('products.search', compact(
@@ -301,7 +298,7 @@ class ProductController extends Controller
     public function searchSuggestions(Request $request)
     {
         $searchTerm = $request->get('q', '');
-        
+
         if (strlen($searchTerm) < 2) {
             return response()->json([]);
         }
@@ -312,7 +309,7 @@ class ProductController extends Controller
             ->select('id', 'productname')
             ->limit(10)
             ->get()
-            ->map(function($product) {
+            ->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->productname,

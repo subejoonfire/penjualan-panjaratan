@@ -28,41 +28,41 @@ class EcommerceSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('id_ID'); // Menggunakan locale Indonesia
-        
+
         // 1. Seed Users dengan berbagai role
         $this->seedUsers($faker);
-        
+
         // 2. Seed Categories
         $this->seedCategories();
-        
+
         // 3. Seed User Addresses
         $this->seedUserAddresses($faker);
-        
+
         // 4. Seed Products
         $this->seedProducts($faker);
-        
+
         // 5. Seed Product Images
         $this->seedProductImages($faker);
-        
+
         // 6. Seed Product Reviews
         $this->seedProductReviews($faker);
-        
+
         // 7. Seed Carts & Cart Details
         $this->seedCartsAndDetails($faker);
-        
+
         // 8. Seed Orders
         $this->seedOrders($faker);
-        
+
         // 9. Seed Transactions
         $this->seedTransactions($faker);
-        
+
         // 10. Seed Detail Transactions
         $this->seedDetailTransactions($faker);
-        
+
         // 11. Seed Notifications
         $this->seedNotifications($faker);
     }
-    
+
     /**
      * Seed Users dengan role admin, seller, dan customer
      */
@@ -79,7 +79,7 @@ class EcommerceSeeder extends Seeder
             'email_verified_at' => now(),
             'phone_verified_at' => now(),
         ]);
-        
+
         // Seller users
         for ($i = 1; $i <= 5; $i++) {
             User::create([
@@ -93,7 +93,7 @@ class EcommerceSeeder extends Seeder
                 'phone_verified_at' => $faker->boolean(80) ? now() : null,
             ]);
         }
-        
+
         // Customer users
         for ($i = 1; $i <= 20; $i++) {
             User::create([
@@ -108,7 +108,7 @@ class EcommerceSeeder extends Seeder
             ]);
         }
     }
-    
+
     /**
      * Seed Categories produk
      */
@@ -126,23 +126,23 @@ class EcommerceSeeder extends Seeder
             'Makanan & Minuman',
             'Mainan & Hobi'
         ];
-        
+
         foreach ($categories as $category) {
             Category::create(['category' => $category]);
         }
     }
-    
+
     /**
      * Seed User Addresses
      */
     private function seedUserAddresses($faker)
     {
         $users = User::where('role', '!=', 'admin')->get();
-        
+
         foreach ($users as $user) {
             // Setiap user memiliki 1-3 alamat
             $addressCount = $faker->numberBetween(1, 3);
-            
+
             for ($i = 0; $i < $addressCount; $i++) {
                 UserAddress::create([
                     'iduser' => $user->id,
@@ -152,7 +152,7 @@ class EcommerceSeeder extends Seeder
             }
         }
     }
-    
+
     /**
      * Seed Products
      */
@@ -160,7 +160,7 @@ class EcommerceSeeder extends Seeder
     {
         $categories = Category::all();
         $sellers = User::where('role', 'seller')->get();
-        
+
         $productNames = [
             'Smartphone Android Terbaru',
             'Laptop Gaming High Performance',
@@ -178,7 +178,7 @@ class EcommerceSeeder extends Seeder
             'Jam Tangan Smartwatch',
             'Skincare Set Lengkap'
         ];
-        
+
         foreach ($productNames as $index => $productName) {
             // Buat beberapa varian untuk setiap nama produk
             for ($variant = 1; $variant <= 3; $variant++) {
@@ -194,18 +194,18 @@ class EcommerceSeeder extends Seeder
             }
         }
     }
-    
+
     /**
      * Seed Product Images
      */
     private function seedProductImages($faker)
     {
         $products = Product::all();
-        
+
         foreach ($products as $product) {
             // Setiap produk memiliki 1-4 gambar
             $imageCount = $faker->numberBetween(1, 4);
-            
+
             for ($i = 0; $i < $imageCount; $i++) {
                 ProductImage::create([
                     'idproduct' => $product->id,
@@ -215,7 +215,7 @@ class EcommerceSeeder extends Seeder
             }
         }
     }
-    
+
     /**
      * Seed Product Reviews
      */
@@ -223,11 +223,11 @@ class EcommerceSeeder extends Seeder
     {
         $products = Product::all();
         $customers = User::where('role', 'customer')->get();
-        
+
         foreach ($products as $product) {
             // Setiap produk memiliki 0-10 review
             $reviewCount = $faker->numberBetween(0, 10);
-            
+
             for ($i = 0; $i < $reviewCount; $i++) {
                 ProductReview::create([
                     'idproduct' => $product->id,
@@ -238,7 +238,7 @@ class EcommerceSeeder extends Seeder
             }
         }
     }
-    
+
     /**
      * Seed Carts dan Cart Details
      */
@@ -246,43 +246,43 @@ class EcommerceSeeder extends Seeder
     {
         $customers = User::where('role', 'customer')->get();
         $products = Product::where('is_active', true)->get();
-        
+
         foreach ($customers as $customer) {
             // Setiap customer memiliki 1 cart aktif
             $cart = Cart::create([
                 'iduser' => $customer->id,
                 'checkoutstatus' => $faker->randomElement(['active', 'checkout']),
             ]);
-            
+
             // Setiap cart memiliki 1-5 item
             $itemCount = $faker->numberBetween(1, 5);
-            
+
             for ($i = 0; $i < $itemCount; $i++) {
                 $product = $products->random();
-                
+
                 CartDetail::create([
                     'idcart' => $cart->id,
                     'idproduct' => $product->id,
                     'quantity' => $faker->numberBetween(1, 3),
-                    'price' => $product->productprice,
+                    'productprice' => $product->productprice,
                 ]);
             }
         }
     }
-    
+
     /**
      * Seed Orders
      */
     private function seedOrders($faker)
     {
         $carts = Cart::where('checkoutstatus', 'checkout')->get();
-        
+
         foreach ($carts as $cart) {
             $cartDetails = CartDetail::where('idcart', $cart->id)->get();
-            $grandTotal = $cartDetails->sum(function($detail) {
+            $grandTotal = $cartDetails->sum(function ($detail) {
                 return $detail->quantity * $detail->price;
             });
-            
+
             Order::create([
                 'idcart' => $cart->id,
                 'order_number' => 'ORD-' . date('Ymd') . '-' . str_pad($cart->id, 6, '0', STR_PAD_LEFT),
@@ -290,19 +290,19 @@ class EcommerceSeeder extends Seeder
                 'status' => $faker->randomElement(['pending', 'processing', 'shipped', 'delivered']),
                 'shipping_address' => $faker->address,
             ]);
-            
+
             // Update cart status to completed
             $cart->update(['checkoutstatus' => 'completed']);
         }
     }
-    
+
     /**
      * Seed Transactions
      */
     private function seedTransactions($faker)
     {
         $orders = Order::all();
-        
+
         foreach ($orders as $order) {
             Transaction::create([
                 'idorder' => $order->id,
@@ -314,14 +314,14 @@ class EcommerceSeeder extends Seeder
             ]);
         }
     }
-    
+
     /**
      * Seed Detail Transactions
      */
     private function seedDetailTransactions($faker)
     {
         $transactions = Transaction::all();
-        
+
         foreach ($transactions as $transaction) {
             // Detail produk
             DetailTransaction::create([
@@ -330,7 +330,7 @@ class EcommerceSeeder extends Seeder
                 'amount' => $transaction->amount * 0.9, // 90% dari total
                 'type' => 'product',
             ]);
-            
+
             // Detail ongkir
             DetailTransaction::create([
                 'idtransaction' => $transaction->id,
@@ -340,14 +340,14 @@ class EcommerceSeeder extends Seeder
             ]);
         }
     }
-    
+
     /**
      * Seed Notifications
      */
     private function seedNotifications($faker)
     {
         $users = User::where('role', '!=', 'admin')->get();
-        
+
         $notificationTypes = [
             'order' => [
                 'Pesanan Berhasil Dibuat',
@@ -371,15 +371,15 @@ class EcommerceSeeder extends Seeder
                 'Promo Spesial Bulan Ini'
             ]
         ];
-        
+
         foreach ($users as $user) {
             // Setiap user memiliki 3-10 notifikasi
             $notifCount = $faker->numberBetween(3, 10);
-            
+
             for ($i = 0; $i < $notifCount; $i++) {
                 $type = $faker->randomElement(array_keys($notificationTypes));
                 $title = $faker->randomElement($notificationTypes[$type]);
-                
+
                 Notification::create([
                     'iduser' => $user->id,
                     'title' => $title,
