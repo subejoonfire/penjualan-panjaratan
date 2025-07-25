@@ -39,40 +39,40 @@
                                     <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                                 </a>
                                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                                    <i class="fas fa-users mr-2"></i>Users
+                                    <i class="fas fa-users mr-2"></i>Pengguna
                                 </a>
                                 <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                                    <i class="fas fa-box mr-2"></i>Products
+                                    <i class="fas fa-box mr-2"></i>Produk
                                 </a>
                                 <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                                    <i class="fas fa-shopping-cart mr-2"></i>Orders
+                                    <i class="fas fa-shopping-cart mr-2"></i>Pesanan
                                 </a>
                             @elseif(auth()->user()->isSeller())
                                 <a href="{{ route('seller.dashboard') }}" class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                                 </a>
                                 <a href="{{ route('seller.products.index') }}" class="nav-link {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
-                                    <i class="fas fa-box mr-2"></i>My Products
+                                    <i class="fas fa-box mr-2"></i>Produk Saya
                                 </a>
                                 <a href="{{ route('seller.orders.index') }}" class="nav-link {{ request()->routeIs('seller.orders.*') ? 'active' : '' }}">
-                                    <i class="fas fa-shopping-cart mr-2"></i>Orders
+                                    <i class="fas fa-shopping-cart mr-2"></i>Pesanan
                                 </a>
                                 <a href="{{ route('seller.sales') }}" class="nav-link {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
-                                    <i class="fas fa-chart-line mr-2"></i>Sales
+                                    <i class="fas fa-chart-line mr-2"></i>Penjualan
                                 </a>
                             @elseif(auth()->user()->isCustomer())
                                 <a href="{{ route('customer.dashboard') }}" class="nav-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                                 </a>
                                 <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                                    <i class="fas fa-shopping-bag mr-2"></i>Shop
+                                    <i class="fas fa-shopping-bag mr-2"></i>Belanja
                                 </a>
                                 <a href="{{ route('customer.cart.index') }}" class="nav-link {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
-                                    <i class="fas fa-shopping-cart mr-2"></i>Cart
+                                    <i class="fas fa-shopping-cart mr-2"></i>Keranjang
                                     <span class="cart-count bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1">0</span>
                                 </a>
                                 <a href="{{ route('customer.orders.index') }}" class="nav-link {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
-                                    <i class="fas fa-list-alt mr-2"></i>My Orders
+                                    <i class="fas fa-list-alt mr-2"></i>Pesanan Saya
                                 </a>
                             @endif
                         </div>
@@ -89,12 +89,12 @@
                                 <!-- Notification Dropdown -->
                                 <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
                                     <div class="px-4 py-2 border-b">
-                                        <h3 class="text-sm font-medium text-gray-900">Notifications</h3>
+                                        <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
                                     </div>
                                     <div class="max-h-64 overflow-y-auto">
                                         <!-- Notifications will be loaded here -->
                                         <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                            No new notifications
+                                            Tidak ada notifikasi baru
                                         </div>
                                     </div>
                                 </div>
@@ -112,13 +112,13 @@
                                 
                                 <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                                     <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <i class="fas fa-user mr-2"></i>Profile
+                                        <i class="fas fa-user mr-2"></i>Profil
                                     </a>
                                     <div class="border-t border-gray-100"></div>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                            <i class="fas fa-sign-out-alt mr-2"></i>Keluar
                                         </button>
                                     </form>
                                 </div>
@@ -128,7 +128,7 @@
                         <!-- Mobile menu button -->
                         <div class="md:hidden flex items-center">
                             <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-                                <span class="sr-only">Open main menu</span>
+                                <span class="sr-only">Buka menu utama</span>
                                 <i class="fas fa-bars"></i>
                             </button>
                         </div>
@@ -190,21 +190,21 @@
                         <p class="text-gray-300">Platform e-commerce terpercaya untuk kebutuhan belanja online Anda.</p>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                        <h3 class="text-lg font-semibold mb-4">Tautan Cepat</h3>
                         <ul class="space-y-2">
-                            <li><a href="{{ route('products.index') }}" class="text-gray-300 hover:text-white">Products</a></li>
-                            <li><a href="#" class="text-gray-300 hover:text-white">About Us</a></li>
-                            <li><a href="#" class="text-gray-300 hover:text-white">Contact</a></li>
+                            <li><a href="{{ route('products.index') }}" class="text-gray-300 hover:text-white">Produk</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white">Tentang Kami</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white">Kontak</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                        <h3 class="text-lg font-semibold mb-4">Info Kontak</h3>
                         <p class="text-gray-300">Email: info@panjaratan.com</p>
-                        <p class="text-gray-300">Phone: +62 123 456 789</p>
+                        <p class="text-gray-300">Telepon: +62 123 456 789</p>
                     </div>
                 </div>
                 <div class="border-t border-gray-700 mt-8 pt-8 text-center">
-                    <p class="text-gray-300">&copy; {{ date('Y') }} Penjualan Panjaratan. All rights reserved.</p>
+                    <p class="text-gray-300">&copy; {{ date('Y') }} Penjualan Panjaratan. Semua hak dilindungi.</p>
                 </div>
             </div>
         </footer>

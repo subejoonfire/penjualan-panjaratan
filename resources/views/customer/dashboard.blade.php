@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Customer Dashboard - Penjualan Panjaratan')
+@section('title', 'Dashboard Pembeli - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
@@ -24,7 +24,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Orders</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
                             </dl>
                         </div>
@@ -43,7 +43,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Spent</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pengeluaran</dt>
                                 <dd class="text-lg font-medium text-gray-900">Rp {{ number_format($totalSpent) }}</dd>
                             </dl>
                         </div>
@@ -62,7 +62,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Pending Orders</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Pesanan Menunggu</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($pendingOrders) }}</dd>
                             </dl>
                         </div>
@@ -81,7 +81,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Items in Cart</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Item di Keranjang</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($cartItemsCount) }}</dd>
                             </dl>
                         </div>
@@ -90,7 +90,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <a href="{{ route('customer.cart.index') }}" class="font-medium text-purple-600 hover:text-purple-500">
-                            View cart
+                            Lihat keranjang
                         </a>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
         <!-- Quick Actions -->
         <div class="bg-white shadow rounded-lg mb-8">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                <h3 class="text-lg font-medium text-gray-900">Aksi Cepat</h3>
             </div>
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -109,8 +109,8 @@
                             <i class="fas fa-search text-blue-600 text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-blue-600">Browse Products</p>
-                            <p class="text-sm text-gray-500">Discover new items</p>
+                            <p class="text-sm font-medium text-blue-600">Jelajahi Produk</p>
+                            <p class="text-sm text-gray-500">Temukan item baru</p>
                         </div>
                     </a>
                     
@@ -119,8 +119,8 @@
                             <i class="fas fa-list text-green-600 text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-green-600">My Orders</p>
-                            <p class="text-sm text-gray-500">Track your purchases</p>
+                            <p class="text-sm font-medium text-green-600">Pesanan Saya</p>
+                            <p class="text-sm text-gray-500">Lacak pembelian Anda</p>
                         </div>
                     </a>
                     
@@ -129,8 +129,8 @@
                             <i class="fas fa-bell text-purple-600 text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-purple-600">Notifications</p>
-                            <p class="text-sm text-gray-500">{{ $unreadNotifications }} unread</p>
+                            <p class="text-sm font-medium text-purple-600">Notifikasi</p>
+                            <p class="text-sm text-gray-500">{{ $unreadNotifications }} belum dibaca</p>
                         </div>
                     </a>
                 </div>
@@ -141,9 +141,9 @@
         <div class="bg-white shadow rounded-lg mb-8">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-medium text-gray-900">Recent Orders</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Pesanan Terbaru</h3>
                     <a href="{{ route('customer.orders.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                        View all
+                        Lihat semua
                     </a>
                 </div>
             </div>
@@ -161,7 +161,7 @@
                                         </div>
                                         <div class="ml-4">
                                             <p class="text-sm font-medium text-gray-900">{{ $order->order_number }}</p>
-                                            <p class="text-sm text-gray-500">{{ $order->cart->cartDetails->count() }} items • Rp {{ number_format($order->total_amount) }}</p>
+                                            <p class="text-sm text-gray-500">{{ $order->cart->cartDetails->count() }} item • Rp {{ number_format($order->total_amount) }}</p>
                                             <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
                                         </div>
                                     </div>
@@ -186,9 +186,9 @@
                 @else
                     <div class="px-6 py-8 text-center">
                         <i class="fas fa-shopping-bag text-gray-400 text-4xl mb-4"></i>
-                        <p class="text-gray-500">You haven't placed any orders yet</p>
+                        <p class="text-gray-500">Anda belum melakukan pesanan apapun</p>
                         <a href="{{ route('products.index') }}" class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            Start Shopping
+                            Mulai Berbelanja
                         </a>
                     </div>
                 @endif
@@ -199,7 +199,7 @@
         @if($favoriteProducts->count() > 0)
         <div class="bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Your Reviewed Products</h3>
+                <h3 class="text-lg font-medium text-gray-900">Produk yang Pernah Anda Ulas</h3>
             </div>
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -231,7 +231,7 @@
                                     <span class="ml-2 text-xs text-gray-500">({{ $product->reviews->count() }})</span>
                                 </div>
                                 <a href="{{ route('products.show', $product) }}" class="mt-3 block w-full bg-blue-600 text-white text-center py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700">
-                                    View Product
+                                    Lihat Produk
                                 </a>
                             </div>
                         </div>

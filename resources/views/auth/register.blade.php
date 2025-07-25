@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Register - Penjualan Panjaratan')
+@section('title', 'Daftar - Penjualan Panjaratan')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="text-center">
             <h2 class="text-3xl font-extrabold text-gray-900">
-                Create your account
+                Buat Akun Anda
             </h2>
             <p class="mt-2 text-sm text-gray-600">
-                Join Penjualan Panjaratan marketplace
+                Bergabunglah dengan marketplace Penjualan Panjaratan
             </p>
         </div>
     </div>
@@ -23,7 +23,7 @@
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700">
-                        Username
+                        Nama Pengguna
                     </label>
                     <div class="mt-1">
                         <input id="username" name="username" type="text" autocomplete="username" required
@@ -38,7 +38,7 @@
                 <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">
-                        Email address
+                        Alamat Email
                     </label>
                     <div class="mt-1">
                         <input id="email" name="email" type="email" autocomplete="email" required
@@ -53,7 +53,7 @@
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">
-                        Password
+                        Kata Sandi
                     </label>
                     <div class="mt-1">
                         <input id="password" name="password" type="password" autocomplete="new-password" required
@@ -67,7 +67,7 @@
                 <!-- Password Confirmation -->
                 <div>
                     <label for="password_confirmation" class="block text-sm font-medium text-gray-700">
-                        Confirm Password
+                        Konfirmasi Kata Sandi
                     </label>
                     <div class="mt-1">
                         <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
@@ -78,7 +78,7 @@
                 <!-- Role Selection -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">
-                        I want to register as
+                        Saya ingin mendaftar sebagai
                     </label>
                     <div class="mt-2 space-y-2">
                         <div class="flex items-center">
@@ -86,7 +86,7 @@
                                    {{ old('role', 'customer') === 'customer' ? 'checked' : '' }}
                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                             <label for="role_customer" class="ml-3 block text-sm font-medium text-gray-700">
-                                Customer - Buy products from sellers
+                                Pembeli - Membeli produk dari penjual
                             </label>
                         </div>
                         <div class="flex items-center">
@@ -94,7 +94,7 @@
                                    {{ old('role') === 'seller' ? 'checked' : '' }}
                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                             <label for="role_seller" class="ml-3 block text-sm font-medium text-gray-700">
-                                Seller - Sell products to customers
+                                Penjual - Menjual produk kepada pembeli
                             </label>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                 <!-- Phone (Optional) -->
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">
-                        Phone Number <span class="text-gray-400">(Optional)</span>
+                        Nomor Telepon <span class="text-gray-400">(Opsional)</span>
                     </label>
                     <div class="mt-1">
                         <input id="phone" name="phone" type="tel" autocomplete="tel"
@@ -124,10 +124,10 @@
                     <input id="terms" name="terms" type="checkbox" required
                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                     <label for="terms" class="ml-2 block text-sm text-gray-900">
-                        I agree to the 
-                        <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a>
-                        and 
-                        <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                        Saya setuju dengan 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Syarat dan Ketentuan</a>
+                        dan 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Kebijakan Privasi</a>
                     </label>
                 </div>
                 @error('terms')
@@ -138,7 +138,7 @@
                 <div>
                     <button type="submit"
                             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Create Account
+                        Buat Akun
                     </button>
                 </div>
             </form>
@@ -149,14 +149,14 @@
                         <div class="w-full border-t border-gray-300" />
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">Already have an account?</span>
+                        <span class="px-2 bg-white text-gray-500">Sudah punya akun?</span>
                     </div>
                 </div>
 
                 <div class="mt-6">
                     <a href="{{ route('login') }}"
                        class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                        Sign in to your account
+                        Masuk ke akun Anda
                     </a>
                 </div>
             </div>

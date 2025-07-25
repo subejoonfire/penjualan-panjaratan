@@ -1,36 +1,36 @@
 @extends('layouts.app')
 
-@section('title', 'Browse Products - Penjualan Panjaratan')
+@section('title', 'Jelajahi Produk - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Browse Products</h1>
-            <p class="mt-2 text-gray-600">Discover amazing products from our sellers</p>
+            <h1 class="text-3xl font-bold text-gray-900">Jelajahi Produk</h1>
+            <p class="mt-2 text-gray-600">Temukan produk menakjubkan dari para penjual kami</p>
         </div>
 
         <div class="lg:grid lg:grid-cols-4 lg:gap-8">
             <!-- Filters Sidebar -->
             <div class="hidden lg:block">
                 <div class="bg-white shadow rounded-lg p-6 sticky top-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Filters</h3>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Filter</h3>
                     
                     <form method="GET" action="{{ route('products.index') }}" class="space-y-6">
                         <!-- Search -->
                         <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
                             <input type="text" name="search" id="search" value="{{ request('search') }}"
-                                   placeholder="Search products..."
+                                   placeholder="Cari produk..."
                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
 
                         <!-- Categories -->
                         <div>
-                            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
                             <select name="category" id="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">All Categories</option>
+                                <option value="">Semua Kategori</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                         {{ $category->categoryname }} ({{ $category->products_count }})
@@ -42,7 +42,7 @@
                         <!-- Price Range -->
                         @if($priceRange && $priceRange->max_price > 0)
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Rentang Harga</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <input type="number" name="min_price" value="{{ request('min_price') }}"
@@ -51,23 +51,23 @@
                                 </div>
                                 <div>
                                     <input type="number" name="max_price" value="{{ request('max_price') }}"
-                                           placeholder="Max" min="0" max="{{ $priceRange->max_price }}"
+                                           placeholder="Maks" min="0" max="{{ $priceRange->max_price }}"
                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                 </div>
                             </div>
                             <div class="mt-2 text-xs text-gray-500">
-                                Range: Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price) }}
+                                Rentang: Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price) }}
                             </div>
                         </div>
                         @endif
 
                         <div class="pt-4">
                             <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                Apply Filters
+                                Terapkan Filter
                             </button>
                             @if(request()->hasAny(['search', 'category', 'min_price', 'max_price']))
                                 <a href="{{ route('products.index') }}" class="w-full mt-2 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 text-center block">
-                                    Clear Filters
+                                    Hapus Filter
                                 </a>
                             @endif
                         </div>
@@ -83,22 +83,22 @@
                         <div class="flex items-center space-x-4">
                             <span class="text-sm text-gray-700">
                                 @if(request()->hasAny(['search', 'category', 'min_price', 'max_price']))
-                                    {{ $products->total() }} results found
+                                    {{ $products->total() }} hasil ditemukan
                                 @else
-                                    {{ $products->total() }} products
+                                    {{ $products->total() }} produk
                                 @endif
                             </span>
                         </div>
                         
                         <div class="flex items-center space-x-4">
-                            <label for="sort" class="text-sm text-gray-700">Sort by:</label>
+                            <label for="sort" class="text-sm text-gray-700">Urutkan berdasarkan:</label>
                             <select name="sort" id="sort" onchange="updateSort(this.value)" 
                                     class="border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="latest" {{ $sortBy === 'latest' ? 'selected' : '' }}>Latest</option>
-                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                                <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                                <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                                <option value="name" {{ $sortBy === 'name' ? 'selected' : '' }}>Name A-Z</option>
+                                <option value="latest" {{ $sortBy === 'latest' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Paling Populer</option>
+                                <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Harga: Rendah ke Tinggi</option>
+                                <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Harga: Tinggi ke Rendah</option>
+                                <option value="name" {{ $sortBy === 'name' ? 'selected' : '' }}>Nama A-Z</option>
                             </select>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
                                                     <input type="hidden" name="quantity" value="1">
                                                     <button type="submit" 
                                                             class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                            title="Add to Cart">
+                                                            title="Tambah ke Keranjang">
                                                         <i class="fas fa-shopping-cart text-sm"></i>
                                                     </button>
                                                 </form>
@@ -150,11 +150,11 @@
                                     </h3>
                                     
                                     <p class="text-sm text-gray-600 mb-2">{{ $product->category->categoryname }}</p>
-                                    <p class="text-sm text-gray-500 mb-3">by {{ $product->seller->username }}</p>
+                                    <p class="text-sm text-gray-500 mb-3">oleh {{ $product->seller->username }}</p>
                                     
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-lg font-bold text-blue-600">Rp {{ number_format($product->price) }}</span>
-                                        <span class="text-sm text-gray-500">Stock: {{ $product->stock }}</span>
+                                        <span class="text-sm text-gray-500">Stok: {{ $product->stock }}</span>
                                     </div>
 
                                     <!-- Rating & Reviews -->
@@ -176,7 +176,7 @@
                                     <div class="flex space-x-2">
                                         <a href="{{ route('products.show', $product) }}" 
                                            class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200 text-center">
-                                            View Details
+                                            Lihat Detail
                                         </a>
                                         @auth
                                             @if(auth()->user()->isCustomer() && $product->stock > 0)
@@ -185,14 +185,14 @@
                                                     <input type="hidden" name="quantity" value="1">
                                                     <button type="submit" 
                                                             class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 </form>
                                             @endif
                                         @else
                                             <a href="{{ route('login') }}" 
                                                class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center">
-                                                Login to Buy
+                                                Masuk untuk Beli
                                             </a>
                                         @endauth
                                     </div>
@@ -212,19 +212,19 @@
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-6 py-12 text-center">
                             <i class="fas fa-search text-gray-400 text-6xl mb-4"></i>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Products Found</h3>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Produk Ditemukan</h3>
                             <p class="text-gray-600 mb-6">
                                 @if(request()->hasAny(['search', 'category', 'min_price', 'max_price']))
-                                    No products match your search criteria. Try adjusting your filters.
+                                    Tidak ada produk yang sesuai dengan kriteria pencarian Anda. Coba sesuaikan filter Anda.
                                 @else
-                                    No products are available at the moment.
+                                    Tidak ada produk yang tersedia saat ini.
                                 @endif
                             </p>
                             @if(request()->hasAny(['search', 'category', 'min_price', 'max_price']))
                                 <a href="{{ route('products.index') }}" 
                                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                                     <i class="fas fa-refresh mr-2"></i>
-                                    Clear Filters
+                                    Hapus Filter
                                 </a>
                             @endif
                         </div>

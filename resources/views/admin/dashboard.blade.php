@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard - Penjualan Panjaratan')
+@section('title', 'Dashboard Admin - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard Admin</h1>
             <p class="mt-2 text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ?? auth()->user()->username }}!</p>
         </div>
 
@@ -24,7 +24,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pengguna</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalUsers) }}</dd>
                             </dl>
                         </div>
@@ -33,9 +33,9 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalCustomers) }}</span>
-                        <span class="text-gray-500"> customers, </span>
+                        <span class="text-gray-500"> pembeli, </span>
                         <span class="text-blue-600 font-medium">{{ number_format($totalSellers) }}</span>
-                        <span class="text-gray-500"> sellers</span>
+                        <span class="text-gray-500"> penjual</span>
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Products</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Produk</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
                             </dl>
                         </div>
@@ -60,7 +60,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalActiveProducts) }}</span>
-                        <span class="text-gray-500"> active products</span>
+                        <span class="text-gray-500"> produk aktif</span>
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Orders</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
                             </dl>
                         </div>
@@ -85,7 +85,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-yellow-600 font-medium">{{ $orderStats['pending'] ?? 0 }}</span>
-                        <span class="text-gray-500"> pending</span>
+                        <span class="text-gray-500"> menunggu</span>
                     </div>
                 </div>
             </div>
@@ -101,7 +101,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
                                 <dd class="text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</dd>
                             </dl>
                         </div>
@@ -110,7 +110,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ $transactionStats['paid'] ?? 0 }}</span>
-                        <span class="text-gray-500"> paid transactions</span>
+                        <span class="text-gray-500"> transaksi berhasil</span>
                     </div>
                 </div>
             </div>
@@ -119,9 +119,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Order Status Chart -->
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Order Status Distribution</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Pesanan</h3>
                 <div class="space-y-3">
-                    @foreach(['pending' => 'Pending', 'processing' => 'Processing', 'shipped' => 'Shipped', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'] as $status => $label)
+                    @foreach(['pending' => 'Menunggu', 'processing' => 'Diproses', 'shipped' => 'Dikirim', 'delivered' => 'Diterima', 'cancelled' => 'Dibatalkan'] as $status => $label)
                         @php $count = $orderStats[$status] ?? 0; @endphp
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-gray-600">{{ $label }}</span>
@@ -138,9 +138,9 @@
 
             <!-- Transaction Status Chart -->
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Transaction Status Distribution</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Transaksi</h3>
                 <div class="space-y-3">
-                    @foreach(['pending' => 'Pending', 'paid' => 'Paid', 'failed' => 'Failed', 'refunded' => 'Refunded'] as $status => $label)
+                    @foreach(['pending' => 'Menunggu', 'paid' => 'Dibayar', 'failed' => 'Gagal', 'refunded' => 'Dikembalikan'] as $status => $label)
                         @php $count = $transactionStats[$status] ?? 0; @endphp
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-gray-600">{{ $label }}</span>
@@ -160,7 +160,7 @@
             <!-- Recent Orders -->
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Recent Orders</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Pesanan Terbaru</h3>
                 </div>
                 <div class="overflow-hidden">
                     <div class="max-h-96 overflow-y-auto">
@@ -187,14 +187,14 @@
                             </div>
                         @empty
                             <div class="px-6 py-4 text-center text-gray-500">
-                                No recent orders
+                                Belum ada pesanan terbaru
                             </div>
                         @endforelse
                     </div>
                 </div>
                 <div class="px-6 py-3 bg-gray-50">
                     <a href="{{ route('admin.orders.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                        View all orders →
+                        Lihat semua pesanan →
                     </a>
                 </div>
             </div>
@@ -202,7 +202,7 @@
             <!-- Top Products -->
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Top Selling Products</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Produk Terlaris</h3>
                 </div>
                 <div class="overflow-hidden">
                     <div class="max-h-96 overflow-y-auto">
@@ -214,21 +214,21 @@
                                         <p class="text-sm text-gray-500">{{ $product->seller->username ?? 'N/A' }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-medium text-gray-900">{{ $product->sold_quantity }} sold</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ $product->sold_quantity }} terjual</p>
                                         <p class="text-sm text-gray-500">{{ $product->formatted_price }}</p>
                                     </div>
                                 </div>
                             </div>
                         @empty
                             <div class="px-6 py-4 text-center text-gray-500">
-                                No sales data available
+                                Belum ada data penjualan
                             </div>
                         @endforelse
                     </div>
                 </div>
                 <div class="px-6 py-3 bg-gray-50">
                     <a href="{{ route('admin.products.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                        View all products →
+                        Lihat semua produk →
                     </a>
                 </div>
             </div>
@@ -237,7 +237,7 @@
         <!-- Category Statistics -->
         <div class="bg-white shadow rounded-lg mb-8">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Categories Overview</h3>
+                <h3 class="text-lg font-medium text-gray-900">Ikhtisar Kategori</h3>
             </div>
             <div class="p-6">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -247,7 +247,7 @@
                                 <i class="fas fa-tag text-white text-lg"></i>
                             </div>
                             <h4 class="text-sm font-medium text-gray-900">{{ $category->category }}</h4>
-                            <p class="text-sm text-gray-500">{{ $category->products_count }} products</p>
+                            <p class="text-sm text-gray-500">{{ $category->products_count }} produk</p>
                         </div>
                     @endforeach
                 </div>
@@ -257,25 +257,25 @@
         <!-- Quick Actions -->
         <div class="bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                <h3 class="text-lg font-medium text-gray-900">Aksi Cepat</h3>
             </div>
             <div class="p-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <a href="{{ route('admin.users.index') }}" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                         <i class="fas fa-users text-blue-600 text-xl mr-3"></i>
-                        <span class="font-medium text-blue-900">Manage Users</span>
+                        <span class="font-medium text-blue-900">Kelola Pengguna</span>
                     </a>
                     <a href="{{ route('admin.products.index') }}" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                         <i class="fas fa-box text-green-600 text-xl mr-3"></i>
-                        <span class="font-medium text-green-900">Manage Products</span>
+                        <span class="font-medium text-green-900">Kelola Produk</span>
                     </a>
                     <a href="{{ route('admin.orders.index') }}" class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
                         <i class="fas fa-shopping-cart text-yellow-600 text-xl mr-3"></i>
-                        <span class="font-medium text-yellow-900">Manage Orders</span>
+                        <span class="font-medium text-yellow-900">Kelola Pesanan</span>
                     </a>
                     <a href="{{ route('admin.transactions.index') }}" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                         <i class="fas fa-credit-card text-purple-600 text-xl mr-3"></i>
-                        <span class="font-medium text-purple-900">View Transactions</span>
+                        <span class="font-medium text-purple-900">Lihat Transaksi</span>
                     </a>
                 </div>
             </div>
