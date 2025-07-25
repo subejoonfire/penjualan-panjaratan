@@ -76,7 +76,7 @@
                                     <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
                                         class="flex items-center space-x-2">
                                         @csrf
-                                        @method('PATCH')
+                                        @method('PUT')
                                         <button type="button" onclick="decreaseQuantity(this)"
                                             class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                             <i class="fas fa-minus text-xs"></i>
