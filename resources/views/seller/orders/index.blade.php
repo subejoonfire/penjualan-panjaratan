@@ -18,28 +18,36 @@
                     <div class="flex-1 min-w-64">
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Orders</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                               placeholder="Search by order number..."
-                               class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            placeholder="Search by order number..."
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="min-w-48">
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <select name="status" id="status"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">All Status</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                            <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Shipped</option>
-                            <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Delivered</option>
-                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Pending
+                            </option>
+                            <option value="confirmed" {{ request('status')==='confirmed' ? 'selected' : '' }}>Confirmed
+                            </option>
+                            <option value="shipped" {{ request('status')==='shipped' ? 'selected' : '' }}>Shipped
+                            </option>
+                            <option value="delivered" {{ request('status')==='delivered' ? 'selected' : '' }}>Delivered
+                            </option>
+                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Cancelled
+                            </option>
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Filter
                         </button>
                         @if(request()->hasAny(['search', 'status']))
-                            <a href="{{ route('seller.orders.index') }}" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                                Clear
-                            </a>
+                        <a href="{{ route('seller.orders.index') }}"
+                            class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                            Clear
+                        </a>
                         @endif
                     </div>
                 </form>
@@ -77,7 +85,8 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'pending')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'pending')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -95,7 +104,8 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Confirmed</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'confirmed')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'confirmed')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -113,7 +123,8 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Delivered</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'delivered')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'delivered')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -147,97 +158,108 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Order</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Products</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($orders as $order)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $order->order_number }}</div>
-                                    <div class="text-sm text-gray-500">ID: {{ $order->id }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8">
-                                            <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                                                <i class="fas fa-user text-gray-600 text-xs"></i>
-                                            </div>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $order->cart->user->username }}</div>
-                                            <div class="text-sm text-gray-500">{{ $order->cart->user->email }}</div>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $order->order_number }}</div>
+                                <div class="text-sm text-gray-500">ID: {{ $order->id }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8">
+                                        <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-600 text-xs"></i>
                                         </div>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">
-                                        @php
-                                            $myProducts = $order->cart->cartDetails->filter(function($item) {
-                                                return $item->product->seller_id === auth()->id();
-                                            });
-                                        @endphp
-                                        {{ $myProducts->count() }} of {{ $order->cart->cartDetails->count() }} products
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $order->cart->user->username
+                                            }}</div>
+                                        <div class="text-sm text-gray-500">{{ $order->cart->user->email }}</div>
                                     </div>
-                                    <div class="text-sm text-gray-500">
-                                        @foreach($myProducts->take(2) as $item)
-                                            {{ $item->product->productname }}@if(!$loop->last), @endif
-                                        @endforeach
-                                        @if($myProducts->count() > 2)
-                                            +{{ $myProducts->count() - 2 }} more
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        Rp {{ number_format($myProducts->sum(function($item) { return $item->quantity * $item->product->price; })) }}
-                                    </div>
-                                    <div class="text-sm text-gray-500">
-                                        {{ $myProducts->sum('quantity') }} items
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">
+                                    @php
+                                    $myProducts = $order->cart->cartDetails->filter(function($item) {
+                                    return $item->product->seller_id === auth()->id();
+                                    });
+                                    @endphp
+                                    {{ $myProducts->count() }} of {{ $order->cart->cartDetails->count() }} products
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    @foreach($myProducts->take(2) as $item)
+                                    {{ $item->product->productname }}@if(!$loop->last), @endif
+                                    @endforeach
+                                    @if($myProducts->count() > 2)
+                                    +{{ $myProducts->count() - 2 }} more
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">
+                                    Rp {{ number_format($myProducts->sum(function($item) { return $item->quantity *
+                                    $item->product->productprice; })) }}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    {{ $myProducts->sum('quantity') }} items
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($order->status === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
                                         @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
                                         @elseif($order->status === 'delivered') bg-green-100 text-green-800
                                         @elseif($order->status === 'cancelled') bg-red-100 text-red-800
                                         @endif">
-                                        {{ ucfirst($order->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $order->created_at->format('d M Y') }}
-                                    <div class="text-xs text-gray-400">{{ $order->created_at->format('H:i') }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <button onclick="viewOrderDetails('{{ $order->id }}')" class="text-blue-600 hover:text-blue-900">
-                                            View
-                                        </button>
-                                        @if(in_array($order->status, ['pending', 'confirmed']))
-                                            <button onclick="updateOrderStatus('{{ $order->id }}')" class="text-green-600 hover:text-green-900">
-                                                Update
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                                    {{ ucfirst($order->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $order->created_at->format('d M Y') }}
+                                <div class="text-xs text-gray-400">{{ $order->created_at->format('H:i') }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button onclick="viewOrderDetails('{{ $order->id }}')"
+                                        class="text-blue-600 hover:text-blue-900">
+                                        View
+                                    </button>
+                                    @if(in_array($order->status, ['pending', 'confirmed']))
+                                    <button onclick="updateOrderStatus('{{ $order->id }}')"
+                                        class="text-green-600 hover:text-green-900">
+                                        Update
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
-                                    <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-4"></i>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
-                                    <p class="text-gray-600">No orders match your filter criteria.</p>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
+                                <p class="text-gray-600">No orders match your filter criteria.</p>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -245,9 +267,9 @@
 
             <!-- Pagination -->
             @if($orders->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200">
-                    {{ $orders->appends(request()->query())->links() }}
-                </div>
+            <div class="px-6 py-4 border-t border-gray-200">
+                {{ $orders->appends(request()->query())->links() }}
+            </div>
             @endif
         </div>
     </div>
@@ -283,7 +305,8 @@
             <form id="statusForm">
                 <div class="mb-4">
                     <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
-                    <select id="newStatus" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select id="newStatus"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="confirmed">Confirmed</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
@@ -291,11 +314,13 @@
                 </div>
                 <div class="mb-4">
                     <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-                    <textarea id="notes" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                              placeholder="Add any notes about this status update..."></textarea>
+                    <textarea id="notes" rows="3"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Add any notes about this status update..."></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeStatusModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
+                    <button type="button" onclick="closeStatusModal()"
+                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
                         Cancel
                     </button>
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
@@ -308,7 +333,7 @@
 </div>
 
 <script>
-let currentOrderId = null;
+    let currentOrderId = null;
 
 function viewOrderDetails(orderId) {
     currentOrderId = orderId;

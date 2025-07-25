@@ -168,7 +168,7 @@
                                 <div class="ml-4">
                                     <p class="text-sm font-medium text-gray-900">{{ $order->order_number }}</p>
                                     <p class="text-sm text-gray-500">{{ $order->cart->cartDetails->count() }} item • Rp
-                                        {{ number_format($order->total_amount) }}</p>
+                                        {{ number_format($order->grandtotal) }}</p>
                                     <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
                                 </div>
                             </div>
@@ -226,7 +226,7 @@
                         </div>
                         <div class="p-4">
                             <h4 class="text-sm font-medium text-gray-900 truncate">{{ $product->productname }}</h4>
-                            <p class="text-sm text-gray-600">Rp {{ number_format($product->price) }}</p>
+                            <p class="text-sm text-gray-600">Rp {{ number_format($product->productprice) }}</p>
                             <div class="mt-2 flex items-center">
                                 @php
                                 $avgRating = $product->reviews->avg('rating');

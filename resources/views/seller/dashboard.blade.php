@@ -192,7 +192,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">Rp {{
-                                        number_format($order->total_amount) }}</p>
+                                        number_format($order->grandtotal) }}</p>
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                                                 @if($order->status === 'pending') bg-yellow-100 text-yellow-800
                                                 @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
@@ -241,13 +241,14 @@
                                     <div class="ml-3">
                                         <p class="text-sm font-medium text-gray-900 truncate">{{
                                             Str::limit($product->productname, 25) }}</p>
-                                        <p class="text-xs text-gray-500">Rp {{ number_format($product->price) }}</p>
+                                        <p class="text-xs text-gray-500">Rp {{ number_format($product->productprice) }}
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">{{ $product->sold_quantity }} terjual
                                     </p>
-                                    <p class="text-xs text-gray-500">{{ $product->stock }} stok</p>
+                                    <p class="text-xs text-gray-500">{{ $product->productstock }} stok</p>
                                 </div>
                             </div>
                         </li>
@@ -289,7 +290,7 @@
                                 <p class="text-sm font-medium text-gray-900">{{ Str::limit($product->productname, 20) }}
                                 </p>
                                 <p class="text-xs text-gray-600">Stok: <span class="font-medium text-red-600">{{
-                                        $product->stock }}</span></p>
+                                        $product->productstock }}</span></p>
                                 <a href="{{ route('seller.products.edit', $product) }}"
                                     class="text-xs text-blue-600 hover:text-blue-500">
                                     Perbarui Stok

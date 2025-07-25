@@ -34,7 +34,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalCustomers) }}</span>
-                        <span class="text-gray-500"> customers, </span>
+                        <span class="text-gray-500"> pelanggan, </span>
                         <span class="text-blue-600 font-medium">{{ number_format($totalSellers) }}</span>
                         <span class="text-gray-500"> penjual</span>
                     </div>
@@ -112,7 +112,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ $transactionStats['paid'] ?? 0 }}</span>
-                        <span class="text-gray-500"> paid transactions</span>
+                        <span class="text-gray-500"> transaksi terbayar</span>
                     </div>
                 </div>
             </div>

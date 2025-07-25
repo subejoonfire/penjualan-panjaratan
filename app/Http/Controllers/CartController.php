@@ -31,7 +31,7 @@ class CartController extends Controller
             ->get();
 
         $total = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->price;
+            return $detail->quantity * $detail->product->productprice;
         });
 
         return view('customer.cart.index', compact('cartDetails', 'total'));
@@ -45,7 +45,7 @@ class CartController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->stock
+            'quantity' => 'required|integer|min:1|max:' . $product->productstock
         ]);
 
         // Check if product is active
@@ -54,7 +54,7 @@ class CartController extends Controller
         }
 
         // Check stock
-        if ($product->stock < $request->quantity) {
+        if ($product->productstock < $request->quantity) {
             return back()->with('error', 'Insufficient stock');
         }
 
@@ -75,7 +75,7 @@ class CartController extends Controller
         if ($existingDetail) {
             $newQuantity = $existingDetail->quantity + $request->quantity;
 
-            if ($newQuantity > $product->stock) {
+            if ($newQuantity > $product->productstock) {
                 return back()->with('error', 'Insufficient stock');
             }
 
@@ -104,11 +104,11 @@ class CartController extends Controller
         }
 
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $cartDetail->product->stock
+            'quantity' => 'required|integer|min:1|max:' . $cartDetail->product->productstock
         ]);
 
         // Check stock
-        if ($cartDetail->product->stock < $request->quantity) {
+        if ($cartDetail->product->productstock < $request->quantity) {
             return back()->with('error', 'Insufficient stock');
         }
 
@@ -165,14 +165,14 @@ class CartController extends Controller
 
         // Check stock for all items
         foreach ($cartDetails as $detail) {
-            if ($detail->product->stock < $detail->quantity) {
+            if ($detail->product->productstock < $detail->quantity) {
                 return redirect()->route('customer.cart.index')
                     ->with('error', 'Insufficient stock for ' . $detail->product->productname);
             }
         }
 
         $subtotal = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->price;
+            return $detail->quantity * $detail->product->productprice;
         });
 
         $shippingCost = 15000; // Fixed shipping cost
@@ -216,13 +216,13 @@ class CartController extends Controller
 
             // Check stock again
             foreach ($cartDetails as $detail) {
-                if ($detail->product->stock < $detail->quantity) {
+                if ($detail->product->productstock < $detail->quantity) {
                     throw new \Exception('Insufficient stock for ' . $detail->product->productname);
                 }
             }
 
             $subtotal = $cartDetails->sum(function ($detail) {
-                return $detail->quantity * $detail->product->price;
+                return $detail->quantity * $detail->product->productprice;
             });
 
             $shippingCost = 15000;
@@ -232,7 +232,7 @@ class CartController extends Controller
             $order = Order::create([
                 'idcart' => $cart->id,
                 'order_number' => 'ORD-' . time() . '-' . $user->id,
-                'total_amount' => $total,
+                'grandtotal' => $total,
                 'shipping_address' => $request->shipping_address,
                 'status' => 'pending',
                 'notes' => $request->notes
@@ -252,7 +252,7 @@ class CartController extends Controller
 
             // Update product stock
             foreach ($cartDetails as $detail) {
-                $detail->product->decrement('stock', $detail->quantity);
+                $detail->product->decrement('productstock', $detail->quantity);
             }
 
             // Create notification
@@ -310,9 +310,9 @@ class CartController extends Controller
                     'id' => $detail->id,
                     'product_name' => $detail->product->productname,
                     'product_image' => $detail->product->images->first()?->imageurl,
-                    'productprice' => $detail->product->price,
+                    'productprice' => $detail->product->productprice,
                     'quantity' => $detail->quantity,
-                    'subtotal' => $detail->quantity * $detail->product->price
+                    'subtotal' => $detail->quantity * $detail->product->productprice
                 ];
             });
 

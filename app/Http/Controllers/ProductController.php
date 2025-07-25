@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         $query = Product::with(['category', 'images', 'seller'])
             ->where('is_active', true)
-            ->where('stock', '>', 0);
+            ->where('productstock', '>', 0);
 
         // Search by product name
         if ($request->filled('search')) {
@@ -63,7 +63,7 @@ class ProductController extends Controller
 
         // Get price range for filters
         $priceRange = Product::where('is_active', true)
-            ->where('stock', '>', 0)
+            ->where('productstock', '>', 0)
             ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();
         return view('products.index', compact(
@@ -95,7 +95,7 @@ class ProductController extends Controller
         $relatedProducts = Product::where('idcategories', $product->idcategories)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
-            ->where('stock', '>', 0)
+            ->where('productstock', '>', 0)
             ->with(['images'])
             ->limit(4)
             ->get();
@@ -152,7 +152,7 @@ class ProductController extends Controller
         $query = $category->products()
             ->with(['images', 'seller'])
             ->where('is_active', true)
-            ->where('stock', '>', 0);
+            ->where('productstock', '>', 0);
 
         // Search within category
         if ($request->filled('search')) {
@@ -196,7 +196,7 @@ class ProductController extends Controller
         // Get price range for this category
         $priceRange = $category->products()
             ->where('is_active', true)
-            ->where('stock', '>', 0)
+            ->where('productstock', '>', 0)
             ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();
 
@@ -222,12 +222,12 @@ class ProductController extends Controller
 
         $query = Product::with(['category', 'images', 'seller'])
             ->where('is_active', true)
-            ->where('stock', '>', 0);
+            ->where('productstock', '>', 0);
 
         // Search in product name and description
         $query->where(function ($q) use ($searchTerm) {
             $q->where('productname', 'like', '%' . $searchTerm . '%')
-                ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                ->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
         });
 
         // Filter by category
@@ -275,10 +275,10 @@ class ProductController extends Controller
 
         // Get price range for search results
         $priceRange = Product::where('is_active', true)
-            ->where('stock', '>', 0)
+            ->where('productstock', '>', 0)
             ->where(function ($q) use ($searchTerm) {
                 $q->where('productname', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
             })
             ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();
@@ -304,7 +304,7 @@ class ProductController extends Controller
         }
 
         $suggestions = Product::where('is_active', true)
-            ->where('stock', '>', 0)
+            ->where('productstock', '>', 0)
             ->where('productname', 'like', '%' . $searchTerm . '%')
             ->select('id', 'productname')
             ->limit(10)

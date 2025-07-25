@@ -139,6 +139,17 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
 
 /*
 |--------------------------------------------------------------------------
+| Order Routes (Authenticated users)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::resource('orders', OrderController::class);
+    Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
+    Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Public Routes (No authentication required)
 |--------------------------------------------------------------------------
 */

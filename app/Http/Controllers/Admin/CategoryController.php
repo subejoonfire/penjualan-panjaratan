@@ -18,10 +18,10 @@ class CategoryController extends Controller
 
         // Search by category name
         if ($request->filled('search')) {
-            $query->where('categoryname', 'like', '%' . $request->search . '%');
+            $query->where('category', 'like', '%' . $request->search . '%');
         }
 
-        $categories = $query->orderBy('categoryname', 'asc')->paginate(20);
+        $categories = $query->orderBy('category', 'asc')->paginate(20);
 
         return view('admin.categories.index', compact('categories'));
     }
@@ -40,13 +40,11 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'categoryname' => 'required|string|max:255|unique:categories,categoryname',
-            'description' => 'nullable|string|max:1000',
+            'category' => 'required|string|max:255|unique:categories,category',
         ]);
 
         Category::create([
-            'categoryname' => $request->categoryname,
-            'description' => $request->description,
+            'category' => $request->category,
         ]);
 
         return redirect()->route('admin.categories.index')
@@ -66,7 +64,7 @@ class CategoryController extends Controller
         $stats = [
             'total_products' => $category->products()->count(),
             'active_products' => $category->products()->where('is_active', true)->count(),
-            'total_stock' => $category->products()->sum('stock'),
+            'total_stock' => $category->products()->sum('productstock'),
             'avg_price' => $category->products()->avg('productprice'),
         ];
 
@@ -87,13 +85,11 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $request->validate([
-            'categoryname' => 'required|string|max:255|unique:categories,categoryname,' . $category->id,
-            'description' => 'nullable|string|max:1000',
+            'category' => 'required|string|max:255|unique:categories,category,' . $category->id,
         ]);
 
         $category->update([
-            'categoryname' => $request->categoryname,
-            'description' => $request->description,
+            'category' => $request->category,
         ]);
 
         return redirect()->route('admin.categories.index')
@@ -110,11 +106,11 @@ class CategoryController extends Controller
             return back()->with('error', 'Cannot delete category that has products. Please move or delete products first.');
         }
 
-        $categoryName = $category->categoryname;
+        $category = $category->category;
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', "Category '{$categoryName}' deleted successfully");
+            ->with('success', "Category '{$category}' deleted successfully");
     }
 
     /**
@@ -122,13 +118,13 @@ class CategoryController extends Controller
      */
     public function stats()
     {
-        $stats = Category::select('categoryname')
+        $stats = Category::select('category')
             ->withCount('products')
             ->orderBy('products_count', 'desc')
             ->get()
             ->map(function ($category) {
                 return [
-                    'name' => $category->categoryname,
+                    'name' => $category->category,
                     'products_count' => $category->products_count,
                 ];
             });
@@ -151,7 +147,7 @@ class CategoryController extends Controller
         // Check if any category has products
         $categoriesWithProducts = Category::whereIn('id', $categoryIds)
             ->has('products')
-            ->pluck('categoryname')
+            ->pluck('category')
             ->toArray();
 
         if (count($categoriesWithProducts) > 0) {

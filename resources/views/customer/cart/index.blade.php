@@ -57,15 +57,15 @@
                                         </a>
                                     </h4>
                                     <p class="text-sm text-gray-600">oleh {{ $detail->product->seller->username }}</p>
-                                    <p class="text-sm text-gray-500">{{ $detail->product->category->categoryname }}</p>
+                                    <p class="text-sm text-gray-500">{{ $detail->product->category->category }}</p>
 
                                     <div class="mt-2 flex items-center space-x-4">
                                         <span class="text-lg font-bold text-blue-600">
-                                            Rp {{ number_format($detail->product->price) }}
+                                            Rp {{ number_format($detail->product->productprice) }}
                                         </span>
-                                        @if($detail->product->stock < $detail->quantity)
+                                        @if($detail->product->productstock < $detail->quantity)
                                             <span class="text-sm text-red-600 font-medium">
-                                                Stok tidak mencukupi (Tersedia: {{ $detail->product->stock }})
+                                                Stok tidak mencukupi (Tersedia: {{ $detail->product->productstock }})
                                             </span>
                                             @endif
                                     </div>
@@ -82,7 +82,7 @@
                                             <i class="fas fa-minus text-xs"></i>
                                         </button>
                                         <input type="number" name="quantity" value="{{ $detail->quantity }}" min="1"
-                                            max="{{ $detail->product->stock }}"
+                                            max="{{ $detail->product->productstock }}"
                                             class="w-16 text-center border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500"
                                             onchange="this.form.submit()">
                                         <button type="button" onclick="increaseQuantity(this)"
@@ -95,7 +95,7 @@
                                 <!-- Subtotal -->
                                 <div class="text-right">
                                     <p class="text-lg font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->price) }}
+                                        Rp {{ number_format($detail->quantity * $detail->product->productprice) }}
                                     </p>
                                 </div>
 
@@ -152,7 +152,7 @@
                     <div class="mt-6 space-y-3">
                         @php
                         $hasInsufficientStock = $cartDetails->contains(function($detail) {
-                        return $detail->product->stock < $detail->quantity;
+                        return $detail->product->productstock < $detail->quantity;
                             });
                             @endphp
 
