@@ -146,7 +146,7 @@ class DashboardController extends Controller
 
         $request->validate([
             'productname' => 'required|string|max:255',
-            'description' => 'required|string',
+            'productdescription' => 'required|string',
             'productprice' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
@@ -155,9 +155,9 @@ class DashboardController extends Controller
 
         $product = Product::create([
             'productname' => $request->productname,
-            'description' => $request->description,
-            'productprice' => $request->price,
-            'stock' => $request->stock,
+            'productdescription' => $request->productdescription,
+            'productprice' => $request->productprice,
+            'stock' => $request->productstock,
             'idcategories' => $request->idcategories,
             'iduserseller' => $user->id,
             'is_active' => true
@@ -208,7 +208,7 @@ class DashboardController extends Controller
 
         $request->validate([
             'productname' => 'required|string|max:255',
-            'description' => 'required|string',
+            'productdescription' => 'required|string',
             'productprice' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
@@ -218,9 +218,9 @@ class DashboardController extends Controller
 
         $product->update([
             'productname' => $request->productname,
-            'description' => $request->description,
-            'productprice' => $request->price,
-            'stock' => $request->stock,
+            'productdescription' => $request->productdescription,
+            'productprice' => $request->productprice,
+            'stock' => $request->productstock,
             'idcategories' => $request->idcategories,
             'is_active' => $request->has('is_active')
         ]);

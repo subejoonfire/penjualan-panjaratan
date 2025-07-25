@@ -105,7 +105,7 @@ return new class extends Migration
         Schema::create('detail_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('idtransaction')->constrained('transactions')->onDelete('cascade'); // Relasi ke transactions
-            $table->string('description', 255); // Deskripsi detail
+            $table->string('productdescription', 255); // Deskripsi detail
             $table->decimal('amount', 12, 2); // Jumlah
             $table->enum('type', ['product', 'shipping', 'tax', 'discount'])->default('product'); // Tipe detail
             $table->timestamps();

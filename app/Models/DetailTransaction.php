@@ -17,7 +17,7 @@ class DetailTransaction extends Model
      */
     protected $fillable = [
         'idtransaction',
-        'description',
+        'productdescription',
         'amount',
         'type',
     ];

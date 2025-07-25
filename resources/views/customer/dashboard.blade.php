@@ -226,7 +226,7 @@
                         </div>
                         <div class="p-4">
                             <h4 class="text-sm font-medium text-gray-900 truncate">{{ $product->productname }}</h4>
-                            <p class="text-sm text-gray-600">Rp {{ number_format($product->price) }}</p>
+                            <p class="text-sm text-gray-600">Rp {{ number_format($product->productprice) }}</p>
                             <div class="mt-2 flex items-center">
                                 @php
                                 $avgRating = $product->reviews->avg('rating');

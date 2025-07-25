@@ -44,7 +44,7 @@ class CartDetail extends Model
     // Helper method untuk mendapatkan subtotal
     public function getSubtotalAttribute()
     {
-        return $this->quantity * $this->price;
+        return $this->quantity * $this->productprice;
     }
 
     // Helper method untuk mendapatkan subtotal format rupiah
@@ -56,6 +56,6 @@ class CartDetail extends Model
     // Helper method untuk mendapatkan harga format rupiah
     public function getFormattedPriceAttribute()
     {
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
+        return 'Rp ' . number_format($this->productprice, 0, ',', '.');
     }
 }

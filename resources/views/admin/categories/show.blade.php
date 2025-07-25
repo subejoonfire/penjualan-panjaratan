@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Category Details - ' . $category->categoryname)
+@section('title', 'Category Details - ' . $category->category)
 
 @section('content')
 <div class="py-6">
@@ -9,7 +9,7 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $category->categoryname }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ $category->category }}</h1>
                     <p class="mt-2 text-gray-600">Category details and statistics</p>
                 </div>
                 <div class="flex space-x-3">
@@ -42,7 +42,7 @@
                                 </div>
                             </div>
                             <div class="ml-4">
-                                <h4 class="text-xl font-medium text-gray-900">{{ $category->categoryname }}</h4>
+                                <h4 class="text-xl font-medium text-gray-900">{{ $category->category }}</h4>
                                 <p class="text-sm text-gray-500">Category ID: {{ $category->id }}</p>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Description</dt>
                                 <dd class="mt-1 text-sm text-gray-900">
-                                    {{ $category->description ?: 'No description provided' }}
+                                    {{ $category->productdescription ?: 'No description provided' }}
                                 </dd>
                             </div>
                             <div>
@@ -160,7 +160,8 @@
                     @if($category->products()->count() > 0)
                     <div class="px-6 py-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as $product)
+                            @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as
+                            $product)
                             <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-shrink-0 h-16 w-16">
@@ -183,7 +184,7 @@
                                         <p class="text-sm text-gray-500">by {{ $product->seller->username }}</p>
                                         <div class="mt-1 flex items-center space-x-2">
                                             <span class="text-sm font-medium text-blue-600">Rp {{
-                                                number_format($product->price) }}</span>
+                                                number_format($product->productprice) }}</span>
                                             <span
                                                 class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                                     {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
@@ -191,7 +192,7 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-500 mt-1">
-                                            Stock: {{ $product->stock }} |
+                                            Stock: {{ $product->productstock }} |
                                             Created: {{ $product->created_at->format('M d, Y') }}
                                         </p>
                                     </div>
@@ -236,7 +237,8 @@
                             <div>
                                 <h4 class="text-sm font-medium text-gray-900 mb-3">Top Sellers in this Category</h4>
                                 <div class="space-y-2">
-                                    @foreach($category->products()->with('seller')->get()->groupBy('seller_id')->take(5) as $sellerId => $products)
+                                    @foreach($category->products()->with('seller')->get()->groupBy('seller_id')->take(5)
+                                    as $sellerId => $products)
                                     @php $seller = $products->first()->seller; @endphp
                                     <div class="flex items-center justify-between py-2">
                                         <div class="flex items-center">
