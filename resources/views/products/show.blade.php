@@ -37,12 +37,12 @@
             <div class="space-y-4">
                 @if($product->primaryImage)
                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
-                    <img id="mainImage" src="{{ url($product->primaryImage->image) }}" alt="{{ $product->productname }}"
-                        class="w-full h-96 object-cover">
+                    <img id="mainImage" src="{{ url('storage/'.$product->primaryImage->image) }}"
+                        alt="{{ $product->productname }}" class="w-full h-96 object-cover">
                 </div>
                 @elseif($product->images->count() > 0)
                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
-                    <img id="mainImage" src="{{ $product->images->first()->imageurl }}"
+                    <img id="mainImage" src="{{ url('storage/'.$product->images->first()->imageurl) }}"
                         alt="{{ $product->productname }}" class="w-full h-96 object-cover">
                 </div>
                 @else

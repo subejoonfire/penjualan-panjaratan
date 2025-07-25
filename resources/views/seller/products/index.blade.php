@@ -77,7 +77,8 @@
                 <!-- Product Image -->
                 <div class="aspect-w-1 aspect-h-1 relative">
                     @if($product->primaryImage)
-                    <img src="{{ url($product->primaryImage->image) }}" alt="{{ $product->productname }}" class="w-full h-48 object-cover">
+                    <img src="{{ url('storage/'.$product->primaryImage->image) }}" alt="{{ $product->productname }}"
+                        class="w-full h-48 object-cover">
                     @else
                     <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                         <i class="fas fa-image text-gray-400 text-3xl"></i>
