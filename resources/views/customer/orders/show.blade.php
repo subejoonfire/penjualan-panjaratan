@@ -134,7 +134,7 @@
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0 h-16 w-16">
                                     @if($item->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $item->product->images->first()->imageurl) }}"
+                                    <img src="{{ url('storage/' . $item->product->images->first()->imageurl) }}"
                                         alt="{{ $item->product->productname }}"
                                         class="h-16 w-16 rounded-lg object-cover">
                                     @else

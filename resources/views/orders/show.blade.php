@@ -50,7 +50,7 @@
                         <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                             <div class="flex-shrink-0">
                                 @if($detail->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $detail->product->images->first()->imageurl) }}" 
+                                    <img src="{{ url('storage/' . $detail->product->images->first()->imageurl) }}" 
                                          alt="{{ $detail->product->productname }}"
                                          class="w-16 h-16 object-cover rounded-lg">
                                 @else

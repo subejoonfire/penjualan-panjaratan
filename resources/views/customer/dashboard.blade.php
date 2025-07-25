@@ -216,7 +216,7 @@
                     <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                         <div class="aspect-w-1 aspect-h-1">
                             @if($product->images->count() > 0)
-                            <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                            <img src="{{ url('storage/' . $product->images->first()->imageurl) }}"
                                 alt="{{ $product->productname }}" class="w-full h-48 object-cover">
                             @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
