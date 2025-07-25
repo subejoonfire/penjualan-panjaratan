@@ -168,15 +168,15 @@ Route::get('/search', [ProductController::class, 'search'])->name('products.sear
 */
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     // Cart API
-    Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
-    Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
+    Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('api.cart.count');
+    Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('api.cart.items');
 
     // Notification API
     Route::get('/notifications/unread', function () {
         return response()->json([
             'count' => auth()->user()->unreadNotifications()->count()
         ]);
-    })->name('notifications.unread');
+    })->name('api.notifications.unread');
 
     // Product search suggestions
     Route::get('/products/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search.suggestions');
