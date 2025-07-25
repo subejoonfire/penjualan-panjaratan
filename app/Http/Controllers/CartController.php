@@ -31,7 +31,7 @@ class CartController extends Controller
             ->get();
 
         $total = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->price;
+            return $detail->quantity * $detail->product->productprice;
         });
 
         return view('customer.cart.index', compact('cartDetails', 'total'));
@@ -172,7 +172,7 @@ class CartController extends Controller
         }
 
         $subtotal = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->price;
+            return $detail->quantity * $detail->product->productprice;
         });
 
         $shippingCost = 15000; // Fixed shipping cost
@@ -222,7 +222,7 @@ class CartController extends Controller
             }
 
             $subtotal = $cartDetails->sum(function ($detail) {
-                return $detail->quantity * $detail->product->price;
+                return $detail->quantity * $detail->product->productprice;
             });
 
             $shippingCost = 15000;
@@ -310,9 +310,9 @@ class CartController extends Controller
                     'id' => $detail->id,
                     'product_name' => $detail->product->productname,
                     'product_image' => $detail->product->images->first()?->imageurl,
-                    'productprice' => $detail->product->price,
+                    'productprice' => $detail->product->productprice,
                     'quantity' => $detail->quantity,
-                    'subtotal' => $detail->quantity * $detail->product->price
+                    'subtotal' => $detail->quantity * $detail->product->productprice
                 ];
             });
 
