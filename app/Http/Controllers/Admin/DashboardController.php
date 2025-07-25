@@ -121,6 +121,27 @@ class DashboardController extends Controller
     }
 
     /**
+     * Show user details
+     */
+    public function showUser($id)
+    {
+        $user = User::with(['products', 'carts.cartDetails', 'notifications'])
+            ->withCount(['products', 'carts', 'notifications'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'user' => $user,
+            'stats' => [
+                'total_products' => $user->products_count,
+                'total_orders' => $user->carts_count,
+                'total_notifications' => $user->notifications_count,
+                'unread_notifications' => $user->notifications()->where('readstatus', false)->count(),
+                'recent_activity' => $user->updated_at,
+            ]
+        ]);
+    }
+
+    /**
      * Manage products
      */
     public function products(Request $request)

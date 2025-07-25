@@ -52,6 +52,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // User Management
     Route::get('/users', [AdminDashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{id}', [AdminDashboardController::class, 'showUser'])->name('users.show');
 
     // Product Management
     Route::get('/products', [AdminDashboardController::class, 'products'])->name('products.index');
