@@ -76,9 +76,9 @@
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <!-- Product Image -->
                 <div class="aspect-w-1 aspect-h-1 relative">
-                    @if($product->images->count() > 0)
-                    <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                        alt="{{ $product->productname }}" class="w-full h-48 object-cover">
+                    @if($product->primaryImage)
+                    <img src="{{ url('storage/'.$product->primaryImage->image) }}" alt="{{ $product->productname }}"
+                        class="w-full h-48 object-cover">
                     @else
                     <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                         <i class="fas fa-image text-gray-400 text-3xl"></i>

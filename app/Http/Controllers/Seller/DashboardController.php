@@ -150,6 +150,7 @@ class DashboardController extends Controller
             'productprice' => 'required|numeric|min:0',
             'productstock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
+            'images' => 'required|array|min:1', // minimal 1 gambar
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -394,5 +395,18 @@ class DashboardController extends Controller
         $image->delete();
 
         return back()->with('success', 'Image deleted successfully');
+    }
+
+    /**
+     * Set gambar produk sebagai utama
+     */
+    public function setPrimaryImage(ProductImage $image)
+    {
+        $user = Auth::user();
+        if ($image->product->iduserseller !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+        $image->setAsPrimary();
+        return redirect()->route('seller.products.edit', $image->product)->with('success', 'Gambar utama berhasil diubah.');
     }
 }

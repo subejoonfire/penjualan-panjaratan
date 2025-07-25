@@ -38,7 +38,7 @@ class DashboardController extends Controller
             $query->where('iduser', $user->id);
         })->where('status', 'pending')->count();
         
-        $unreadNotifications = $user->unreadNotifications()->count();
+        // Notifications - sudah tersedia dari AppServiceProvider
         
         // Recent orders
         $recentOrders = Order::with(['cart.cartDetails.product', 'transaction'])
@@ -65,7 +65,7 @@ class DashboardController extends Controller
             'totalOrders',
             'totalSpent', 
             'pendingOrders',
-            'unreadNotifications',
+
             'recentOrders',
             'cartItemsCount',
             'favoriteProducts'
@@ -195,13 +195,9 @@ class DashboardController extends Controller
      */
     public function notifications()
     {
-        $user = Auth::user();
-        // Prioritaskan unread, lalu read, lalu paginasi
-        $notifications = $user->notifications()
-            ->orderByRaw('readstatus ASC') // unread (false) dulu
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-        return view('customer.notifications.index', compact('notifications'));
+        // Data notifikasi sudah tersedia dari AppServiceProvider
+        // Gunakan $userNotifications yang sudah di-share
+        return view('customer.notifications.index');
     }
     
     /**

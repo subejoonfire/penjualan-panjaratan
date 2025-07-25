@@ -25,7 +25,7 @@
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-16 w-16">
                     @if($product->images->count() > 0)
-                    <img src="{{ asset('storage/' . $product->images->first()->image) }}"
+                                            <img src="{{ url('storage/' . $product->images->where('is_primary', true)->first()?->image ?? $product->images->first()?->image) }}"
                         alt="{{ $product->productname }}" class="h-16 w-16 rounded-lg object-cover">
                     @else
                     <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -180,15 +180,21 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         @foreach($product->images as $image)
                         <div class="relative group">
-                            <img src="{{ asset('storage/' . $image->image) }}" alt="Gambar Produk"
+                            <img src="{{ url('storage/' . $image->image) }}" alt="Gambar Produk"
                                 class="w-full h-32 object-cover rounded-lg border border-gray-200">
-                            <div
-                                class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button type="button" onclick="deleteImage({{ $image->id }})"
-                                    class="text-white hover:text-red-300">
-                                    <i class="fas fa-trash text-lg"></i>
-                                </button>
-                            </div>
+                            @if($image->is_primary)
+                            <span
+                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>
+                            @else
+                            <a href="{{ route('seller.products.images.primary', $image) }}"
+                                class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">Jadikan
+                                Utama</a>
+                            @endif
+                            <a href="{{ route('seller.products.images.delete', $image) }}"
+                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
+                                onclick="return confirm('Hapus gambar ini?')">
+                                Hapus
+                            </a>
                         </div>
                         @endforeach
                     </div>

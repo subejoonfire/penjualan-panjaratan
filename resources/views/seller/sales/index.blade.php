@@ -113,7 +113,7 @@
                         <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                             <div class="flex items-center space-x-3">
                                 @if($product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}" 
+                                                                                    <img src="{{ url('storage/' . $product->images->first()->imageurl) }}" 
                                          alt="{{ $product->productname }}"
                                          class="w-12 h-12 object-cover rounded-lg">
                                 @else

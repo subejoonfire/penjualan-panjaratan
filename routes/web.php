@@ -52,6 +52,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // User Management
     Route::get('/users', [AdminDashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{id}', [AdminDashboardController::class, 'showUser'])->name('users.show');
 
     // Product Management
     Route::get('/products', [AdminDashboardController::class, 'products'])->name('products.index');
@@ -85,7 +86,8 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::post('/products', [SellerDashboardController::class, 'storeProduct'])->name('products.store');
     Route::get('/products/{product}/edit', [SellerDashboardController::class, 'editProduct'])->name('products.edit');
     Route::put('/products/{product}', [SellerDashboardController::class, 'updateProduct'])->name('products.update');
-    Route::delete('/products/images/{image}', [SellerDashboardController::class, 'deleteImage'])->name('products.images.delete');
+    Route::get('/products/images/{image}', [SellerDashboardController::class, 'deleteImage'])->name('products.images.delete');
+    Route::get('/products/images/{image}/primary', [SellerDashboardController::class, 'setPrimaryImage'])->name('products.images.primary');
 
     // Order Management for Seller
     Route::get('/orders', [SellerDashboardController::class, 'orders'])->name('orders.index');
@@ -171,12 +173,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('api.cart.count');
     Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('api.cart.items');
 
-    // Notification API
-    Route::get('/notifications/unread', function () {
-        return response()->json([
-            'count' => auth()->user()->unreadNotifications()->count()
-        ]);
-    })->name('api.notifications.unread');
+    // Notification API - Dihapus karena sudah menggunakan provider
 
     // Product search suggestions
     Route::get('/products/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search.suggestions');

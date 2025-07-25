@@ -211,14 +211,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <button onclick="viewOrderDetails('{{ $order->id }}')" class="text-blue-600 hover:text-blue-900">
-                                            View
+                                            Lihat
                                         </button>
                                         <button onclick="updateOrderStatus('{{ $order->id }}')" class="text-green-600 hover:text-green-900">
-                                            Update
+                                            Perbarui
                                         </button>
                                         @if($order->status === 'pending')
                                             <button onclick="cancelOrder('{{ $order->id }}')" class="text-red-600 hover:text-red-900">
-                                                Cancel
+                                                Batalkan
                                             </button>
                                         @endif
                                     </div>
@@ -228,8 +228,8 @@
                             <tr>
                                 <td colspan="8" class="px-6 py-12 text-center">
                                     <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-4"></i>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
-                                    <p class="text-gray-600">No orders match your filter criteria.</p>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pesanan Ditemukan</h3>
+                                    <p class="text-gray-600">Tidak ada pesanan yang cocok dengan kriteria filter Anda.</p>
                                 </td>
                             </tr>
                         @endforelse

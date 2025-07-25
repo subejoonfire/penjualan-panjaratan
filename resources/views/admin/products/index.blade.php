@@ -178,7 +178,7 @@
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-12 w-12">
                                         @if($product->images->count() > 0)
-                                        <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                                        <img src="{{ url('storage/' . $product->images->first()->imageurl) }}"
                                             alt="{{ $product->productname }}" class="h-12 w-12 rounded-lg object-cover">
                                         @else
                                         <div class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -229,16 +229,16 @@
                                 <div class="flex space-x-2">
                                     <a href="{{ route('products.show', $product) }}"
                                         class="text-blue-600 hover:text-blue-900">
-                                        View
+                                        Lihat
                                     </a>
                                     <button
                                         onclick="toggleProductStatus('{{ $product->id }}', '{{ $product->is_active }}')"
                                         class="text-yellow-600 hover:text-yellow-900">
-                                        {{ $product->is_active ? 'Deactivate' : 'Activate' }}
+                                        {{ $product->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                     </button>
                                     <button onclick="deleteProduct('{{ $product->id }}')"
                                         class="text-red-600 hover:text-red-900">
-                                        Delete
+                                        Hapus
                                     </button>
                                 </div>
                             </td>
@@ -247,8 +247,8 @@
                         <tr>
                             <td colspan="8" class="px-6 py-12 text-center">
                                 <i class="fas fa-box text-gray-400 text-4xl mb-4"></i>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">No Products Found</h3>
-                                <p class="text-gray-600">No products match your filter criteria.</p>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Produk Ditemukan</h3>
+                                <p class="text-gray-600">Tidak ada produk yang sesuai dengan kriteria filter Anda.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -271,7 +271,7 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-                <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Confirm Action</h3>
+                <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Konfirmasi Aksi</h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
@@ -281,11 +281,11 @@
             </div>
             <div class="flex justify-end space-x-3">
                 <button onclick="closeModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                    Cancel
+                    Batal
                 </button>
                 <button id="confirmBtn" onclick="confirmAction()"
                     class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                    Confirm
+                    Konfirmasi
                 </button>
             </div>
         </div>

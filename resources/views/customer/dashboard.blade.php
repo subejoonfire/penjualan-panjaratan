@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Pembeli - Penjualan Panjaratan')
+@section('title', 'Dasbor Pembeli - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
@@ -135,7 +135,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-purple-600">Notifikasi</p>
-                            <p class="text-sm text-gray-500">{{ $unreadNotifications }} belum dibaca</p>
+                            <p class="text-sm text-gray-500">{{ $unreadNotifications ?? 0 }} belum dibaca</p>
                         </div>
                     </a>
                 </div>
@@ -216,7 +216,7 @@
                     <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                         <div class="aspect-w-1 aspect-h-1">
                             @if($product->images->count() > 0)
-                            <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                            <img src="{{ url('storage/' . $product->images->first()->imageurl) }}"
                                 alt="{{ $product->productname }}" class="w-full h-48 object-cover">
                             @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">

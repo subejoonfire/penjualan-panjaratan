@@ -37,7 +37,7 @@ class ProductImage extends Model
     // Helper method untuk mendapatkan URL gambar lengkap
     public function getImageUrlAttribute()
     {
-        return asset('storage/' . $this->image);
+        return url('storage/' . $this->image);
     }
 
     // Helper method untuk set sebagai gambar utama

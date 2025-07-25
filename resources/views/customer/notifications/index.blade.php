@@ -12,7 +12,7 @@
                     <h1 class="text-3xl font-bold text-gray-900">Notifikasi</h1>
                     <p class="mt-2 text-gray-600">Dapatkan info terbaru tentang pesanan dan aktivitas akun Anda</p>
                 </div>
-                @if($notifications->where('readstatus', false)->count() > 0)
+                @if($userNotifications->where('readstatus', false)->count() > 0)
                     <form action="{{ route('customer.notifications.mark-all-read') }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -25,10 +25,10 @@
         </div>
 
         <!-- Notifications List -->
-        @if($notifications->count() > 0)
+        @if($userNotifications->count() > 0)
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="divide-y divide-gray-200">
-                    @foreach($notifications as $notification)
+                    @foreach($userNotifications as $notification)
                         <div class="px-6 py-4 hover:bg-gray-50 {{ !$notification->readstatus ? 'bg-blue-50' : '' }}">
                             <div class="flex items-start space-x-4">
                                 <!-- Notification Icon -->
@@ -89,9 +89,9 @@
                 </div>
 
                 <!-- Pagination -->
-                @if($notifications->hasPages())
+                @if($userNotifications->hasPages())
                     <div class="px-6 py-4 border-t border-gray-200">
-                        {{ $notifications->links() }}
+                        {{ $userNotifications->links() }}
                     </div>
                 @endif
             </div>

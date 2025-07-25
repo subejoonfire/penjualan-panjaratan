@@ -116,8 +116,30 @@ class DashboardController extends Controller
         $users = $query->withCount(['products', 'carts', 'notifications'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+        $usersAll = User::all();
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'usersAll'));
+    }
+
+    /**
+     * Show user details
+     */
+    public function showUser($id)
+    {
+        $user = User::with(['products', 'carts.cartDetails', 'notifications'])
+            ->withCount(['products', 'carts', 'notifications'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'user' => $user,
+            'stats' => [
+                'total_products' => $user->products_count,
+                'total_orders' => $user->carts_count,
+                'total_notifications' => $user->notifications_count,
+                'unread_notifications' => $user->notifications()->where('readstatus', false)->count(),
+                'recent_activity' => $user->updated_at,
+            ]
+        ]);
     }
 
     /**
