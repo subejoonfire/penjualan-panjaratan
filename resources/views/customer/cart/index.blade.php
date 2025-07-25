@@ -37,12 +37,11 @@
                             <div class="flex items-center space-x-4">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
-                                    @if($detail->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $detail->product->images->first()->imageurl) }}"
-                                        alt="{{ $detail->product->productname }}"
-                                        class="w-24 h-24 rounded-lg object-cover">
+                                    @if($detail->product->mainImage)
+                                    <img src="{{ asset('storage/' . $detail->product->mainImage->image) }}"
+                                        alt="{{ $detail->product->productname }}" class="w-16 h-16 rounded object-cover">
                                     @else
-                                    <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div class="w-16 h-16 bg-gray-200 flex items-center justify-center rounded">
                                         <i class="fas fa-image text-gray-400 text-xl"></i>
                                     </div>
                                     @endif

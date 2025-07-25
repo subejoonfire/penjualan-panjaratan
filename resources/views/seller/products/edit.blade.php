@@ -24,8 +24,8 @@
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-16 w-16">
-                    @if($product->images->count() > 0)
-                    <img src="{{ asset('storage/' . $product->images->first()->image) }}"
+                    @if($product->mainImage)
+                    <img src="{{ asset('storage/' . $product->mainImage->image) }}"
                         alt="{{ $product->productname }}" class="h-16 w-16 rounded-lg object-cover">
                     @else
                     <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -181,7 +181,19 @@
                         @foreach($product->images as $image)
                         <div class="relative group">
                             <img src="{{ asset('storage/' . $image->image) }}" alt="Gambar Produk"
-                                class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                                class="w-full h-32 object-cover rounded-lg border border-gray-200 @if($image->is_primary) ring-2 ring-blue-500 @endif">
+                            @if(!$image->is_primary)
+                            <div class="absolute top-2 left-2">
+                                <form action="{{ route('seller.products.setMainImage', $image) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="bg-blue-600 text-white text-xs px-2 py-1 rounded">Jadikan Utama</button>
+                                </form>
+                            </div>
+                            @else
+                            <div class="absolute top-2 left-2">
+                                <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>
+                            </div>
+                            @endif
                             <div
                                 class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button type="button" onclick="deleteImage({{ $image->id }})"

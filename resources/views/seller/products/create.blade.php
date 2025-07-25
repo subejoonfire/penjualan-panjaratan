@@ -148,6 +148,7 @@
                     <div id="imagePreview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 hidden">
                         <!-- Images will be previewed here -->
                     </div>
+                    <p class="mt-1 text-sm text-gray-500">Gambar pertama akan menjadi gambar utama (utama).</p>
 
                     @error('images')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

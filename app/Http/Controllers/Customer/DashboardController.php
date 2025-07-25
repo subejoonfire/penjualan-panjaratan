@@ -105,7 +105,7 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized');
         }
         
-        $order->load(['cart.cartDetails.product.images', 'transaction']);
+        $order->load(['cart.cartDetails.product.images', 'cart.cartDetails.product.mainImage', 'transaction']);
         
         return view('customer.orders.show', compact('order'));
     }

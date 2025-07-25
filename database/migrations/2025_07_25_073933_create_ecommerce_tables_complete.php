@@ -31,13 +31,14 @@ return new class extends Migration
         // Tabel Products - Produk
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('productname', 200); // Nama produk
+            $table->string('productname', 255); // Nama produk
             $table->text('productdescription'); // Deskripsi produk
             $table->decimal('productprice', 12, 2); // Harga produk
             $table->integer('productstock')->default(0); // Stok produk
             $table->foreignId('idcategories')->constrained('categories')->onDelete('cascade'); // Relasi ke categories
             $table->foreignId('iduserseller')->constrained('users')->onDelete('cascade'); // Relasi ke users (seller)
             $table->boolean('is_active')->default(true); // Status aktif produk
+            $table->foreignId('main_image_id')->nullable()->constrained('product_images')->nullOnDelete(); // Main image reference
             $table->timestamps();
         });
 
@@ -129,6 +130,10 @@ return new class extends Migration
     public function down(): void
     {
         // Drop tables in reverse order due to foreign key constraints
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropForeign(['main_image_id']);
+            $table->dropColumn('main_image_id');
+        });
         Schema::dropIfExists('notifications');
         Schema::dropIfExists('detail_transactions');
         Schema::dropIfExists('transactions');

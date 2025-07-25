@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'images', 'seller'])
+        $query = Product::with(['category', 'images', 'mainImage', 'seller'])
             ->where('is_active', true)
             ->where('productstock', '>', 0);
 
@@ -88,6 +88,7 @@ class ProductController extends Controller
             'category',
             'seller',
             'images',
+            'mainImage',
             'reviews.user'
         ]);
 
@@ -96,7 +97,7 @@ class ProductController extends Controller
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->where('productstock', '>', 0)
-            ->with(['images'])
+            ->with(['images', 'mainImage'])
             ->limit(4)
             ->get();
 
@@ -220,7 +221,7 @@ class ProductController extends Controller
             return redirect()->route('products.index');
         }
 
-        $query = Product::with(['category', 'images', 'seller'])
+        $query = Product::with(['category', 'images', 'mainImage', 'seller'])
             ->where('is_active', true)
             ->where('productstock', '>', 0);
 

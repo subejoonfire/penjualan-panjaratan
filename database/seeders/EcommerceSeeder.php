@@ -205,13 +205,21 @@ class EcommerceSeeder extends Seeder
         foreach ($products as $product) {
             // Setiap produk memiliki 1-4 gambar
             $imageCount = $faker->numberBetween(1, 4);
-
+            $mainImageId = null;
             for ($i = 0; $i < $imageCount; $i++) {
-                ProductImage::create([
+                $image = ProductImage::create([
                     'idproduct' => $product->id,
                     'image' => 'products/' . $faker->uuid . '.jpg',
                     'is_primary' => $i === 0, // Gambar pertama sebagai primary
                 ]);
+                if ($i === 0) {
+                    $mainImageId = $image->id;
+                }
+            }
+            // Set main_image_id di products
+            if ($mainImageId) {
+                $product->main_image_id = $mainImageId;
+                $product->save();
             }
         }
     }

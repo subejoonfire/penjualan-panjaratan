@@ -112,13 +112,12 @@
                     @forelse($productSales as $product)
                         <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                             <div class="flex items-center space-x-3">
-                                @if($product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}" 
-                                         alt="{{ $product->productname }}"
-                                         class="w-12 h-12 object-cover rounded-lg">
+                                @if($product->mainImage)
+                                    <img src="{{ asset('storage/' . $product->mainImage->image) }}"
+                                         alt="{{ $product->productname }}" class="w-full h-16 object-cover rounded">
                                 @else
-                                    <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-image text-gray-400"></i>
+                                    <div class="w-full h-16 bg-gray-200 flex items-center justify-center rounded">
+                                        <i class="fas fa-image text-gray-400 text-xs"></i>
                                     </div>
                                 @endif
                                 <div>

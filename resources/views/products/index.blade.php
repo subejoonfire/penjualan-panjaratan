@@ -121,8 +121,8 @@
                         <!-- Product Image -->
                         <div class="aspect-w-1 aspect-h-1 relative">
                             <a href="{{ route('products.show', $product) }}">
-                                @if($product->images->count() > 0)
-                                <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                                @if($product->mainImage)
+                                <img src="{{ asset('storage/' . $product->mainImage->image) }}"
                                     alt="{{ $product->productname }}"
                                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                                 @else

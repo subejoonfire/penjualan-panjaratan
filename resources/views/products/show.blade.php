@@ -35,21 +35,19 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Product Images -->
             <div class="space-y-4">
-                @if($product->images->count() > 0)
+                @if($product->mainImage)
                 <!-- Main Image -->
                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
-                    <img id="mainImage" src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                    <img id="mainImage" src="{{ asset('storage/' . $product->mainImage->image) }}"
                         alt="{{ $product->productname }}" class="w-full h-96 object-cover">
                 </div>
-
-                <!-- Thumbnail Images -->
                 @if($product->images->count() > 1)
                 <div class="grid grid-cols-4 gap-2">
                     @foreach($product->images as $image)
                     <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-75"
-                        onclick="changeMainImage('{{ asset('storage/' . $image->imageurl) }}')">
-                        <img src="{{ asset('storage/' . $image->imageurl) }}" alt="{{ $product->productname }}"
-                            class="w-full h-20 object-cover">
+                        onclick="changeMainImage('{{ asset('storage/' . $image->image) }}')">
+                        <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->productname }}"
+                            class="w-full h-20 object-cover @if($image->is_primary) ring-2 ring-blue-500 @endif">
                     </div>
                     @endforeach
                 </div>

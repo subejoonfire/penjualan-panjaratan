@@ -134,8 +134,8 @@
                             @foreach($order->cart->cartDetails as $item)
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0 h-16 w-16">
-                                    @if($item->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $item->product->images->first()->imageurl) }}"
+                                    @if($item->product->mainImage)
+                                    <img src="{{ asset('storage/' . $item->product->mainImage->image) }}"
                                         alt="{{ $item->product->productname }}"
                                         class="h-16 w-16 rounded-lg object-cover">
                                     @else

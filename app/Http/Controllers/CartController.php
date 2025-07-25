@@ -27,7 +27,7 @@ class CartController extends Controller
         }
 
         $cartDetails = $cart->cartDetails()
-            ->with(['product.images', 'product.seller'])
+            ->with(['product.images', 'product.mainImage', 'product.seller'])
             ->get();
 
         $total = $cartDetails->sum(function ($detail) {
@@ -161,7 +161,9 @@ class CartController extends Controller
             return redirect()->route('customer.cart.index')->with('error', 'Cart is empty');
         }
 
-        $cartDetails = $cart->cartDetails()->with(['product.images'])->get();
+        $cartDetails = $cart->cartDetails()
+            ->with(['product.images', 'product.mainImage'])
+            ->get();
 
         // Check stock for all items
         foreach ($cartDetails as $detail) {
@@ -303,7 +305,7 @@ class CartController extends Controller
         }
 
         $items = $cart->cartDetails()
-            ->with(['product.images'])
+            ->with(['product.images', 'product.mainImage'])
             ->get()
             ->map(function ($detail) {
                 return [

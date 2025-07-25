@@ -57,7 +57,7 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         $category->load(['products' => function ($query) {
-            $query->with(['seller', 'images'])->latest()->limit(10);
+            $query->with(['seller', 'images', 'mainImage'])->latest()->limit(10);
         }]);
 
         // Category statistics

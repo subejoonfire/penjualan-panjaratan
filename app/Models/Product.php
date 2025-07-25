@@ -51,10 +51,16 @@ class Product extends Model
         return $this->hasMany(ProductImage::class, 'idproduct');
     }
 
-    // Relasi ke gambar utama
-    public function primaryImage()
+    // Relasi ke gambar utama (main image)
+    public function mainImage()
     {
-        return $this->hasOne(ProductImage::class, 'idproduct')->where('is_primary', true);
+        return $this->belongsTo(ProductImage::class, 'main_image_id');
+    }
+
+    // Accessor untuk mendapatkan url gambar utama
+    public function getMainImageUrlAttribute()
+    {
+        return $this->mainImage ? $this->mainImage->imageurl : null;
     }
 
     // Relasi ke ProductReview (One to Many)

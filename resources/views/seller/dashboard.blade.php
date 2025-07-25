@@ -229,11 +229,11 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0">
-                                        @if($product->images->count() > 0)
-                                        <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
-                                            alt="{{ $product->productname }}" class="w-8 h-8 rounded object-cover">
+                                        @if($product->mainImage)
+                                        <img src="{{ asset('storage/' . $product->mainImage->image) }}"
+                                            alt="{{ $product->productname }}" class="w-full h-16 object-cover rounded">
                                         @else
-                                        <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+                                        <div class="w-full h-16 bg-gray-200 flex items-center justify-center rounded">
                                             <i class="fas fa-image text-gray-400 text-xs"></i>
                                         </div>
                                         @endif

@@ -103,8 +103,8 @@
                                 @if($order->cart && $order->cart->cartDetails->count() > 0)
                                 @php $firstDetail = $order->cart->cartDetails->first(); @endphp
                                 <div class="flex-shrink-0">
-                                    @if($firstDetail->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $firstDetail->product->images->first()->imageurl) }}"
+                                    @if($firstDetail->product->mainImage)
+                                    <img src="{{ asset('storage/' . $firstDetail->product->mainImage->image) }}"
                                         alt="{{ $firstDetail->product->productname }}"
                                         class="w-12 h-12 rounded-lg object-cover">
                                     @else

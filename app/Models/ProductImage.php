@@ -40,15 +40,24 @@ class ProductImage extends Model
         return asset('storage/' . $this->image);
     }
 
-    // Helper method untuk set sebagai gambar utama
-    public function setAsPrimary()
+    // Scope untuk gambar utama
+    public function scopePrimary(
+        $query
+    ) {
+        return $query->where('is_primary', true);
+    }
+
+    // Helper method untuk set sebagai gambar utama dan update main_image_id di product
+    public function setAsMainImage()
     {
         // Set semua gambar produk lain menjadi false
         self::where('idproduct', $this->idproduct)
             ->where('id', '!=', $this->id)
             ->update(['is_primary' => false]);
-        
         // Set gambar ini sebagai primary
         $this->update(['is_primary' => true]);
+        // Update main_image_id di product
+        $this->product->main_image_id = $this->id;
+        $this->product->save();
     }
 }

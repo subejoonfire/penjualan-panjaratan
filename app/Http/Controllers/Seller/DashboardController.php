@@ -105,7 +105,7 @@ class DashboardController extends Controller
     public function products(Request $request)
     {
         $user = Auth::user();
-        $query = $user->products()->with(['category', 'images']);
+        $query = $user->products()->with(['category', 'images', 'mainImage']);
 
         // Filter by category
         if ($request->filled('category')) {
@@ -164,15 +164,23 @@ class DashboardController extends Controller
         ]);
 
         // Handle image uploads
+        $mainImageId = null;
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
+            foreach ($request->file('images') as $i => $image) {
                 $path = $image->store('products', 'public');
-                ProductImage::create([
+                $img = ProductImage::create([
                     'idproduct' => $product->id,
                     'image' => $path,
-                    'is_primary' => ProductImage::where('idproduct', $product->id)->count() === 0
+                    'is_primary' => $i === 0
                 ]);
+                if ($i === 0) {
+                    $mainImageId = $img->id;
+                }
             }
+        }
+        if ($mainImageId) {
+            $product->main_image_id = $mainImageId;
+            $product->save();
         }
 
         return redirect()->route('seller.products.index')->with('success', 'Product created successfully');
@@ -229,11 +237,15 @@ class DashboardController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('products', 'public');
-                ProductImage::create([
+                $img = ProductImage::create([
                     'idproduct' => $product->id,
                     'image' => $path,
-                    'is_primary' => $product->images()->count() === 0
+                    'is_primary' => false
                 ]);
+                // If product has no main image, set this as main
+                if (!$product->main_image_id) {
+                    $img->setAsMainImage();
+                }
             }
         }
 
@@ -370,11 +382,15 @@ class DashboardController extends Controller
 
         $path = $request->file('image')->store('products', 'public');
 
-        ProductImage::create([
+        $img = ProductImage::create([
             'idproduct' => $product->id,
             'image' => $path,
-            'is_primary' => $product->images()->count() === 0
+            'is_primary' => false
         ]);
+        // If product has no main image, set this as main
+        if (!$product->main_image_id) {
+            $img->setAsMainImage();
+        }
 
         return back()->with('success', 'Image uploaded successfully');
     }
@@ -390,9 +406,36 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        $product = $image->product;
+        $wasMain = $image->is_primary;
         Storage::disk('public')->delete($image->image);
         $image->delete();
 
+        // If deleted image was main, set another as main if available
+        if ($wasMain) {
+            $nextImage = $product->images()->first();
+            if ($nextImage) {
+                $nextImage->setAsMainImage();
+            } else {
+                $product->main_image_id = null;
+                $product->save();
+            }
+        }
+
         return back()->with('success', 'Image deleted successfully');
+    }
+
+    /**
+     * Set a product image as the main image
+     */
+    public function setMainImage(ProductImage $image)
+    {
+        $user = Auth::user();
+        $product = $image->product;
+        if ($product->iduserseller !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+        $image->setAsMainImage();
+        return back()->with('success', 'Gambar utama berhasil diubah');
     }
 }

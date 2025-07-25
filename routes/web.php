@@ -86,6 +86,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::get('/products/{product}/edit', [SellerDashboardController::class, 'editProduct'])->name('products.edit');
     Route::put('/products/{product}', [SellerDashboardController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/images/{image}', [SellerDashboardController::class, 'deleteImage'])->name('products.images.delete');
+    Route::post('/seller/products/images/{image}/set-main', [App\Http\Controllers\Seller\DashboardController::class, 'setMainImage'])->name('seller.products.setMainImage');
 
     // Order Management for Seller
     Route::get('/orders', [SellerDashboardController::class, 'orders'])->name('orders.index');

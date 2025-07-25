@@ -214,7 +214,7 @@ class OrderController extends Controller
             }
         }
 
-        $order->load(['cart.user', 'cart.cartDetails.product.images', 'transaction']);
+        $order->load(['cart.user', 'cart.cartDetails.product.images', 'cart.cartDetails.product.mainImage', 'transaction']);
 
         return view('orders.show', compact('order'));
     }
