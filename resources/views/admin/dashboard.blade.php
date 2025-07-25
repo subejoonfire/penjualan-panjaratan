@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard - Penjualan Panjaratan')
+@section('title', 'Dasbor Admin - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Dasbor Admin</h1>
             <p class="mt-2 text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ?? auth()->user()->username }}!</p>
         </div>
 
@@ -24,7 +24,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pengguna</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalUsers) }}</dd>
                             </dl>
                         </div>
@@ -33,9 +33,9 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalCustomers) }}</span>
-                        <span class="text-gray-500"> customers, </span>
+                        <span class="text-gray-500"> pelanggan, </span>
                         <span class="text-blue-600 font-medium">{{ number_format($totalSellers) }}</span>
-                        <span class="text-gray-500"> sellers</span>
+                        <span class="text-gray-500"> penjual</span>
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Products</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Produk</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
                             </dl>
                         </div>
@@ -60,7 +60,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalActiveProducts) }}</span>
-                        <span class="text-gray-500"> active products</span>
+                        <span class="text-gray-500"> produk aktif</span>
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Orders</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
                             </dl>
                         </div>
@@ -85,7 +85,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-yellow-600 font-medium">{{ $orderStats['pending'] ?? 0 }}</span>
-                        <span class="text-gray-500"> pending</span>
+                        <span class="text-gray-500"> menunggu</span>
                     </div>
                 </div>
             </div>
@@ -101,7 +101,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
                                 <dd class="text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</dd>
                             </dl>
                         </div>
@@ -110,7 +110,7 @@
                 <div class="bg-gray-50 px-5 py-3">
                     <div class="text-sm">
                         <span class="text-green-600 font-medium">{{ $transactionStats['paid'] ?? 0 }}</span>
-                        <span class="text-gray-500"> paid transactions</span>
+                        <span class="text-gray-500"> transaksi dibayar</span>
                     </div>
                 </div>
             </div>
