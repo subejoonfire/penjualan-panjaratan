@@ -44,6 +44,9 @@
                                 <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                                     <i class="fas fa-box mr-2"></i>Products
                                 </a>
+                                <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                                    <i class="fas fa-list mr-2"></i>Categories
+                                </a>
                                 <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                                     <i class="fas fa-shopping-cart mr-2"></i>Orders
                                 </a>
