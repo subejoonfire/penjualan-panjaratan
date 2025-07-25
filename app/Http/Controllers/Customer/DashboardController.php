@@ -196,10 +196,11 @@ class DashboardController extends Controller
     public function notifications()
     {
         $user = Auth::user();
+        // Prioritaskan unread, lalu read, lalu paginasi
         $notifications = $user->notifications()
+            ->orderByRaw('readstatus ASC') // unread (false) dulu
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-        
         return view('customer.notifications.index', compact('notifications'));
     }
     
