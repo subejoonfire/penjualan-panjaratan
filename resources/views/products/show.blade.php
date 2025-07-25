@@ -38,7 +38,7 @@
                 @if($product->images->count() > 0)
                 <!-- Main Image -->
                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
-                    <img id="mainImage" src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                    <img id="mainImage" src="{{ asset('storage/' . $product->images->first()->image) }}"
                         alt="{{ $product->productname }}" class="w-full h-96 object-cover">
                 </div>
 
@@ -47,8 +47,8 @@
                 <div class="grid grid-cols-4 gap-2">
                     @foreach($product->images as $image)
                     <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-75"
-                        onclick="changeMainImage('{{ asset('storage/' . $image->imageurl) }}')">
-                        <img src="{{ asset('storage/' . $image->imageurl) }}" alt="{{ $product->productname }}"
+                        onclick="changeMainImage('{{ asset('storage/' . $image->image) }}')">
+                        <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->productname }}"
                             class="w-full h-20 object-cover">
                     </div>
                     @endforeach
@@ -236,50 +236,146 @@
         </div>
 
         <!-- Reviews Section -->
-        @if($product->reviews()->count() > 0)
         <div class="mt-8">
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">
-                        Customer Reviews ({{ $product->reviews()->count() }})
-                    </h3>
-                </div>
-                <div class="px-6 py-6 space-y-6">
-                    @foreach($product->reviews()->with('user')->latest()->limit(5)->get() as $review)
-                    <div class="flex space-x-4">
-                        <div class="flex-shrink-0">
-                            <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                <i class="fas fa-user text-gray-600"></i>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900">
+                            Customer Reviews ({{ $totalReviews }})
+                        </h3>
+                        @if($totalReviews > 0)
+                        <div class="flex items-center">
+                            <div class="flex items-center mr-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                <i class="fas fa-star text-lg {{ $i <= round($averageRating) ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                @endfor
                             </div>
+                            <span class="text-lg font-semibold text-gray-900">{{ number_format($averageRating, 1) }}</span>
+                            <span class="text-sm text-gray-500 ml-1">out of 5</span>
                         </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between">
-                                <h4 class="text-sm font-medium text-gray-900">{{ $review->user->username }}</h4>
-                                <div class="flex items-center">
-                                    @for($i = 1; $i <= 5; $i++) <i
-                                        class="fas fa-star text-sm {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}">
-                                        </i>
-                                        @endfor
-                                        <span class="ml-2 text-sm text-gray-500">{{ $review->created_at->diffForHumans()
-                                            }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                @if($totalReviews > 0)
+                <!-- Rating Distribution -->
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="space-y-2">
+                        @foreach($ratingDistribution as $rating => $data)
+                        <div class="flex items-center text-sm">
+                            <span class="w-3">{{ $rating }}</span>
+                            <i class="fas fa-star text-yellow-400 mx-1"></i>
+                            <div class="flex-1 mx-3">
+                                <div class="bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ $data['percentage'] }}%"></div>
                                 </div>
                             </div>
-                            <p class="mt-2 text-sm text-gray-700">{{ $review->comment }}</p>
+                            <span class="w-8 text-right">{{ $data['count'] }}</span>
                         </div>
+                        @endforeach
                     </div>
-                    @endforeach
+                </div>
 
-                    @if($product->reviews()->count() > 5)
-                    <div class="text-center pt-4">
-                        <button class="text-blue-600 hover:text-blue-500 text-sm font-medium">
-                            View all {{ $product->reviews()->count() }} reviews
-                        </button>
+                <!-- Reviews List -->
+                <div class="px-6 py-6">
+                    <div class="space-y-6">
+                        @foreach($product->reviews()->with('user')->latest()->limit(5)->get() as $review)
+                        <div class="flex space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-600"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-medium text-gray-900">{{ $review->user->username }}</h4>
+                                    <div class="flex items-center">
+                                        @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star text-sm {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                        @endfor
+                                        <span class="ml-2 text-sm text-gray-500">{{ $review->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                                @if($review->productreviews)
+                                <p class="mt-2 text-sm text-gray-700">{{ $review->productreviews }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+
+                        @if($totalReviews > 5)
+                        <div class="text-center pt-4">
+                            <button class="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                                View all {{ $totalReviews }} reviews
+                            </button>
+                        </div>
+                        @endif
                     </div>
-                    @endif
+                </div>
+                @else
+                <div class="px-6 py-8 text-center">
+                    <i class="fas fa-star text-gray-400 text-3xl mb-2"></i>
+                    <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Add Review Form -->
+        @auth
+        @if($canReview)
+        <div class="mt-8">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Write a Review</h3>
+                </div>
+                <div class="px-6 py-6">
+                    <form action="{{ route('customer.products.reviews.store', $product) }}" method="POST">
+                        @csrf
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                            <div class="flex items-center space-x-1">
+                                @for($i = 1; $i <= 5; $i++)
+                                <button type="button" onclick="setRating({{ $i }})" 
+                                    class="rating-star focus:outline-none" data-rating="{{ $i }}">
+                                    <i class="fas fa-star text-2xl text-gray-300 hover:text-yellow-400 transition-colors"></i>
+                                </button>
+                                @endfor
+                            </div>
+                            <input type="hidden" name="rating" id="rating" value="5" required>
+                            @error('rating')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="productreviews" class="block text-sm font-medium text-gray-700 mb-2">Review (Optional)</label>
+                            <textarea name="productreviews" id="productreviews" rows="4" 
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Share your experience with this product...">{{ old('productreviews') }}</textarea>
+                            @error('productreviews')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                Submit Review
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+        @elseif(auth()->user()->isCustomer())
+        <div class="mt-8">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
+                <p class="text-gray-600">You need to purchase this product before you can write a review.</p>
+            </div>
+        </div>
         @endif
+        @endauth
 
         <!-- Related Products -->
         @if($relatedProducts->count() > 0)
@@ -290,7 +386,7 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                     <div class="aspect-w-1 aspect-h-1 bg-gray-200">
                         @if($relatedProduct->images->count() > 0)
-                        <img src="{{ asset('storage/' . $relatedProduct->images->first()->imageurl) }}"
+                        <img src="{{ asset('storage/' . $relatedProduct->images->first()->image) }}"
                             alt="{{ $relatedProduct->productname }}" class="w-full h-48 object-cover">
                         @else
                         <div class="w-full h-48 flex items-center justify-center">
@@ -320,24 +416,47 @@
 
 <script>
     function changeMainImage(imageUrl) {
-    document.getElementById('mainImage').src = imageUrl;
-}
-
-function increaseQuantity() {
-    const input = document.getElementById('quantity');
-    const max = parseInt(input.getAttribute('max'));
-    const current = parseInt(input.value);
-    if (current < max) {
-        input.value = current + 1;
+        document.getElementById('mainImage').src = imageUrl;
     }
-}
 
-function decreaseQuantity() {
-    const input = document.getElementById('quantity');
-    const current = parseInt(input.value);
-    if (current > 1) {
-        input.value = current - 1;
+    function increaseQuantity() {
+        const input = document.getElementById('quantity');
+        const max = parseInt(input.getAttribute('max'));
+        const current = parseInt(input.value);
+        if (current < max) {
+            input.value = current + 1;
+        }
     }
-}
+
+    function decreaseQuantity() {
+        const input = document.getElementById('quantity');
+        const current = parseInt(input.value);
+        if (current > 1) {
+            input.value = current - 1;
+        }
+    }
+
+    function setRating(rating) {
+        document.getElementById('rating').value = rating;
+        
+        // Update star display
+        const stars = document.querySelectorAll('.rating-star i');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('text-gray-300');
+                star.classList.add('text-yellow-400');
+            } else {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+            }
+        });
+    }
+
+    // Initialize rating to 5 stars on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('rating')) {
+            setRating(5);
+        }
+    });
 </script>
 @endsection

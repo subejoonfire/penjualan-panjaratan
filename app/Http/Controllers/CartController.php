@@ -309,7 +309,7 @@ class CartController extends Controller
                 return [
                     'id' => $detail->id,
                     'product_name' => $detail->product->productname,
-                    'product_image' => $detail->product->images->first()?->imageurl,
+                    'product_image' => $detail->product->images->first()?->image,
                     'productprice' => $detail->product->productprice,
                     'quantity' => $detail->quantity,
                     'subtotal' => $detail->quantity * $detail->product->productprice

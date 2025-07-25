@@ -38,7 +38,7 @@
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
                                     @if($detail->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $detail->product->images->first()->imageurl) }}"
+                                    <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}"
                                         alt="{{ $detail->product->productname }}"
                                         class="w-24 h-24 rounded-lg object-cover">
                                     @else

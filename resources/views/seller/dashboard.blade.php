@@ -230,7 +230,7 @@
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0">
                                         @if($product->images->count() > 0)
-                                        <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                                        <img src="{{ asset('storage/' . $product->images->first()->image) }}"
                                             alt="{{ $product->productname }}" class="w-8 h-8 rounded object-cover">
                                         @else
                                         <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">

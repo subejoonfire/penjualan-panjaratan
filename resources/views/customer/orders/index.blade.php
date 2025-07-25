@@ -104,7 +104,7 @@
                                 @php $firstDetail = $order->cart->cartDetails->first(); @endphp
                                 <div class="flex-shrink-0">
                                     @if($firstDetail->product->images->count() > 0)
-                                    <img src="{{ asset('storage/' . $firstDetail->product->images->first()->imageurl) }}"
+                                    <img src="{{ asset('storage/' . $firstDetail->product->images->first()->image) }}"
                                         alt="{{ $firstDetail->product->productname }}"
                                         class="w-12 h-12 rounded-lg object-cover">
                                     @else
