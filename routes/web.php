@@ -62,21 +62,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Transaction Management
     Route::get('/transactions', [AdminDashboardController::class, 'transactions'])->name('transactions.index');
+    Route::get('/transactionsdsafdsa', [AdminDashboardController::class, 'transactions'])->name('categories.index');
 
     // Notification Management
     Route::post('/notifications/send', [AdminDashboardController::class, 'sendNotification'])->name('notifications.send');
 
     // Category Management
-    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->names([
-        'index' => 'admin.categories.index',
-        'create' => 'admin.categories.create',
-        'store' => 'admin.categories.store',
-        'show' => 'admin.categories.show',
-        'edit' => 'admin.categories.edit',
-        'update' => 'admin.categories.update',
-        'destroy' => 'admin.categories.destroy'
-    ]);
-    Route::post('/categories/bulk-delete', [\App\Http\Controllers\Admin\CategoryController::class, 'bulkDelete'])->name('admin.categories.bulk-delete');
+    Route::prefix('categories')->name('categories.')->group(function () {
+    Route::get('categories', [\App\Http\Controllers\Admin\CategoryController::class, 'index'])->name('index');
+    Route::get('categories/create', [\App\Http\Controllers\Admin\CategoryController::class, 'create'])->name('create');
+    Route::post('categories', [\App\Http\Controllers\Admin\CategoryController::class, 'store'])->name('store');
+    Route::get('categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'show'])->name('show');
+    Route::get('categories/{id}/edit', [\App\Http\Controllers\Admin\CategoryController::class, 'edit'])->name('edit');
+    Route::put('categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'update'])->name('update');
+    Route::delete('categories/{id}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('destroy');
+});
+    Route::post('/categories/bulk-delete', [\App\Http\Controllers\Admin\CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
 });
 
 /*
@@ -178,8 +179,8 @@ Route::get('/search', [ProductController::class, 'search'])->name('products.sear
 */
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     // Cart API
-    Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('api.cart.count');
-    Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('api.cart.items');
+    Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+    Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
 
     // Notification API - Dihapus karena sudah menggunakan provider
 
