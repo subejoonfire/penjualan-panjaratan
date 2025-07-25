@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Orders List -->
+        <!-- Daftar Pesanan -->
         <div class="space-y-6">
             @forelse($orders as $order)
             <div class="bg-white shadow rounded-lg overflow-hidden">

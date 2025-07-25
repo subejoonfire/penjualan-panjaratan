@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Notifications - Penjualan Panjaratan')
+@section('title', 'Notifikasi - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
@@ -9,15 +9,15 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Notifications</h1>
-                    <p class="mt-2 text-gray-600">Stay updated with your orders and account activities</p>
+                    <h1 class="text-3xl font-bold text-gray-900">Notifikasi</h1>
+                    <p class="mt-2 text-gray-600">Dapatkan info terbaru tentang pesanan dan aktivitas akun Anda</p>
                 </div>
                 @if($notifications->where('readstatus', false)->count() > 0)
                     <form action="{{ route('customer.notifications.mark-all-read') }}" method="POST">
                         @csrf
                         @method('PUT')
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Mark All as Read
+                            Tandai Semua Sudah Dibaca
                         </button>
                     </form>
                 @endif
@@ -70,13 +70,13 @@
                                         <div class="flex items-center space-x-2 ml-4">
                                             @if(!$notification->readstatus)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    New
+                                                    Baru
                                                 </span>
                                                 <form action="{{ route('customer.notifications.read', $notification) }}" method="POST" class="inline-block">
                                                     @csrf
                                                     @method('PUT')
                                                     <button type="submit" class="text-blue-600 hover:text-blue-500 text-sm">
-                                                        Mark as Read
+                                                        Tandai Sudah Dibaca
                                                     </button>
                                                 </form>
                                             @endif
@@ -100,12 +100,12 @@
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-12 text-center">
                     <i class="fas fa-bell text-gray-400 text-6xl mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Notifications</h3>
-                    <p class="text-gray-600 mb-6">You don't have any notifications yet. When you place orders or there are updates to your account, you'll see them here.</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Notifikasi</h3>
+                    <p class="text-gray-600 mb-6">Anda belum memiliki notifikasi. Jika ada pesanan atau pembaruan akun, notifikasi akan muncul di sini.</p>
                     <a href="{{ route('products.index') }}" 
                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                         <i class="fas fa-search mr-2"></i>
-                        Browse Products
+                        Lihat Produk
                     </a>
                 </div>
             </div>
