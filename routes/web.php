@@ -30,7 +30,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminDashboardController::class, 'users'])->name('users.index');
     Route::get('/products', [AdminDashboardController::class, 'products'])->name('products.index');
+    Route::post('/products/{product}/toggle-status', [AdminDashboardController::class, 'toggleProductStatus'])->name('products.toggle-status');
     Route::get('/orders', [AdminDashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{order}/details', [AdminDashboardController::class, 'orderDetails'])->name('orders.details');
+    Route::put('/orders/{order}/status', [AdminDashboardController::class, 'updateOrderStatus'])->name('orders.update-status');
     Route::get('/transactions', [AdminDashboardController::class, 'transactions'])->name('transactions.index');
     Route::post('/notifications/send', [AdminDashboardController::class, 'sendNotification'])->name('notifications.send');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);

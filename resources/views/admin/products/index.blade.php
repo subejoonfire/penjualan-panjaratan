@@ -227,18 +227,17 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                    @if($product->is_active)
                                     <a href="{{ route('products.show', $product) }}"
-                                        class="text-blue-600 hover:text-blue-900">
-                                        View
+                                        class="text-blue-600 hover:text-blue-900 transition-colors">
+                                        <i class="fas fa-eye mr-1"></i>Lihat
                                     </a>
+                                    @endif
                                     <button
                                         onclick="toggleProductStatus('{{ $product->id }}', '{{ $product->is_active }}')"
-                                        class="text-yellow-600 hover:text-yellow-900">
-                                        {{ $product->is_active ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                    <button onclick="deleteProduct('{{ $product->id }}')"
-                                        class="text-red-600 hover:text-red-900">
-                                        Delete
+                                        class="text-yellow-600 hover:text-yellow-900 transition-colors">
+                                        <i class="fas {{ $product->is_active ? 'fa-eye-slash' : 'fa-eye' }} mr-1"></i>
+                                        {{ $product->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                     </button>
                                 </div>
                             </td>
@@ -247,8 +246,8 @@
                         <tr>
                             <td colspan="8" class="px-6 py-12 text-center">
                                 <i class="fas fa-box text-gray-400 text-4xl mb-4"></i>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">No Products Found</h3>
-                                <p class="text-gray-600">No products match your filter criteria.</p>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Produk</h3>
+                                <p class="text-gray-600">Tidak ada produk yang sesuai dengan kriteria filter.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -267,12 +266,12 @@
 </div>
 
 <!-- Action Modals -->
-<div id="actionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+<div id="actionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-                <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Confirm Action</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Konfirmasi Aksi</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -280,12 +279,13 @@
                 <!-- Modal content will be loaded here -->
             </div>
             <div class="flex justify-end space-x-3">
-                <button onclick="closeModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                    Cancel
+                <button onclick="closeModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition-colors">
+                    Batal
                 </button>
                 <button id="confirmBtn" onclick="confirmAction()"
-                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                    Confirm
+                    class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors">
+                    <i class="fas fa-spinner fa-spin mr-2 hidden" id="actionLoader"></i>
+                    Konfirmasi
                 </button>
             </div>
         </div>
@@ -293,31 +293,25 @@
 </div>
 
 <script>
-    let currentAction = null;
+let currentAction = null;
 let currentProductId = null;
+
+// CSRF Token Setup
+const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
 function toggleProductStatus(productId, currentStatus) {
     currentAction = 'toggle';
     currentProductId = productId;
-    const newStatus = currentStatus === '1' ? 'deactivate' : 'activate';
+    const actionText = currentStatus === '1' ? 'menonaktifkan' : 'mengaktifkan';
     
-    document.getElementById('modalTitle').innerText = 'Toggle Product Status';
+    document.getElementById('modalTitle').innerText = 'Ubah Status Produk';
     document.getElementById('modalContent').innerHTML = `
-        <p class="text-gray-600">Are you sure you want to ${newStatus} this product?</p>
+        <div class="flex items-center mb-4">
+            <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mr-3"></i>
+            <p class="text-gray-600">Apakah Anda yakin ingin ${actionText} produk ini?</p>
+        </div>
     `;
-    document.getElementById('confirmBtn').className = 'bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700';
-    document.getElementById('actionModal').classList.remove('hidden');
-}
-
-function deleteProduct(productId) {
-    currentAction = 'delete';
-    currentProductId = productId;
-    
-    document.getElementById('modalTitle').innerText = 'Delete Product';
-    document.getElementById('modalContent').innerHTML = `
-        <p class="text-gray-600">Are you sure you want to delete this product? This action cannot be undone.</p>
-    `;
-    document.getElementById('confirmBtn').className = 'bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700';
+    document.getElementById('confirmBtn').className = 'bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors';
     document.getElementById('actionModal').classList.remove('hidden');
 }
 
@@ -329,16 +323,65 @@ function closeModal() {
 
 function confirmAction() {
     if (currentAction && currentProductId) {
-        // In a real application, you would make AJAX calls here
+        const loader = document.getElementById('actionLoader');
+        if (loader) loader.classList.remove('hidden');
+        
         if (currentAction === 'toggle') {
-            alert('Product status would be toggled via AJAX call');
-        } else if (currentAction === 'delete') {
-            alert('Product would be deleted via AJAX call');
+            // Toggle product status via form submission (since we don't have an API endpoint)
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/products/${currentProductId}/toggle-status`;
+            
+            const csrfField = document.createElement('input');
+            csrfField.type = 'hidden';
+            csrfField.name = '_token';
+            csrfField.value = token;
+            
+            form.appendChild(csrfField);
+            document.body.appendChild(form);
+            
+            showNotification('Status produk berhasil diubah', 'success');
+            setTimeout(() => {
+                form.submit();
+            }, 500);
         }
+        
         closeModal();
-        // Refresh page or update UI
-        // window.location.reload();
     }
 }
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
+    notification.style.backgroundColor = type === 'success' ? '#10B981' : '#EF4444';
+    notification.style.color = 'white';
+    
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(full)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Close modal when clicking outside
+document.getElementById('actionModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
 </script>
 @endsection
