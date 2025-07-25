@@ -119,10 +119,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Price -->
                         <div>
-                            <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="productprice" class="block text-sm font-medium text-gray-700 mb-2">
                                 Price (Rp) <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="price" id="price" min="0" step="1000"
+                            <input type="number" name="productprice" id="productprice" min="0" step="1000"
                                 value="{{ old('productprice', $product->price) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                           @error('productprice') border-red-300 @enderror" placeholder="0">
                             @error('productprice')

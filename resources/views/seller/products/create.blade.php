@@ -87,15 +87,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Price -->
                         <div>
-                            <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="productprice" class="block text-sm font-medium text-gray-700 mb-2">
                                 Price (Rp) <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-gray-500 sm:text-sm">Rp</span>
                                 </div>
-                                <input type="number" name="price" id="price" value="{{ old('productprice') }}" required
-                                    min="0" step="0.01"
+                                <input type="number" name="productprice" id="productprice"
+                                    value="{{ old('productprice') }}" required min="0" step="0.01"
                                     class="w-full pl-12 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     placeholder="0.00">
                             </div>
