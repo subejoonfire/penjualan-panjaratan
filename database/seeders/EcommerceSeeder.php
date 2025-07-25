@@ -390,4 +390,76 @@ class EcommerceSeeder extends Seeder
             }
         }
     }
+
+    /**
+     * Seed Product Reviews
+     */
+    private function seedProductReviews()
+    {
+        $faker = \Faker\Factory::create('id_ID');
+        
+        // Ambil semua order yang sudah delivered dengan produk
+        $deliveredOrders = Order::where('status', 'delivered')
+            ->whereHas('transaction', function($query) {
+                $query->where('transactionstatus', 'paid');
+            })
+            ->with(['cart.cartDetails.product', 'cart.user'])
+            ->get();
+
+        foreach ($deliveredOrders as $order) {
+            $customer = $order->cart->user;
+            
+            // Skip jika bukan customer
+            if ($customer->role !== 'customer') {
+                continue;
+            }
+
+            foreach ($order->cart->cartDetails as $cartDetail) {
+                // 70% kemungkinan customer akan memberikan review
+                if ($faker->boolean(70)) {
+                    // Cek apakah sudah ada review dari customer ini untuk produk ini
+                    $existingReview = ProductReview::where('iduser', $customer->id)
+                        ->where('idproduct', $cartDetail->product->id)
+                        ->first();
+                    
+                    if (!$existingReview) {
+                        $rating = $faker->numberBetween(3, 5); // Kebanyakan rating bagus
+                        
+                        $reviewTexts = [
+                            'Produk sangat bagus dan sesuai dengan deskripsi.',
+                            'Kualitas produk memuaskan, pengiriman cepat.',
+                            'Sangat puas dengan pembelian ini. Recommended!',
+                            'Produk berkualitas dengan harga yang terjangkau.',
+                            'Sesuai ekspektasi, penjual responsif.',
+                            'Produk original dan kondisi baik.',
+                            'Pelayanan baik, produk sesuai gambar.',
+                            'Kualitas oke, worth it untuk harga segini.',
+                            'Fast response, produk sampai dengan aman.',
+                            'Produk bagus, sudah beberapa kali beli disini.',
+                        ];
+                        
+                        if ($rating <= 3) {
+                            $reviewTexts = [
+                                'Produk lumayan, tapi ada beberapa kekurangan.',
+                                'Sesuai harga, tidak terlalu istimewa.',
+                                'Kualitas standar, pengiriman agak lama.',
+                                'Produk oke tapi tidak sesuai ekspektasi.',
+                                'Cukup memuaskan untuk harga segini.',
+                            ];
+                        }
+
+                        ProductReview::create([
+                            'iduser' => $customer->id,
+                            'idproduct' => $cartDetail->product->id,
+                            'rating' => $rating,
+                            'review' => $faker->randomElement($reviewTexts),
+                            'created_at' => $faker->dateTimeBetween($order->created_at, 'now'),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $this->command->info('✅ Product Reviews seeded successfully');
+    }
 }

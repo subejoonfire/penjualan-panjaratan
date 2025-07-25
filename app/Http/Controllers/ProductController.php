@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ProductReview;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -297,26 +298,68 @@ class ProductController extends Controller
      */
     public function searchSuggestions(Request $request)
     {
-        $searchTerm = $request->get('q', '');
-
-        if (strlen($searchTerm) < 2) {
+        $query = $request->get('q');
+        
+        if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $suggestions = Product::where('is_active', true)
-            ->where('productstock', '>', 0)
-            ->where('productname', 'like', '%' . $searchTerm . '%')
-            ->select('id', 'productname')
+        $products = Product::where('productname', 'like', '%' . $query . '%')
+            ->where('is_active', true)
             ->limit(10)
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->productname,
-                    'url' => route('products.show', $product)
-                ];
-            });
+            ->get(['id', 'productname', 'productprice']);
 
-        return response()->json($suggestions);
+        return response()->json($products);
+    }
+
+    /**
+     * Store product review
+     */
+    public function storeReview(Request $request, Product $product)
+    {
+        $user = auth()->user();
+
+        // Validasi input
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'required|string|max:1000'
+        ]);
+
+        // Cek apakah user adalah customer
+        if ($user->role !== 'customer') {
+            return back()->with('error', 'Hanya customer yang dapat memberikan ulasan.');
+        }
+
+        // Cek apakah user sudah membeli produk ini dan sudah diterima
+        $hasPurchased = Order::whereHas('cart', function($query) use ($user) {
+            $query->where('iduser', $user->id);
+        })->whereHas('cart.cartDetails', function($query) use ($product) {
+            $query->where('idproduct', $product->id);
+        })->whereHas('transaction', function($query) {
+            $query->where('transactionstatus', 'paid');
+        })->where('status', 'delivered')->exists();
+
+        if (!$hasPurchased) {
+            return back()->with('error', 'Anda hanya dapat memberikan ulasan untuk produk yang sudah Anda beli dan terima.');
+        }
+
+        // Cek apakah user sudah memberikan review untuk produk ini
+        $existingReview = ProductReview::where('iduser', $user->id)
+            ->where('idproduct', $product->id)
+            ->first();
+
+        if ($existingReview) {
+            return back()->with('error', 'Anda sudah memberikan ulasan untuk produk ini.');
+        }
+
+        // Simpan review
+        ProductReview::create([
+            'iduser' => $user->id,
+            'idproduct' => $product->id,
+            'rating' => $request->rating,
+            'review' => $request->review
+        ]);
+
+        return back()->with('success', 'Ulasan Anda berhasil disimpan. Terima kasih!');
     }
 }

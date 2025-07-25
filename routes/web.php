@@ -171,6 +171,11 @@ Route::get('/categories/{category}', [ProductController::class, 'byCategory'])->
 // Search
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 
+// Product Reviews
+Route::middleware('auth')->group(function () {
+    Route::post('/products/{product}/reviews', [ProductController::class, 'storeReview'])->name('products.review.store');
+});
+
 /*
 |--------------------------------------------------------------------------
 | API Routes (for AJAX requests)

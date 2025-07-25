@@ -318,8 +318,8 @@
                     <input type="hidden" name="rating" id="ratingInput" value="0">
                 </div>
                 <div class="mb-4">
-                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Komentar</label>
-                    <textarea id="comment" name="comment" rows="4" required
+                    <label for="review" class="block text-sm font-medium text-gray-700 mb-2">Ulasan</label>
+                    <textarea id="review" name="review" rows="4" required
                         class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         placeholder="Bagikan pengalaman Anda dengan produk ini..."></textarea>
                 </div>
@@ -342,7 +342,7 @@
 
 function openReviewModal(productId, productName) {
     document.getElementById('productName').textContent = 'Produk: ' + productName;
-    document.getElementById('reviewForm').action = '/customer/products/' + productId + '/reviews';
+    document.getElementById('reviewForm').action = '/products/' + productId + '/reviews';
     document.getElementById('reviewModal').classList.remove('hidden');
     resetRating();
 }

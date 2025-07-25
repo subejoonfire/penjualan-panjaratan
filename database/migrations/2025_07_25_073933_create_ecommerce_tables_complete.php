@@ -55,7 +55,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('idproduct')->constrained('products')->onDelete('cascade'); // Relasi ke products
             $table->foreignId('iduser')->constrained('users')->onDelete('cascade'); // Relasi ke users (reviewer)
-            $table->text('productreviews'); // Isi review
+            $table->text('review'); // Isi review
             $table->integer('rating')->default(5); // Rating 1-5
             $table->timestamps();
         });

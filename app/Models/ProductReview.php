@@ -18,7 +18,7 @@ class ProductReview extends Model
     protected $fillable = [
         'idproduct',
         'iduser',
-        'productreviews',
+        'review',
         'rating',
     ];
 
@@ -38,6 +38,18 @@ class ProductReview extends Model
     public function getStarsAttribute()
     {
         return str_repeat('★', $this->rating) . str_repeat('☆', 5 - $this->rating);
+    }
+
+    // Accessor untuk backward compatibility
+    public function getProductreviewsAttribute()
+    {
+        return $this->review;
+    }
+
+    // Mutator untuk backward compatibility  
+    public function setProductreviewsAttribute($value)
+    {
+        $this->attributes['review'] = $value;
     }
 
     // Scope untuk review berdasarkan rating

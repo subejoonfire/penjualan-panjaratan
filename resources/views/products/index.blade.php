@@ -157,20 +157,32 @@
 
                         <!-- Product Details -->
                         <div class="p-4">
-                            <h3 class="text-lg font-medium text-gray-900 mb-2 truncate">
-                                <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
-                                    {{ $product->productname }}
-                                </a>
-                            </h3>
+                            <h4 class="text-sm font-medium text-gray-900 truncate">{{ $product->productname }}</h4>
+                            <p class="text-lg font-bold text-blue-600 mt-1">Rp {{ number_format($product->productprice) }}</p>
 
-                            <p class="text-sm text-gray-600 mb-2">{{ $product->category->category }}</p>
-                            <p class="text-sm text-gray-500 mb-3">oleh {{ $product->seller->username }}</p>
+                            <!-- Rating Display -->
+                            <div class="mt-2 flex items-center">
+                                <div class="flex items-center">
+                                    @if($product->review_count > 0)
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star text-xs {{ $i <= round($product->average_rating) ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                        @endfor
+                                        <span class="ml-1 text-xs text-gray-600">{{ number_format($product->average_rating, 1) }}</span>
+                                        <span class="ml-1 text-xs text-gray-500">({{ $product->review_count }})</span>
+                                    @else
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star text-xs text-gray-300"></i>
+                                        @endfor
+                                        <span class="ml-1 text-xs text-gray-500">Belum ada ulasan</span>
+                                    @endif
+                                </div>
+                            </div>
 
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-lg font-bold text-blue-600">Rp {{
-                                    number_format($product->productprice)
-                                    }}</span>
-                                <span class="text-sm text-gray-500">Stok: {{ $product->productstock }}</span>
+                            <div class="mt-2 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">{{ $product->seller->username }}</span>
+                                <span class="text-xs text-gray-500">
+                                    Stok: {{ $product->productstock }}
+                                </span>
                             </div>
 
                             <!-- Rating & Reviews -->
