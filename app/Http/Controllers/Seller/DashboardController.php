@@ -395,4 +395,17 @@ class DashboardController extends Controller
 
         return back()->with('success', 'Image deleted successfully');
     }
+
+    /**
+     * Set gambar produk sebagai utama
+     */
+    public function setPrimaryImage(ProductImage $image)
+    {
+        $user = Auth::user();
+        if ($image->product->iduserseller !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+        $image->setAsPrimary();
+        return redirect()->route('seller.products.edit', $image->product)->with('success', 'Gambar utama berhasil diubah.');
+    }
 }

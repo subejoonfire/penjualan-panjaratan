@@ -11,7 +11,7 @@
                 <li class="inline-flex items-center">
                     <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-blue-600">
                         <i class="fas fa-home mr-2"></i>
-                        Products
+                        Produk
                     </a>
                 </li>
                 <li>
@@ -58,7 +58,7 @@
                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg flex items-center justify-center">
                     <div class="text-center">
                         <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
-                        <p class="text-gray-500">No image available</p>
+                        <p class="text-gray-500">Tidak ada gambar tersedia</p>
                     </div>
                 </div>
                 @endif
@@ -73,12 +73,12 @@
                         <div>
                             <p class="text-3xl font-bold text-blue-600">Rp {{ number_format($product->productprice) }}
                             </p>
-                            <p class="text-sm text-gray-500 mt-1">Price per item</p>
+                            <p class="text-sm text-gray-500 mt-1">Harga per item</p>
                         </div>
                         <div class="text-right">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                 {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $product->is_active ? 'Available' : 'Unavailable' }}
+                                {{ $product->is_active ? 'Tersedia' : 'Tidak Tersedia' }}
                             </span>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                 <div class="border-t border-gray-200 pt-6">
                     <dl class="space-y-4">
                         <div>
-                            <dt class="text-sm font-medium text-gray-900">Category</dt>
+                            <dt class="text-sm font-medium text-gray-900">Kategori</dt>
                             <dd class="mt-1">
                                 <a href="{{ route('products.category', $product->category) }}"
                                     class="text-blue-600 hover:text-blue-500">
@@ -97,27 +97,27 @@
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-900">Seller</dt>
+                            <dt class="text-sm font-medium text-gray-900">Penjual</dt>
                             <dd class="mt-1 text-gray-700">{{ $product->seller->username }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-900">Stock</dt>
+                            <dt class="text-sm font-medium text-gray-900">Stok</dt>
                             <dd class="mt-1">
                                 <span
                                     class="text-lg font-semibold
                                     {{ $product->productstock > 10 ? 'text-green-600' : ($product->productstock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
                                     {{ $product->productstock }} {{ $product->productstock === 1 ? 'item' : 'items' }}
-                                    available
+                                    tersedia
                                 </span>
                                 @if($product->productstock <= 10 && $product->productstock > 0)
                                     <p class="text-sm text-yellow-600 mt-1">
                                         <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        Only {{ $product->productstock }} left in stock!
+                                        Hanya {{ $product->productstock }} tersisa!
                                     </p>
                                     @elseif($product->productstock === 0)
                                     <p class="text-sm text-red-600 mt-1">
                                         <i class="fas fa-times-circle mr-1"></i>
-                                        Out of stock
+                                        Stok habis
                                     </p>
                                     @endif
                             </dd>
@@ -134,7 +134,7 @@
                         <!-- Quantity Selector -->
                         <div>
                             <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                                Quantity
+                                Jumlah
                             </label>
                             <div class="flex items-center space-x-2">
                                 <button type="button" onclick="decreaseQuantity()"
@@ -148,7 +148,7 @@
                                     class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
                                     <i class="fas fa-plus text-sm"></i>
                                 </button>
-                                <span class="text-sm text-gray-500">Max: {{ $product->productstock }}</span>
+                                <span class="text-sm text-gray-500">Maks: {{ $product->productstock }}</span>
                             </div>
                         </div>
 
@@ -169,10 +169,10 @@
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm text-blue-800">
-                                    This is your product. You can
+                                    Ini adalah produk Anda. Anda dapat
                                     <a href="{{ route('seller.products.edit', $product) }}"
                                         class="font-medium underline">
-                                        edit it here
+                                        editnya di sini
                                     </a>.
                                 </p>
                             </div>
@@ -183,7 +183,7 @@
                 @else
                 <div class="border-t border-gray-200 pt-6">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-4 text-center">
-                        <p class="text-gray-700 mb-4">Please login to purchase this product</p>
+                        <p class="text-gray-700 mb-4">Silakan login untuk membeli produk ini</p>
                         <div class="space-x-4">
                             <a href="{{ route('login') }}"
                                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
@@ -203,11 +203,11 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="text-center">
                             <div class="text-2xl font-bold text-gray-900">{{ $product->views ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Views</div>
+                            <div class="text-sm text-gray-500">Tampilan</div>
                         </div>
                         <div class="text-center">
                             <div class="text-2xl font-bold text-gray-900">{{ $product->sold ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Sold</div>
+                            <div class="text-sm text-gray-500">Terjual</div>
                         </div>
                         <div class="text-center">
                             <div class="text-2xl font-bold text-gray-900">
@@ -225,7 +225,7 @@
         <div class="mt-12">
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Product Description</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Deskripsi Produk</h3>
                 </div>
                 <div class="px-6 py-6">
                     <div class="prose max-w-none">
@@ -241,7 +241,7 @@
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">
-                        Customer Reviews ({{ $product->reviews()->count() }})
+                        Ulasan Pelanggan ({{ $product->reviews()->count() }})
                     </h3>
                 </div>
                 <div class="px-6 py-6 space-y-6">
@@ -272,7 +272,7 @@
                     @if($product->reviews()->count() > 5)
                     <div class="text-center pt-4">
                         <button class="text-blue-600 hover:text-blue-500 text-sm font-medium">
-                            View all {{ $product->reviews()->count() }} reviews
+                            Lihat semua {{ $product->reviews()->count() }} ulasan
                         </button>
                     </div>
                     @endif
@@ -284,7 +284,7 @@
         <!-- Related Products -->
         @if($relatedProducts->count() > 0)
         <div class="mt-12">
-            <h3 class="text-xl font-bold text-gray-900 mb-6">Related Products</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Produk Terkait</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($relatedProducts as $relatedProduct)
                 <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -306,7 +306,7 @@
                             <span class="text-xs text-gray-500">{{ $relatedProduct->seller->username }}</span>
                             <a href="{{ route('products.show', $relatedProduct) }}"
                                 class="text-blue-600 hover:text-blue-500 text-sm">
-                                View
+                                Lihat
                             </a>
                         </div>
                     </div>

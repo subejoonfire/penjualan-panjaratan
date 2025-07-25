@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Transaction Management - Admin Dashboard')
+@section('title', 'Transaksi Management - Admin Dashboard')
 
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Transaction Management</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Transaksi Management</h1>
             <p class="mt-2 text-gray-600">Manage all transactions in the system</p>
         </div>
 
@@ -16,19 +16,19 @@
             <div class="p-6">
                 <form method="GET" action="{{ route('admin.transactions.index') }}" class="flex flex-wrap gap-4">
                     <div class="flex-1 min-w-64">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Transactions</label>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Transaksi</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                               placeholder="Search by transaction number..."
+                               placeholder="Cari berdasarkan nomor transaksi..."
                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="min-w-48">
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">All Status</option>
+                            <option value="">Semua Status</option>
                             <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid</option>
-                            <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>Failed</option>
-                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Dibayar</option>
+                            <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>Gagal</option>
+                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
                         </select>
                     </div>
                     <div class="flex items-end">
@@ -37,7 +37,7 @@
                         </button>
                         @if(request()->hasAny(['search', 'status']))
                             <a href="{{ route('admin.transactions.index') }}" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                                Clear
+                                Bersihkan
                             </a>
                         @endif
                     </div>
@@ -57,7 +57,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Transactions</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Transaksi</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $transactions->total() }}</dd>
                             </dl>
                         </div>
@@ -75,7 +75,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Paid</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Dibayar</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $transactions->where('transactionstatus', 'paid')->count() }}</dd>
                             </dl>
                         </div>
@@ -118,7 +118,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Failed</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Gagal</dt>
                                 <dd class="text-lg font-medium text-gray-900">{{ $transactions->where('transactionstatus', 'failed')->count() }}</dd>
                             </dl>
                         </div>
@@ -133,14 +133,14 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaksi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pesanan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metode Pembayaran</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -201,15 +201,15 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <button onclick="viewTransactionDetails('{{ $transaction->id }}')" class="text-blue-600 hover:text-blue-900">
-                                            View
+                                            Lihat
                                         </button>
                                         @if($transaction->transactionstatus === 'pending')
                                             <button onclick="updateTransactionStatus('{{ $transaction->id }}')" class="text-green-600 hover:text-green-900">
-                                                Update
+                                                Perbarui
                                             </button>
                                         @endif
                                         <button onclick="generateReceipt('{{ $transaction->id }}')" class="text-purple-600 hover:text-purple-900">
-                                            Receipt
+                                            Resi
                                         </button>
                                     </div>
                                 </td>
@@ -218,8 +218,8 @@
                             <tr>
                                 <td colspan="8" class="px-6 py-12 text-center">
                                     <i class="fas fa-receipt text-gray-400 text-4xl mb-4"></i>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Transactions Found</h3>
-                                    <p class="text-gray-600">No transactions match your filter criteria.</p>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Transaksi Ditemukan</h3>
+                                    <p class="text-gray-600">Tidak ada transaksi yang sesuai dengan kriteria filter Anda.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -242,7 +242,7 @@
     <div class="relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-                <h3 id="transactionModalTitle" class="text-lg font-medium text-gray-900">Transaction Details</h3>
+                <h3 id="transactionModalTitle" class="text-lg font-medium text-gray-900">Transaksi Details</h3>
                 <button onclick="closeTransactionModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
@@ -259,32 +259,32 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Update Transaction Status</h3>
+                <h3 class="text-lg font-medium text-gray-900">Update Status Transaksi</h3>
                 <button onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="statusForm">
                 <div class="mb-4">
-                    <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
+                    <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
                     <select id="newStatus" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="failed">Failed</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="paid">Dibayar</option>
+                        <option value="failed">Gagal</option>
+                        <option value="cancelled">Dibatalkan</option>
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Catatan (Opsional)</label>
                     <textarea id="notes" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                              placeholder="Add any notes about this status change..."></textarea>
+                              placeholder="Tambahkan catatan tentang perubahan status..."></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeStatusModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                        Cancel
+                        Batal
                     </button>
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        Update Status
+                        Perbarui Status
                     </button>
                 </div>
             </form>
@@ -297,7 +297,7 @@ let currentTransactionId = null;
 
 function viewTransactionDetails(transactionId) {
     currentTransactionId = transactionId;
-    document.getElementById('transactionModalTitle').innerText = `Transaction Details - #${transactionId}`;
+    document.getElementById('transactionModalTitle').innerText = `Transaksi Details - #${transactionId}`;
     document.getElementById('transactionModalContent').innerHTML = `
         <div class="text-center py-8">
             <i class="fas fa-spinner fa-spin text-gray-400 text-2xl mb-4"></i>
@@ -311,8 +311,8 @@ function viewTransactionDetails(transactionId) {
         document.getElementById('transactionModalContent').innerHTML = `
             <div class="space-y-4">
                 <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Transaction Information</h4>
-                    <p class="text-sm text-gray-600">Transaction details would be loaded via AJAX here</p>
+                    <h4 class="font-medium text-gray-900 mb-2">Transaksi Information</h4>
+                    <p class="text-sm text-gray-600">Transaksi details would be loaded via AJAX here</p>
                 </div>
                 <div class="bg-blue-50 p-4 rounded-lg">
                     <h4 class="font-medium text-gray-900 mb-2">Order Details</h4>
