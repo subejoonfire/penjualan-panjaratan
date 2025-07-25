@@ -183,11 +183,16 @@
                             <img src="{{ asset('storage/' . $image->image) }}" alt="Gambar Produk"
                                 class="w-full h-32 object-cover rounded-lg border border-gray-200">
                             @if($image->is_primary)
-                                <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>
+                            <span
+                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>
                             @else
-                                <a href="{{ route('seller.products.images.primary', $image) }}" class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">Jadikan Utama</a>
+                            <a href="{{ route('seller.products.images.primary', $image) }}"
+                                class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">Jadikan
+                                Utama</a>
                             @endif
-                            <a href="{{ route('seller.products.images.delete', $image) }}" class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700" onclick="return confirm('Hapus gambar ini?')">
+                            <a href="{{ route('seller.products.images.delete', $image) }}"
+                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
+                                onclick="return confirm('Hapus gambar ini?')">
                                 Hapus
                             </a>
                         </div>
