@@ -79,7 +79,11 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('dashboard');
     
     // Product Management for Seller
-    // Route::resource('products', \App\Http\Controllers\Seller\ProductController::class);
+    Route::get('/products', [SellerDashboardController::class, 'products'])->name('products.index');
+    Route::get('/products/create', [SellerDashboardController::class, 'createProduct'])->name('products.create');
+    Route::post('/products', [SellerDashboardController::class, 'storeProduct'])->name('products.store');
+    Route::get('/products/{product}/edit', [SellerDashboardController::class, 'editProduct'])->name('products.edit');
+    Route::put('/products/{product}', [SellerDashboardController::class, 'updateProduct'])->name('products.update');
     
     // Order Management for Seller
     Route::get('/orders', [SellerDashboardController::class, 'orders'])->name('orders.index');
