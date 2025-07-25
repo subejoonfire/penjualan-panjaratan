@@ -41,7 +41,7 @@ class Cart extends Model
     // Helper method untuk mendapatkan total harga cart
     public function getTotalPriceAttribute()
     {
-        return $this->cartDetails->sum(function($detail) {
+        return $this->cartDetails->sum(function ($detail) {
             return $detail->quantity * $detail->price;
         });
     }
@@ -62,7 +62,7 @@ class Cart extends Model
     public function addProduct($productId, $quantity = 1)
     {
         $product = Product::find($productId);
-        
+
         if (!$product || !$product->isInStock()) {
             return false;
         }
@@ -75,7 +75,7 @@ class Cart extends Model
             $this->cartDetails()->create([
                 'idproduct' => $productId,
                 'quantity' => $quantity,
-                'price' => $product->productprice,
+                'productprice' => $product->productprice,
             ]);
         }
 
@@ -86,7 +86,7 @@ class Cart extends Model
     public function updateProductQuantity($productId, $quantity)
     {
         $detail = $this->cartDetails()->where('idproduct', $productId)->first();
-        
+
         if ($detail) {
             if ($quantity <= 0) {
                 $detail->delete();
@@ -95,7 +95,7 @@ class Cart extends Model
             }
             return true;
         }
-        
+
         return false;
     }
 

@@ -74,7 +74,7 @@ return new class extends Migration
             $table->foreignId('idcart')->constrained('carts')->onDelete('cascade'); // Relasi ke carts
             $table->foreignId('idproduct')->constrained('products')->onDelete('cascade'); // Relasi ke products
             $table->integer('quantity')->default(1); // Jumlah produk
-            $table->decimal('price', 12, 2); // Harga saat ditambahkan ke cart
+            $table->decimal('productprice', 12, 2); // Harga saat ditambahkan ke cart
             $table->timestamps();
         });
 
