@@ -160,8 +160,7 @@
                     @if($category->products()->count() > 0)
                     <div class="px-6 py-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as
-                            $product)
+                            @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as $product)
                             <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-shrink-0 h-16 w-16">
@@ -237,8 +236,7 @@
                             <div>
                                 <h4 class="text-sm font-medium text-gray-900 mb-3">Top Sellers in this Category</h4>
                                 <div class="space-y-2">
-                                    @foreach($category->products()->with('seller')->get()->groupBy('seller_id')->take(5)
-                                    as $sellerId => $products)
+                                    @foreach($category->products()->with('seller')->get()->groupBy('seller_id')->take(5) as $sellerId => $products)
                                     @php $seller = $products->first()->seller; @endphp
                                     <div class="flex items-center justify-between py-2">
                                         <div class="flex items-center">
