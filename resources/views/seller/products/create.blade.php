@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add New Product - Seller Dashboard')
+@section('title', 'Tambah Produk Baru - Dashboard Penjual')
 
 @section('content')
 <div class="py-6">
@@ -9,13 +9,13 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Add New Product</h1>
-                    <p class="mt-2 text-gray-600">Create a new product listing for your store</p>
+                    <h1 class="text-3xl font-bold text-gray-900">Tambah Produk Baru</h1>
+                    <p class="mt-2 text-gray-600">Buat listing produk baru untuk toko Anda</p>
                 </div>
                 <a href="{{ route('seller.products.index') }}"
                     class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-arrow-left mr-2"></i>
-                    Back to Products
+                    Kembali ke Produk
                 </a>
             </div>
         </div>
@@ -27,17 +27,17 @@
             <!-- Basic Information -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Basic Information</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Informasi Dasar</h3>
                 </div>
                 <div class="p-6 space-y-6">
                     <!-- Product Name -->
                     <div>
                         <label for="productname" class="block text-sm font-medium text-gray-700 mb-2">
-                            Product Name <span class="text-red-500">*</span>
+                            Nama Produk <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="productname" id="productname" value="{{ old('productname') }}" required
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="Enter product name">
+                            placeholder="Masukkan nama produk">
                         @error('productname')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -46,11 +46,11 @@
                     <!-- Category -->
                     <div>
                         <label for="idcategories" class="block text-sm font-medium text-gray-700 mb-2">
-                            Category <span class="text-red-500">*</span>
+                            Kategori <span class="text-red-500">*</span>
                         </label>
                         <select name="idcategories" id="idcategories" required
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">Select a category</option>
+                            <option value="">Pilih kategori</option>
                             @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('idcategories')==$category->id ? 'selected' : ''
                                 }}>
@@ -65,12 +65,12 @@
 
                     <!-- Description -->
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                            Description <span class="text-red-500">*</span>
+                        <label for="productdescription" class="block text-sm font-medium text-gray-700 mb-2">
+                            Deskripsi <span class="text-red-500">*</span>
                         </label>
-                        <textarea name="description" id="description" rows="4" required
+                        <textarea name="productdescription" id="productdescription" rows="4" required
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="Describe your product in detail...">{{ old('productdescription') }}</textarea>
+                            placeholder="Deskripsikan produk Anda secara detail...">{{ old('productdescription') }}</textarea>
                         @error('productdescription')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -81,14 +81,14 @@
             <!-- Pricing & Inventory -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Pricing & Inventory</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Harga & Stok</h3>
                 </div>
                 <div class="p-6 space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Price -->
                         <div>
                             <label for="productprice" class="block text-sm font-medium text-gray-700 mb-2">
-                                Price (Rp) <span class="text-red-500">*</span>
+                                Harga (Rp) <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -106,13 +106,13 @@
 
                         <!-- Stock -->
                         <div>
-                            <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">
-                                Stock Quantity <span class="text-red-500">*</span>
+                            <label for="productstock" class="block text-sm font-medium text-gray-700 mb-2">
+                                Jumlah Stok <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="stock" id="stock" value="{{ old('stock') }}" required min="0"
+                            <input type="number" name="productstock" id="productstock" value="{{ old('productstock') }}" required min="0"
                                 class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="0">
-                            @error('stock')
+                            @error('productstock')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -123,9 +123,9 @@
             <!-- Product Images -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Product Images</h3>
-                    <p class="mt-1 text-sm text-gray-600">Upload product images to showcase your product. First image
-                        will be the primary image.</p>
+                    <h3 class="text-lg font-medium text-gray-900">Gambar Produk</h3>
+                    <p class="mt-1 text-sm text-gray-600">Unggah gambar produk untuk menampilkan produk Anda. Gambar pertama
+                        akan menjadi gambar utama.</p>
                 </div>
                 <div class="p-6">
                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
@@ -134,13 +134,13 @@
                             <div class="flex text-sm text-gray-600">
                                 <label for="images"
                                     class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                                    <span>Upload images</span>
+                                    <span>Unggah gambar</span>
                                     <input id="images" name="images[]" type="file" class="sr-only" multiple
                                         accept="image/*">
                                 </label>
-                                <p class="pl-1">or drag and drop</p>
+                                <p class="pl-1">atau seret dan lepas</p>
                             </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB each</p>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar</p>
                         </div>
                     </div>
 
@@ -162,12 +162,12 @@
             <div class="flex items-center justify-end space-x-4">
                 <a href="{{ route('seller.products.index') }}"
                     class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    Cancel
+                    Batal
                 </a>
                 <button type="submit"
                     class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <i class="fas fa-save mr-2"></i>
-                    Create Product
+                    Buat Produk
                 </button>
             </div>
         </form>
@@ -193,8 +193,8 @@
                         const imageDiv = document.createElement('div');
                         imageDiv.className = 'relative';
                         imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview ${index + 1}" class="w-full h-24 object-cover rounded-md border">
-                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Primary</span>' : ''}
+                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" class="w-full h-24 object-cover rounded-md border">
+                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : ''}
                         `;
                         imagePreview.appendChild(imageDiv);
                     };

@@ -80,9 +80,9 @@ class DashboardController extends Controller
 
         // Low stock products
         $lowStockProducts = $user->products()
-            ->where('stock', '<', 10)
+            ->where('productstock', '<', 10)
             ->where('is_active', true)
-            ->orderBy('stock', 'asc')
+            ->orderBy('productstock', 'asc')
             ->limit(5)
             ->get();
 
@@ -148,7 +148,7 @@ class DashboardController extends Controller
             'productname' => 'required|string|max:255',
             'productdescription' => 'required|string',
             'productprice' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'productstock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
@@ -157,7 +157,7 @@ class DashboardController extends Controller
             'productname' => $request->productname,
             'productdescription' => $request->productdescription,
             'productprice' => $request->productprice,
-            'stock' => $request->productstock,
+            'productstock' => $request->productstock,
             'idcategories' => $request->idcategories,
             'iduserseller' => $user->id,
             'is_active' => true
@@ -169,7 +169,7 @@ class DashboardController extends Controller
                 $path = $image->store('products', 'public');
                 ProductImage::create([
                     'idproduct' => $product->id,
-                    'imageurl' => $path,
+                    'image' => $path,
                     'is_primary' => ProductImage::where('idproduct', $product->id)->count() === 0
                 ]);
             }
@@ -210,7 +210,7 @@ class DashboardController extends Controller
             'productname' => 'required|string|max:255',
             'productdescription' => 'required|string',
             'productprice' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'productstock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
             'is_active' => 'boolean',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -220,7 +220,7 @@ class DashboardController extends Controller
             'productname' => $request->productname,
             'productdescription' => $request->productdescription,
             'productprice' => $request->productprice,
-            'stock' => $request->productstock,
+            'productstock' => $request->productstock,
             'idcategories' => $request->idcategories,
             'is_active' => $request->has('is_active')
         ]);
@@ -231,7 +231,7 @@ class DashboardController extends Controller
                 $path = $image->store('products', 'public');
                 ProductImage::create([
                     'idproduct' => $product->id,
-                    'imageurl' => $path,
+                    'image' => $path,
                     'is_primary' => $product->images()->count() === 0
                 ]);
             }
@@ -372,7 +372,7 @@ class DashboardController extends Controller
 
         ProductImage::create([
             'idproduct' => $product->id,
-            'imageurl' => $path,
+            'image' => $path,
             'is_primary' => $product->images()->count() === 0
         ]);
 
@@ -390,7 +390,7 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        Storage::disk('public')->delete($image->imageurl);
+        Storage::disk('public')->delete($image->image);
         $image->delete();
 
         return back()->with('success', 'Image deleted successfully');
