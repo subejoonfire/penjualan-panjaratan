@@ -156,7 +156,7 @@ class DashboardController extends Controller
         $product = Product::create([
             'productname' => $request->productname,
             'description' => $request->description,
-            'productprice' => $request->price,
+            'productprice' => $request->productprice,
             'stock' => $request->stock,
             'idcategories' => $request->idcategories,
             'iduserseller' => $user->id,
@@ -219,7 +219,7 @@ class DashboardController extends Controller
         $product->update([
             'productname' => $request->productname,
             'description' => $request->description,
-            'productprice' => $request->price,
+            'productprice' => $request->productprice,
             'stock' => $request->stock,
             'idcategories' => $request->idcategories,
             'is_active' => $request->has('is_active')

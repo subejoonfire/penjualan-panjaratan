@@ -57,11 +57,11 @@
                                         </a>
                                     </h4>
                                     <p class="text-sm text-gray-600">oleh {{ $detail->product->seller->username }}</p>
-                                    <p class="text-sm text-gray-500">{{ $detail->product->category->categoryname }}</p>
+                                    <p class="text-sm text-gray-500">{{ $detail->product->category->category }}</p>
 
                                     <div class="mt-2 flex items-center space-x-4">
                                         <span class="text-lg font-bold text-blue-600">
-                                            Rp {{ number_format($detail->product->price) }}
+                                            Rp {{ number_format($detail->product->productprice) }}
                                         </span>
                                         @if($detail->product->stock < $detail->quantity)
                                             <span class="text-sm text-red-600 font-medium">
@@ -95,7 +95,7 @@
                                 <!-- Subtotal -->
                                 <div class="text-right">
                                     <p class="text-lg font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->price) }}
+                                        Rp {{ number_format($detail->quantity * $detail->product->productprice) }}
                                     </p>
                                 </div>
 

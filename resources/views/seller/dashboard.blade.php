@@ -241,7 +241,8 @@
                                     <div class="ml-3">
                                         <p class="text-sm font-medium text-gray-900 truncate">{{
                                             Str::limit($product->productname, 25) }}</p>
-                                        <p class="text-xs text-gray-500">Rp {{ number_format($product->price) }}</p>
+                                        <p class="text-xs text-gray-500">Rp {{ number_format($product->productprice) }}
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="text-right">

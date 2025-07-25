@@ -36,7 +36,7 @@
                                 @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ request('category')==$category->id ? 'selected' :
                                     '' }}>
-                                    {{ $category->categoryname }} ({{ $category->products_count }})
+                                    {{ $category->category }} ({{ $category->products_count }})
                                 </option>
                                 @endforeach
                             </select>
@@ -159,11 +159,12 @@
                                 </a>
                             </h3>
 
-                            <p class="text-sm text-gray-600 mb-2">{{ $product->category->categoryname }}</p>
+                            <p class="text-sm text-gray-600 mb-2">{{ $product->category->category }}</p>
                             <p class="text-sm text-gray-500 mb-3">oleh {{ $product->seller->username }}</p>
 
                             <div class="flex items-center justify-between mb-3">
-                                <span class="text-lg font-bold text-blue-600">Rp {{ number_format($product->price)
+                                <span class="text-lg font-bold text-blue-600">Rp {{
+                                    number_format($product->productprice)
                                     }}</span>
                                 <span class="text-sm text-gray-500">Stok: {{ $product->stock }}</span>
                             </div>

@@ -280,7 +280,7 @@ class EcommerceSeeder extends Seeder
         foreach ($carts as $cart) {
             $cartDetails = CartDetail::where('idcart', $cart->id)->get();
             $grandTotal = $cartDetails->sum(function ($detail) {
-                return $detail->quantity * $detail->price;
+                return $detail->quantity * $detail->productprice;
             });
 
             Order::create([

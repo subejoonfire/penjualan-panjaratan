@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-medium text-blue-900">{{ $category->categoryname }}</h3>
+                    <h3 class="text-lg font-medium text-blue-900">{{ $category->category }}</h3>
                     <p class="text-sm text-blue-700">
                         Created {{ $category->created_at->format('M d, Y') }} •
                         {{ $category->products_count ?? $category->products()->count() }} products
@@ -47,14 +47,14 @@
                 <div class="px-6 py-6">
                     <!-- Category Name -->
                     <div class="mb-6">
-                        <label for="categoryname" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
                             Category Name <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="categoryname" id="categoryname"
-                            value="{{ old('categoryname', $category->categoryname) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                      @error('categoryname') border-red-300 @enderror"
+                        <input type="text" name="category" id="category"
+                            value="{{ old('category', $category->category) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                      @error('category') border-red-300 @enderror"
                             placeholder="Enter category name...">
-                        @error('categoryname')
+                        @error('category')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-sm text-gray-500">
@@ -176,7 +176,7 @@
                         </div>
                         <div class="ml-4">
                             <div id="preview-name" class="text-lg font-medium text-gray-900">
-                                {{ $category->categoryname }}
+                                {{ $category->category }}
                             </div>
                             <div id="preview-description" class="text-sm text-gray-500">
                                 {{ $category->description ?: 'Category description will appear here' }}
@@ -197,7 +197,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const nameInput = document.getElementById('categoryname');
+    const nameInput = document.getElementById('category');
     const descriptionInput = document.getElementById('description');
     const previewName = document.getElementById('preview-name');
     const previewDescription = document.getElementById('preview-description');
@@ -205,7 +205,7 @@
     // Update preview in real-time
     nameInput.addEventListener('input', function() {
         const value = this.value.trim();
-        previewName.textContent = value || '{{ $category->categoryname }}';
+        previewName.textContent = value || '{{ $category->category }}';
     });
 
     descriptionInput.addEventListener('input', function() {

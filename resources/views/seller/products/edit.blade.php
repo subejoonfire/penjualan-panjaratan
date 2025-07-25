@@ -36,7 +36,7 @@
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-blue-900">{{ $product->productname }}</h3>
                     <p class="text-sm text-blue-700">
-                        {{ $product->category->categoryname }} •
+                        {{ $product->category->category }} •
                         Created {{ $product->created_at->format('M d, Y') }} •
                         {{ $product->images->count() }} images
                     </p>
@@ -45,7 +45,8 @@
                             {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $product->is_active ? 'Active' : 'Inactive' }}
                         </span>
-                        <span class="text-sm text-blue-600 font-medium">Rp {{ number_format($product->price) }}</span>
+                        <span class="text-sm text-blue-600 font-medium">Rp {{ number_format($product->productprice)
+                            }}</span>
                     </div>
                 </div>
             </div>
@@ -77,20 +78,20 @@
 
                     <!-- Category -->
                     <div>
-                        <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="idcategories" class="block text-sm font-medium text-gray-700 mb-2">
                             Category <span class="text-red-500">*</span>
                         </label>
-                        <select name="category_id" id="category_id" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                       @error('category_id') border-red-300 @enderror">
+                        <select name="idcategories" id="idcategories" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                       @error('idcategories') border-red-300 @enderror">
                             <option value="">Select Category</option>
                             @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) ==
+                            <option value="{{ $category->id }}" {{ old('idcategories', $product->idcategories) ==
                                 $category->id ? 'selected' : '' }}>
-                                {{ $category->categoryname }}
+                                {{ $category->category }}
                             </option>
                             @endforeach
                         </select>
-                        @error('category_id')
+                        @error('idcategories')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -123,7 +124,7 @@
                                 Price (Rp) <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="productprice" id="productprice" min="0" step="1000"
-                                value="{{ old('productprice', $product->price) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                value="{{ old('productprice', $product->productprice) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                           @error('productprice') border-red-300 @enderror" placeholder="0">
                             @error('productprice')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
