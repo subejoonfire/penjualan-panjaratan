@@ -175,24 +175,6 @@
                                 Lanjut Belanja
                             </a>
                     </div>
-
-                    <!-- Promo Code -->
-                    <div class="mt-6 pt-6 border-t">
-                        <form action="{{ route('customer.cart.apply-coupon') }}" method="POST">
-                            @csrf
-                            <label for="coupon_code" class="block text-sm font-medium text-gray-700 mb-2">
-                                Kode Promo
-                            </label>
-                            <div class="flex space-x-2">
-                                <input type="text" name="coupon_code" id="coupon_code" placeholder="Masukkan kode promo"
-                                    class="flex-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <button type="submit"
-                                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                                    Terapkan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>
