@@ -137,7 +137,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-lg font-bold text-gray-900">Rp {{ number_format($order->total_amount) }}</p>
+                            <p class="text-lg font-bold text-gray-900">Rp {{ number_format($order->grandtotal) }}</p>
                             @if($order->status === 'pending')
                             <div class="mt-2 space-x-2">
                                 <form action="{{ route('customer.orders.cancel', $order) }}" method="POST"

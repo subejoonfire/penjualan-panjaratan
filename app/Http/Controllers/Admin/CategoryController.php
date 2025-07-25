@@ -41,12 +41,10 @@ class CategoryController extends Controller
     {
         $request->validate([
             'category' => 'required|string|max:255|unique:categories,category',
-            'productdescription' => 'nullable|string|max:1000',
         ]);
 
         Category::create([
             'category' => $request->category,
-            'productdescription' => $request->productdescription,
         ]);
 
         return redirect()->route('admin.categories.index')
@@ -66,7 +64,7 @@ class CategoryController extends Controller
         $stats = [
             'total_products' => $category->products()->count(),
             'active_products' => $category->products()->where('is_active', true)->count(),
-            'total_stock' => $category->products()->sum('stock'),
+            'total_stock' => $category->products()->sum('productstock'),
             'avg_price' => $category->products()->avg('productprice'),
         ];
 
@@ -88,12 +86,10 @@ class CategoryController extends Controller
     {
         $request->validate([
             'category' => 'required|string|max:255|unique:categories,category,' . $category->id,
-            'productdescription' => 'nullable|string|max:1000',
         ]);
 
         $category->update([
             'category' => $request->category,
-            'productdescription' => $request->productdescription,
         ]);
 
         return redirect()->route('admin.categories.index')

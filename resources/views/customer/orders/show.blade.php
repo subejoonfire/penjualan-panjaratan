@@ -251,7 +251,7 @@
                             <div class="flex justify-between border-t border-gray-200 pt-3">
                                 <dt class="text-base font-medium text-gray-900">Total</dt>
                                 <dd class="text-base font-medium text-gray-900">Rp {{
-                                    number_format($order->total_amount) }}</dd>
+                                    number_format($order->grandtotal) }}</dd>
                             </div>
                         </dl>
                     </div>

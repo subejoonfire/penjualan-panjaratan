@@ -175,9 +175,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900">
-                                    {{ $category->productdescription ? Str::limit($category->productdescription, 100) :
-                                    'Tidak ada
-                                    deskripsi' }}
+                                    <span class="text-gray-500 italic">Deskripsi tidak tersedia</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

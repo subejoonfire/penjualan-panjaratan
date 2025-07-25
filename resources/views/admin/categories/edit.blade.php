@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Category - Admin Dashboard')
+@section('title', 'Edit Kategori - Dashboard Admin')
 
 @section('content')
 <div class="py-6">
@@ -9,13 +9,13 @@
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Edit Category</h1>
-                    <p class="mt-2 text-gray-600">Update category information</p>
+                    <h1 class="text-3xl font-bold text-gray-900">Edit Kategori</h1>
+                    <p class="mt-2 text-gray-600">Perbarui informasi kategori</p>
                 </div>
                 <a href="{{ route('admin.categories.index') }}"
                     class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
                     <i class="fas fa-arrow-left mr-2"></i>
-                    Back to Categories
+                    Kembali ke Kategori
                 </a>
             </div>
         </div>
@@ -31,8 +31,8 @@
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-blue-900">{{ $category->category }}</h3>
                     <p class="text-sm text-blue-700">
-                        Created {{ $category->created_at->format('M d, Y') }} •
-                        {{ $category->products_count ?? $category->products()->count() }} products
+                        Dibuat {{ $category->created_at->format('d M Y') }} •
+                        {{ $category->products_count ?? $category->products()->count() }} produk
                     </p>
                 </div>
             </div>
@@ -48,33 +48,17 @@
                     <!-- Category Name -->
                     <div class="mb-6">
                         <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
-                            Category Name <span class="text-red-500">*</span>
+                            Nama Kategori <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="category" id="category"
                             value="{{ old('category', $category->category) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                       @error('category') border-red-300 @enderror"
-                            placeholder="Enter category name...">
+                            placeholder="Masukkan nama kategori...">
                         @error('category')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-sm text-gray-500">
-                            Choose a unique and descriptive name for this category
-                        </p>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="mb-6">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                            Description <span class="text-gray-400">(Optional)</span>
-                        </label>
-                        <textarea name="description" id="description" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                         @error('productdescription') border-red-300 @enderror"
-                            placeholder="Enter category description...">{{ old('productdescription', $category->productdescription) }}</textarea>
-                        @error('productdescription')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-1 text-sm text-gray-500">
-                            Provide a brief description of what products belong to this category
+                            Pilih nama yang unik dan deskriptif untuk kategori ini
                         </p>
                     </div>
 
@@ -103,17 +87,17 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-blue-600">{{ $category->products()->count() }}</div>
-                                <div class="text-xs text-gray-500">Total Products</div>
+                                <div class="text-xs text-gray-500">Total Produk</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-green-600">{{
                                     $category->products()->where('is_active', true)->count() }}</div>
-                                <div class="text-xs text-gray-500">Active Products</div>
+                                <div class="text-xs text-gray-500">Produk Aktif</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-purple-600">{{
-                                    number_format($category->products()->sum('stock')) }}</div>
-                                <div class="text-xs text-gray-500">Total Stock</div>
+                                    number_format($category->products()->sum('productstock')) }}</div>
+                                <div class="text-xs text-gray-500">Total Stok</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-yellow-600">
@@ -123,7 +107,7 @@
                                     -
                                     @endif
                                 </div>
-                                <div class="text-xs text-gray-500">Avg Price</div>
+                                <div class="text-xs text-gray-500">Rata-rata Harga</div>
                             </div>
                         </div>
                     </div>
@@ -135,25 +119,25 @@
                         <a href="{{ route('admin.categories.show', $category) }}"
                             class="text-blue-600 hover:text-blue-800 text-sm">
                             <i class="fas fa-eye mr-1"></i>
-                            View Category Details
+                            Lihat Detail Kategori
                         </a>
                         @if($category->products()->count() > 0)
                         <a href="{{ route('products.category', $category) }}"
                             class="text-green-600 hover:text-green-800 text-sm">
                             <i class="fas fa-box mr-1"></i>
-                            View Products
+                            Lihat Produk
                         </a>
                         @endif
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="{{ route('admin.categories.index') }}"
                             class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                            Cancel
+                            Batal
                         </a>
                         <button type="submit"
                             class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-save mr-2"></i>
-                            Update Category
+                            Perbarui Kategori
                         </button>
                     </div>
                 </div>
@@ -163,8 +147,8 @@
         <!-- Preview Section -->
         <div class="mt-8 bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Preview</h3>
-                <p class="text-sm text-gray-600">See how your updated category will appear</p>
+                <h3 class="text-lg font-medium text-gray-900">Pratinjau</h3>
+                <p class="text-sm text-gray-600">Lihat bagaimana kategori yang diperbarui akan ditampilkan</p>
             </div>
             <div class="px-6 py-6">
                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
@@ -178,13 +162,10 @@
                             <div id="preview-name" class="text-lg font-medium text-gray-900">
                                 {{ $category->category }}
                             </div>
-                            <div id="preview-description" class="text-sm text-gray-500">
-                                {{ $category->productdescription ?: 'Category description will appear here' }}
-                            </div>
                             <div class="mt-1">
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    {{ $category->products()->count() }} products
+                                    {{ $category->products()->count() }} produk
                                 </span>
                             </div>
                         </div>
@@ -198,19 +179,12 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     const nameInput = document.getElementById('category');
-    const descriptionInput = document.getElementById('productdescription');
     const previewName = document.getElementById('preview-name');
-    const previewDescription = document.getElementById('preview-description');
 
     // Update preview in real-time
     nameInput.addEventListener('input', function() {
         const value = this.value.trim();
         previewName.textContent = value || '{{ $category->category }}';
-    });
-
-    descriptionInput.addEventListener('input', function() {
-        const value = this.value.trim();
-        previewDescription.textContent = value || '{{ $category->productdescription ?: "Category description will appear here" }}';
     });
 });
 </script>

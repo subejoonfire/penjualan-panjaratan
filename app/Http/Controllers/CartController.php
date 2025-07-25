@@ -232,7 +232,7 @@ class CartController extends Controller
             $order = Order::create([
                 'idcart' => $cart->id,
                 'order_number' => 'ORD-' . time() . '-' . $user->id,
-                'total_amount' => $total,
+                'grandtotal' => $total,
                 'shipping_address' => $request->shipping_address,
                 'status' => 'pending',
                 'notes' => $request->notes
@@ -252,7 +252,7 @@ class CartController extends Controller
 
             // Update product stock
             foreach ($cartDetails as $detail) {
-                $detail->product->decrement('stock', $detail->quantity);
+                $detail->product->decrement('productstock', $detail->quantity);
             }
 
             // Create notification

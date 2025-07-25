@@ -180,7 +180,7 @@
                                     <div class="text-sm text-gray-500">{{ $order->cart->cartDetails->sum('quantity') }} qty</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Rp {{ number_format($order->total_amount) }}
+                                    Rp {{ number_format($order->grandtotal) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">{{ ucfirst($order->transaction->paymentmethod ?? 'N/A') }}</div>

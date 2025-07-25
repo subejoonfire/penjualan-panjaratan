@@ -192,7 +192,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">Rp {{
-                                        number_format($order->total_amount) }}</p>
+                                        number_format($order->grandtotal) }}</p>
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                                                 @if($order->status === 'pending') bg-yellow-100 text-yellow-800
                                                 @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800

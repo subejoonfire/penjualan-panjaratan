@@ -98,7 +98,7 @@
                         <div class="border-t pt-3">
                             <div class="flex justify-between font-semibold">
                                 <span class="text-gray-900">Total</span>
-                                <span class="text-gray-900">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                                <span class="text-gray-900">Rp {{ number_format($order->grandtotal, 0, ',', '.') }}</span>
                             </div>
                         </div>
                     </div>

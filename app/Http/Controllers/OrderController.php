@@ -133,7 +133,7 @@ class OrderController extends Controller
 
             // Check stock
             foreach ($cartDetails as $detail) {
-                if ($detail->product->stock < $detail->quantity) {
+                if ($detail->product->productstock < $detail->quantity) {
                     throw new \Exception('Stok tidak mencukupi untuk ' . $detail->product->productname);
                 }
             }
@@ -149,7 +149,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'idcart' => $cart->id,
                 'order_number' => 'ORD-' . time() . '-' . $user->id,
-                'total_amount' => $total,
+                'grandtotal' => $total,
                 'shipping_address' => $request->shipping_address,
                 'status' => 'pending',
                 'notes' => $request->notes
@@ -169,7 +169,7 @@ class OrderController extends Controller
 
             // Update product stock
             foreach ($cartDetails as $detail) {
-                $detail->product->decrement('stock', $detail->quantity);
+                $detail->product->decrement('productstock', $detail->quantity);
             }
 
             // Create notification
