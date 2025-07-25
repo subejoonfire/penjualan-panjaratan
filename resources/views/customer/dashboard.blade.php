@@ -135,7 +135,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-purple-600">Notifikasi</p>
-                            <p class="text-sm text-gray-500">{{ $unreadNotifications }} belum dibaca</p>
+                            <p class="text-sm text-gray-500">{{ $unreadNotifications ?? 0 }} belum dibaca</p>
                         </div>
                     </a>
                 </div>

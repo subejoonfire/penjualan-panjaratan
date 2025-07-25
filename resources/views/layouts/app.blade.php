@@ -98,28 +98,82 @@
                     <!-- User Menu -->
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
+                        @if(auth()->user()->isCustomer())
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
-                                <span
-                                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center">0</span>
+                                @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center">
+                                    {{ $unreadNotifications }}
+                                </span>
+                                @endif
                             </button>
 
                             <!-- Notification Dropdown -->
                             <div x-show="open" @click.away="open = false" x-transition
                                 class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
-                                <div class="px-4 py-2 border-b">
+                                <div class="px-4 py-2 border-b flex items-center justify-between">
                                     <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
+                                    @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                                    <a href="{{ route('customer.notifications.index') }}" 
+                                       class="text-xs text-blue-600 hover:text-blue-800">
+                                        Lihat Semua
+                                    </a>
+                                    @endif
                                 </div>
                                 <div class="max-h-64 overflow-y-auto">
-                                    <!-- Notifications will be loaded here -->
-                                    <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                        Tidak ada notifikasi baru
-                                    </div>
+                                    @if(isset($allNotifications) && $allNotifications->count() > 0)
+                                        @foreach($allNotifications as $notification)
+                                        <a href="{{ route('customer.notifications.index') }}" 
+                                           class="block px-4 py-3 hover:bg-gray-50 {{ !$notification->readstatus ? 'bg-blue-50' : '' }}">
+                                            <div class="flex items-start space-x-3">
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-8 h-8 rounded-full flex items-center justify-center
+                                                        @if($notification->type === 'order') bg-blue-100
+                                                        @elseif($notification->type === 'payment') bg-green-100
+                                                        @elseif($notification->type === 'product') bg-purple-100
+                                                        @else bg-gray-100
+                                                        @endif">
+                                                        @if($notification->type === 'order')
+                                                            <i class="fas fa-shopping-bag text-blue-600 text-xs"></i>
+                                                        @elseif($notification->type === 'payment')
+                                                            <i class="fas fa-credit-card text-green-600 text-xs"></i>
+                                                        @elseif($notification->type === 'product')
+                                                            <i class="fas fa-box text-purple-600 text-xs"></i>
+                                                        @else
+                                                            <i class="fas fa-bell text-gray-600 text-xs"></i>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-gray-900 {{ !$notification->readstatus ? 'font-semibold' : '' }}">
+                                                        {{ Str::limit($notification->title, 30) }}
+                                                    </p>
+                                                    <p class="text-xs text-gray-600 mt-1">
+                                                        {{ Str::limit($notification->notification, 50) }}
+                                                    </p>
+                                                    <p class="text-xs text-gray-400 mt-1">
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </p>
+                                                </div>
+                                                @if(!$notification->readstatus)
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </a>
+                                        @endforeach
+                                    @else
+                                        <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                                            Tidak ada notifikasi
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <!-- User Profile Dropdown -->
                         <div class="relative" x-data="{ open: false }">
@@ -273,7 +327,6 @@
             @auth
                 @if(auth()->user()->isCustomer())
                     loadCartCount();
-                    loadNotificationCount();
                 @endif
             @endauth
         });
@@ -291,19 +344,7 @@
                 .catch(error => console.error('Error loading cart count:', error));
         }
 
-        // Load notification count
-        function loadNotificationCount() {
-            fetch('{{ route('api.notifications.unread') }}')
-                .then(response => response.json())
-                .then(data => {
-                    const notificationCount = document.querySelector('.notification-count');
-                    if (notificationCount) {
-                        notificationCount.textContent = data.count;
-                        notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
-                    }
-                })
-                .catch(error => console.error('Error loading notification count:', error));
-        }
+        // Notification count sudah tersedia dari PHP provider
 
         // CSRF token setup for AJAX requests
         window.Laravel = {
