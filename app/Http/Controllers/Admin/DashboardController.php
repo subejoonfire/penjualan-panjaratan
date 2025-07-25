@@ -116,8 +116,9 @@ class DashboardController extends Controller
         $users = $query->withCount(['products', 'carts', 'notifications'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+        $usersAll = User::all();
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'usersAll'));
     }
 
     /**
