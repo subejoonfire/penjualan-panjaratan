@@ -35,12 +35,24 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Product Images -->
             <div class="space-y-4">
-                @if($product->images->count() > 0)
-                <!-- Main Image -->
+                @if($product->primaryImage)
+                <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
+                    <img id="mainImage" src="{{ url($product->primaryImage->image) }}" alt="{{ $product->productname }}"
+                        class="w-full h-96 object-cover">
+                </div>
+                @elseif($product->images->count() > 0)
                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
                     <img id="mainImage" src="{{ $product->images->first()->imageurl }}"
                         alt="{{ $product->productname }}" class="w-full h-96 object-cover">
                 </div>
+                @else
+                <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
+                        <p class="text-gray-500">Tidak ada gambar tersedia</p>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Thumbnail Images -->
                 @if($product->images->count() > 1)
@@ -52,14 +64,6 @@
                             class="w-full h-20 object-cover">
                     </div>
                     @endforeach
-                </div>
-                @endif
-                @else
-                <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <div class="text-center">
-                        <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
-                        <p class="text-gray-500">Tidak ada gambar tersedia</p>
-                    </div>
                 </div>
                 @endif
             </div>

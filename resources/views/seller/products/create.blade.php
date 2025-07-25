@@ -135,8 +135,7 @@
                                 <label for="images"
                                     class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Unggah gambar</span>
-                                    <input id="images" name="images[]" type="file" class="sr-only" multiple
-                                        accept="image/*">
+                                    <input id="images" name="images[]" type="file" class="sr-only" multiple accept="image/*" required>
                                 </label>
                                 <p class="pl-1">atau seret dan lepas</p>
                             </div>

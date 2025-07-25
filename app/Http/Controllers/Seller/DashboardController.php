@@ -150,6 +150,7 @@ class DashboardController extends Controller
             'productprice' => 'required|numeric|min:0',
             'productstock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
+            'images' => 'required|array|min:1', // minimal 1 gambar
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
