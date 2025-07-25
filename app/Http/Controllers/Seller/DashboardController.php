@@ -335,7 +335,10 @@ class DashboardController extends Controller
                         ->whereBetween('created_at', [$startDate, $endDate]);
                 });
             }])
-            ->having('sold_quantity', '>', 0)
+            ->whereHas('cartDetails.cart.order.transaction', function ($query) use ($startDate, $endDate) {
+                $query->where('transactionstatus', 'paid')
+                    ->whereBetween('created_at', [$startDate, $endDate]);
+            })
             ->orderBy('sold_quantity', 'desc')
             ->limit(10)
             ->get();
