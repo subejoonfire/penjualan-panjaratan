@@ -41,12 +41,12 @@ class CategoryController extends Controller
     {
         $request->validate([
             'category' => 'required|string|max:255|unique:categories,category',
-            'description' => 'nullable|string|max:1000',
+            'productdescription' => 'nullable|string|max:1000',
         ]);
 
         Category::create([
             'category' => $request->category,
-            'description' => $request->description,
+            'productdescription' => $request->productdescription,
         ]);
 
         return redirect()->route('admin.categories.index')
@@ -88,12 +88,12 @@ class CategoryController extends Controller
     {
         $request->validate([
             'category' => 'required|string|max:255|unique:categories,category,' . $category->id,
-            'description' => 'nullable|string|max:1000',
+            'productdescription' => 'nullable|string|max:1000',
         ]);
 
         $category->update([
             'category' => $request->category,
-            'description' => $request->description,
+            'productdescription' => $request->productdescription,
         ]);
 
         return redirect()->route('admin.categories.index')

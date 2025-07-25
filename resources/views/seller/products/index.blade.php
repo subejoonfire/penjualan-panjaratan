@@ -95,11 +95,11 @@
                     </div>
 
                     <!-- Stock Badge -->
-                    @if($product->stock < 10) <div class="absolute top-2 right-2">
+                    @if($product->productstock < 10) <div class="absolute top-2 right-2">
                         <span
                             class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                        {{ $product->stock === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
-                            {{ $product->stock === 0 ? 'Out of Stock' : 'Low Stock' }}
+                                        {{ $product->productstock === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
+                            {{ $product->productstock === 0 ? 'Out of Stock' : 'Low Stock' }}
                         </span>
                 </div>
                 @endif
@@ -112,7 +112,7 @@
                 <p class="text-lg font-bold text-blue-600 mb-2">Rp {{ number_format($product->productprice) }}</p>
 
                 <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
-                    <span>Stock: {{ $product->stock }}</span>
+                    <span>Stock: {{ $product->productstock }}</span>
                     <span>{{ $product->images->count() }} images</span>
                 </div>
 

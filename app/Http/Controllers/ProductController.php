@@ -227,7 +227,7 @@ class ProductController extends Controller
         // Search in product name and description
         $query->where(function ($q) use ($searchTerm) {
             $q->where('productname', 'like', '%' . $searchTerm . '%')
-                ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                ->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
         });
 
         // Filter by category
@@ -278,7 +278,7 @@ class ProductController extends Controller
             ->where('stock', '>', 0)
             ->where(function ($q) use ($searchTerm) {
                 $q->where('productname', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
             })
             ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
             ->first();

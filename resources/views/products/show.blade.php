@@ -105,15 +105,16 @@
                             <dd class="mt-1">
                                 <span
                                     class="text-lg font-semibold
-                                    {{ $product->stock > 10 ? 'text-green-600' : ($product->stock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
-                                    {{ $product->stock }} {{ $product->stock === 1 ? 'item' : 'items' }} available
+                                    {{ $product->productstock > 10 ? 'text-green-600' : ($product->productstock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
+                                    {{ $product->productstock }} {{ $product->productstock === 1 ? 'item' : 'items' }}
+                                    available
                                 </span>
-                                @if($product->stock <= 10 && $product->stock > 0)
+                                @if($product->productstock <= 10 && $product->productstock > 0)
                                     <p class="text-sm text-yellow-600 mt-1">
                                         <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        Only {{ $product->stock }} left in stock!
+                                        Only {{ $product->productstock }} left in stock!
                                     </p>
-                                    @elseif($product->stock === 0)
+                                    @elseif($product->productstock === 0)
                                     <p class="text-sm text-red-600 mt-1">
                                         <i class="fas fa-times-circle mr-1"></i>
                                         Out of stock
@@ -126,7 +127,7 @@
 
                 <!-- Add to Cart Section -->
                 @auth
-                @if(auth()->user()->role === 'customer' && $product->is_active && $product->stock > 0)
+                @if(auth()->user()->role === 'customer' && $product->is_active && $product->productstock > 0)
                 <div class="border-t border-gray-200 pt-6">
                     <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
                         @csrf
@@ -140,14 +141,14 @@
                                     class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
                                     <i class="fas fa-minus text-sm"></i>
                                 </button>
-                                <input type="number" name="quantity" id="quantity" min="1" max="{{ $product->stock }}"
-                                    value="1"
+                                <input type="number" name="quantity" id="quantity" min="1"
+                                    max="{{ $product->productstock }}" value="1"
                                     class="w-20 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                 <button type="button" onclick="increaseQuantity()"
                                     class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
                                     <i class="fas fa-plus text-sm"></i>
                                 </button>
-                                <span class="text-sm text-gray-500">Max: {{ $product->stock }}</span>
+                                <span class="text-sm text-gray-500">Max: {{ $product->productstock }}</span>
                             </div>
                         </div>
 
@@ -228,7 +229,7 @@
                 </div>
                 <div class="px-6 py-6">
                     <div class="prose max-w-none">
-                        {!! nl2br(e($product->description)) !!}
+                        {!! nl2br(e($product->productdescription)) !!}
                     </div>
                 </div>
             </div>

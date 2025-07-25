@@ -68,9 +68,9 @@
                             Description <span class="text-gray-400">(Optional)</span>
                         </label>
                         <textarea name="description" id="description" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                         @error('description') border-red-300 @enderror"
-                            placeholder="Enter category description...">{{ old('description', $category->description) }}</textarea>
-                        @error('description')
+                                         @error('productdescription') border-red-300 @enderror"
+                            placeholder="Enter category description...">{{ old('productdescription', $category->productdescription) }}</textarea>
+                        @error('productdescription')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-sm text-gray-500">
@@ -179,7 +179,7 @@
                                 {{ $category->category }}
                             </div>
                             <div id="preview-description" class="text-sm text-gray-500">
-                                {{ $category->description ?: 'Category description will appear here' }}
+                                {{ $category->productdescription ?: 'Category description will appear here' }}
                             </div>
                             <div class="mt-1">
                                 <span
@@ -198,7 +198,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     const nameInput = document.getElementById('category');
-    const descriptionInput = document.getElementById('description');
+    const descriptionInput = document.getElementById('productdescription');
     const previewName = document.getElementById('preview-name');
     const previewDescription = document.getElementById('preview-description');
 
@@ -210,7 +210,7 @@
 
     descriptionInput.addEventListener('input', function() {
         const value = this.value.trim();
-        previewDescription.textContent = value || '{{ $category->description ?: "Category description will appear here" }}';
+        previewDescription.textContent = value || '{{ $category->productdescription ?: "Category description will appear here" }}';
     });
 });
 </script>

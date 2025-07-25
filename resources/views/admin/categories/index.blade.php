@@ -175,7 +175,8 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900">
-                                    {{ $category->description ? Str::limit($category->description, 100) : 'Tidak ada
+                                    {{ $category->productdescription ? Str::limit($category->productdescription, 100) :
+                                    'Tidak ada
                                     deskripsi' }}
                                 </div>
                             </td>

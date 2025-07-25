@@ -51,7 +51,7 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Description</dt>
                                 <dd class="mt-1 text-sm text-gray-900">
-                                    {{ $category->description ?: 'No description provided' }}
+                                    {{ $category->productdescription ?: 'No description provided' }}
                                 </dd>
                             </div>
                             <div>
@@ -192,7 +192,7 @@
                                             </span>
                                         </div>
                                         <p class="text-xs text-gray-500 mt-1">
-                                            Stock: {{ $product->stock }} |
+                                            Stock: {{ $product->productstock }} |
                                             Created: {{ $product->created_at->format('M d, Y') }}
                                         </p>
                                     </div>

@@ -166,7 +166,7 @@
                                 <span class="text-lg font-bold text-blue-600">Rp {{
                                     number_format($product->productprice)
                                     }}</span>
-                                <span class="text-sm text-gray-500">Stok: {{ $product->stock }}</span>
+                                <span class="text-sm text-gray-500">Stok: {{ $product->productstock }}</span>
                             </div>
 
                             <!-- Rating & Reviews -->
@@ -192,7 +192,7 @@
                                     Lihat Detail
                                 </a>
                                 @auth
-                                @if(auth()->user()->isCustomer() && $product->stock > 0)
+                                @if(auth()->user()->isCustomer() && $product->productstock > 0)
                                 <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1">
                                     @csrf
                                     <input type="hidden" name="quantity" value="1">

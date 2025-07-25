@@ -45,7 +45,7 @@ class CartController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->stock
+            'quantity' => 'required|integer|min:1|max:' . $product->productstock
         ]);
 
         // Check if product is active
@@ -54,7 +54,7 @@ class CartController extends Controller
         }
 
         // Check stock
-        if ($product->stock < $request->quantity) {
+        if ($product->productstock < $request->quantity) {
             return back()->with('error', 'Insufficient stock');
         }
 
@@ -75,7 +75,7 @@ class CartController extends Controller
         if ($existingDetail) {
             $newQuantity = $existingDetail->quantity + $request->quantity;
 
-            if ($newQuantity > $product->stock) {
+            if ($newQuantity > $product->productstock) {
                 return back()->with('error', 'Insufficient stock');
             }
 
@@ -104,11 +104,11 @@ class CartController extends Controller
         }
 
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $cartDetail->product->stock
+            'quantity' => 'required|integer|min:1|max:' . $cartDetail->product->productstock
         ]);
 
         // Check stock
-        if ($cartDetail->product->stock < $request->quantity) {
+        if ($cartDetail->product->productstock < $request->quantity) {
             return back()->with('error', 'Insufficient stock');
         }
 
@@ -165,7 +165,7 @@ class CartController extends Controller
 
         // Check stock for all items
         foreach ($cartDetails as $detail) {
-            if ($detail->product->stock < $detail->quantity) {
+            if ($detail->product->productstock < $detail->quantity) {
                 return redirect()->route('customer.cart.index')
                     ->with('error', 'Insufficient stock for ' . $detail->product->productname);
             }
@@ -216,7 +216,7 @@ class CartController extends Controller
 
             // Check stock again
             foreach ($cartDetails as $detail) {
-                if ($detail->product->stock < $detail->quantity) {
+                if ($detail->product->productstock < $detail->quantity) {
                     throw new \Exception('Insufficient stock for ' . $detail->product->productname);
                 }
             }

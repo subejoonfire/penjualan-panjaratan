@@ -326,7 +326,7 @@ class EcommerceSeeder extends Seeder
             // Detail produk
             DetailTransaction::create([
                 'idtransaction' => $transaction->id,
-                'description' => 'Subtotal Produk',
+                'productdescription' => 'Subtotal Produk',
                 'amount' => $transaction->amount * 0.9, // 90% dari total
                 'type' => 'product',
             ]);
@@ -334,7 +334,7 @@ class EcommerceSeeder extends Seeder
             // Detail ongkir
             DetailTransaction::create([
                 'idtransaction' => $transaction->id,
-                'description' => 'Ongkos Kirim',
+                'productdescription' => 'Ongkos Kirim',
                 'amount' => $transaction->amount * 0.1, // 10% dari total
                 'type' => 'shipping',
             ]);

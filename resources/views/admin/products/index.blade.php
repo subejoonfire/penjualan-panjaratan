@@ -208,11 +208,11 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        @if($product->stock === 0) bg-red-100 text-red-800
-                                        @elseif($product->stock < 10) bg-yellow-100 text-yellow-800
+                                        @if($product->productstock === 0) bg-red-100 text-red-800
+                                        @elseif($product->productstock < 10) bg-yellow-100 text-yellow-800
                                         @else bg-green-100 text-green-800
                                         @endif">
-                                    {{ $product->stock }}
+                                    {{ $product->productstock }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

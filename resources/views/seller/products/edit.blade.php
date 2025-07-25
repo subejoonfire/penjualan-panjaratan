@@ -102,9 +102,9 @@
                             Product Description <span class="text-red-500">*</span>
                         </label>
                         <textarea name="description" id="description" rows="4" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                         @error('description') border-red-300 @enderror"
-                            placeholder="Describe your product...">{{ old('description', $product->description) }}</textarea>
-                        @error('description')
+                                         @error('productdescription') border-red-300 @enderror"
+                            placeholder="Describe your product...">{{ old('productdescription', $product->productdescription) }}</textarea>
+                        @error('productdescription')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -137,7 +137,7 @@
                                 Stock Quantity <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="stock" id="stock" min="0"
-                                value="{{ old('stock', $product->stock) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                value="{{ old('stock', $product->productstock) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                           @error('stock') border-red-300 @enderror" placeholder="0">
                             @error('stock')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

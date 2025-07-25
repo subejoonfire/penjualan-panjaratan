@@ -70,8 +70,8 @@
                         </label>
                         <textarea name="description" id="description" rows="4" required
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="Describe your product in detail...">{{ old('description') }}</textarea>
-                        @error('description')
+                            placeholder="Describe your product in detail...">{{ old('productdescription') }}</textarea>
+                        @error('productdescription')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
