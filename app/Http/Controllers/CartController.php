@@ -23,18 +23,28 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart) {
-            return view('customer.cart.index', ['cartDetails' => collect(), 'total' => 0]);
+            // Pastikan semua variabel dikirim walau cart kosong
+            return view('customer.cart.index', [
+                'cartDetails' => collect(),
+                'total' => 0,
+                'subtotal' => 0,
+                'shippingCost' => 15000,
+                'tax' => 0
+            ]);
         }
 
         $cartDetails = $cart->cartDetails()
             ->with(['product.images', 'product.seller'])
             ->get();
 
-        $total = $cartDetails->sum(function ($detail) {
+        $subtotal = $cartDetails->sum(function ($detail) {
             return $detail->quantity * $detail->product->productprice;
         });
+        $shippingCost = 15000; // Fixed shipping cost
+        $tax = 0; // Pajak jika ada, default 0
+        $total = $subtotal + $shippingCost + $tax;
 
-        return view('customer.cart.index', compact('cartDetails', 'total'));
+        return view('customer.cart.index', compact('cartDetails', 'subtotal', 'shippingCost', 'tax', 'total'));
     }
 
     /**
