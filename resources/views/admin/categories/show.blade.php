@@ -49,12 +49,6 @@
 
                         <dl class="space-y-4">
                             <div>
-                                <dt class="text-sm font-medium text-gray-500">Description</dt>
-                                <dd class="mt-1 text-sm text-gray-900">
-                                    {{ $category->productdescription ?: 'No description provided' }}
-                                </dd>
-                            </div>
-                            <div>
                                 <dt class="text-sm font-medium text-gray-500">Created Date</dt>
                                 <dd class="mt-1 text-sm text-gray-900">{{ $category->created_at->format('F d, Y \a\t
                                     H:i') }}</dd>
@@ -160,8 +154,7 @@
                     @if($category->products()->count() > 0)
                     <div class="px-6 py-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as
-                            $product)
+                            @foreach($category->products()->with(['seller', 'images'])->latest()->take(10)->get() as $product)
                             <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-shrink-0 h-16 w-16">
@@ -237,8 +230,7 @@
                             <div>
                                 <h4 class="text-sm font-medium text-gray-900 mb-3">Top Sellers in this Category</h4>
                                 <div class="space-y-2">
-                                    @foreach($category->products()->with('seller')->get()->groupBy('seller_id')->take(5)
-                                    as $sellerId => $products)
+                                    @foreach($category->products()->with('seller')->get()->groupBy('seller_id')->take(5) as $sellerId => $products)
                                     @php $seller = $products->first()->seller; @endphp
                                     <div class="flex items-center justify-between py-2">
                                         <div class="flex items-center">
@@ -292,8 +284,7 @@
                                             </a>
                                             <p class="text-xs text-gray-500">by {{ $product->seller->username }}</p>
                                         </div>
-                                        <span class="text-xs text-gray-500">{{ $product->created_at->diffForHumans()
-                                            }}</span>
+                                        <span class="text-xs text-gray-500">{{ $product->created_at->diffForHumans() }}</span>
                                     </div>
                                     @endforeach
                                 </div>

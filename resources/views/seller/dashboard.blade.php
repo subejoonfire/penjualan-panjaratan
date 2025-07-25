@@ -279,7 +279,7 @@
                     <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
                         <div class="flex items-center">
                             @if($product->images->count() > 0)
-                            <img src="{{ asset('storage/' . $product->images->first()->imageurl) }}"
+                            <img src="{{ asset('storage/' . $product->images->first()->image) }}"
                                 alt="{{ $product->productname }}" class="w-12 h-12 rounded object-cover">
                             @else
                             <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">

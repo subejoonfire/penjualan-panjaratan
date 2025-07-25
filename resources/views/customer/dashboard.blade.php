@@ -232,10 +232,9 @@
                                 $avgRating = $product->reviews->avg('rating');
                                 @endphp
                                 <div class="flex items-center">
-                                    @for($i = 1; $i <= 5; $i++) <i
-                                        class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}">
-                                        </i>
-                                        @endfor
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                    @endfor
                                 </div>
                                 <span class="ml-2 text-xs text-gray-500">({{ $product->reviews->count() }})</span>
                             </div>

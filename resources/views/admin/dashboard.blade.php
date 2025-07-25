@@ -123,8 +123,7 @@
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Pesanan</h3>
                 <div class="space-y-3">
-                    @foreach(['pending' => 'Menunggu', 'processing' => 'Diproses', 'shipped' => 'Dikirim', 'delivered'
-                    => 'Diterima', 'cancelled' => 'Dibatalkan'] as $status => $label)
+                    @foreach(['pending' => 'Menunggu', 'processing' => 'Diproses', 'shipped' => 'Dikirim', 'delivered' => 'Diterima', 'cancelled' => 'Dibatalkan'] as $status => $label)
                     @php $count = $orderStats[$status] ?? 0; @endphp
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">{{ $label }}</span>
@@ -144,8 +143,7 @@
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Transaksi</h3>
                 <div class="space-y-3">
-                    @foreach(['pending' => 'Menunggu', 'paid' => 'Dibayar', 'failed' => 'Gagal', 'refunded' =>
-                    'Dikembalikan'] as $status => $label)
+                    @foreach(['pending' => 'Menunggu', 'paid' => 'Dibayar', 'failed' => 'Gagal', 'refunded' => 'Dikembalikan'] as $status => $label)
                     @php $count = $transactionStats[$status] ?? 0; @endphp
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-600">{{ $label }}</span>

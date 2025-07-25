@@ -106,11 +106,11 @@ class CategoryController extends Controller
             return back()->with('error', 'Cannot delete category that has products. Please move or delete products first.');
         }
 
-        $category = $category->category;
+        $categoryName = $category->category;
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', "Category '{$category}' deleted successfully");
+            ->with('success', "Category '{$categoryName}' deleted successfully");
     }
 
     /**
