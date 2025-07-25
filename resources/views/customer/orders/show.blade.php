@@ -26,8 +26,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-lg font-medium text-gray-900">Status Pesanan</h3>
-                        <p class="text-sm text-gray-600">Ditempatkan pada {{ $order->created_at->format('F d, Y \a\t
-                            H:i') }}</p>
+                        <p class="text-sm text-gray-600">Dipesan pada {{ $order->created_at->format('d M Y, H:i') }}</p>
                     </div>
                     <div class="text-right">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
@@ -175,7 +174,7 @@
                                         onclick="openReviewModal('{{ $item->product->id }}', '{{ $item->product->productname }}')"
                                         class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200">
                                         <i class="fas fa-star mr-1"></i>
-                                        Review
+                                        Ulas
                                     </button>
                                     @endif
                                 </div>
