@@ -105,7 +105,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
             });
         
         return response()->json([
-            'count' => $user->notifications()->count(), // Show total count, not just unread
+            'count' => $user->notifications()->where('readstatus', false)->count(), // Show total count, not just unread
             'notifications' => $notifications
         ]);
     })->name('notifications.unread');
