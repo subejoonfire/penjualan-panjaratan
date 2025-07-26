@@ -23,25 +23,25 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart) {
-            // Pastikan semua variabel dikirim walau cart kosong
             return view('customer.cart.index', [
-                'cartDetails' => collect(),
-                'total' => 0,
+                'cartDetails' => collect(), 
                 'subtotal' => 0,
-                'shippingCost' => 15000,
-                'tax' => 0
+                'shippingCost' => 0,
+                'tax' => 0,
+                'total' => 0
             ]);
         }
 
         $cartDetails = $cart->cartDetails()
-            ->with(['product.images', 'product.seller'])
+            ->with(['product.images', 'product.seller', 'product.category'])
             ->get();
 
         $subtotal = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->productprice;
+            return $detail->quantity * $detail->productprice;
         });
+
         $shippingCost = 15000; // Fixed shipping cost
-        $tax = 0; // Pajak jika ada, default 0
+        $tax = 0; // No tax for now
         $total = $subtotal + $shippingCost + $tax;
 
         return view('customer.cart.index', compact('cartDetails', 'subtotal', 'shippingCost', 'tax', 'total'));
@@ -60,12 +60,12 @@ class CartController extends Controller
 
         // Check if product is active
         if (!$product->is_active) {
-            return back()->with('error', 'Product is not available');
+            return back()->with('error', 'Produk tidak tersedia');
         }
 
         // Check stock
         if ($product->productstock < $request->quantity) {
-            return back()->with('error', 'Insufficient stock');
+            return back()->with('error', 'Stok tidak mencukupi');
         }
 
         // Get or create active cart
@@ -86,7 +86,7 @@ class CartController extends Controller
             $newQuantity = $existingDetail->quantity + $request->quantity;
 
             if ($newQuantity > $product->productstock) {
-                return back()->with('error', 'Insufficient stock');
+                return back()->with('error', 'Stok tidak mencukupi');
             }
 
             $existingDetail->update(['quantity' => $newQuantity]);
@@ -94,11 +94,12 @@ class CartController extends Controller
             CartDetail::create([
                 'idcart' => $cart->id,
                 'idproduct' => $product->id,
-                'quantity' => $request->quantity
+                'quantity' => $request->quantity,
+                'productprice' => $product->productprice
             ]);
         }
 
-        return back()->with('success', 'Product added to cart successfully');
+        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
     }
 
     /**
@@ -119,12 +120,12 @@ class CartController extends Controller
 
         // Check stock
         if ($cartDetail->product->productstock < $request->quantity) {
-            return back()->with('error', 'Insufficient stock');
+            return back()->with('error', 'Stok tidak mencukupi');
         }
 
         $cartDetail->update(['quantity' => $request->quantity]);
 
-        return back()->with('success', 'Cart updated successfully');
+        return back()->with('success', 'Keranjang berhasil diperbarui');
     }
 
     /**
@@ -141,7 +142,7 @@ class CartController extends Controller
 
         $cartDetail->delete();
 
-        return back()->with('success', 'Item removed from cart');
+        return back()->with('success', 'Item berhasil dihapus dari keranjang');
     }
 
     /**
@@ -156,7 +157,7 @@ class CartController extends Controller
             $cart->cartDetails()->delete();
         }
 
-        return back()->with('success', 'Cart cleared successfully');
+        return back()->with('success', 'Keranjang berhasil dikosongkan');
     }
 
     /**
@@ -168,7 +169,7 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart || $cart->cartDetails()->count() === 0) {
-            return redirect()->route('customer.cart.index')->with('error', 'Cart is empty');
+            return redirect()->route('customer.cart.index')->with('error', 'Keranjang belanja kosong');
         }
 
         $cartDetails = $cart->cartDetails()->with(['product.images'])->get();
@@ -177,12 +178,12 @@ class CartController extends Controller
         foreach ($cartDetails as $detail) {
             if ($detail->product->productstock < $detail->quantity) {
                 return redirect()->route('customer.cart.index')
-                    ->with('error', 'Insufficient stock for ' . $detail->product->productname);
+                    ->with('error', 'Stok tidak mencukupi untuk ' . $detail->product->productname);
             }
         }
 
         $subtotal = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->productprice;
+            return $detail->quantity * $detail->productprice;
         });
 
         $shippingCost = 15000; // Fixed shipping cost
@@ -210,14 +211,28 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart || $cart->cartDetails()->count() === 0) {
-            return back()->with('error', 'Cart is empty');
+            return back()->with('error', 'Keranjang belanja kosong');
         }
 
         $request->validate([
-            'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:transfer,cod,ewallet',
+            'address_id' => 'nullable|exists:user_addresses,id',
+            'shipping_address' => 'nullable|string',
+            'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
             'notes' => 'nullable|string|max:500'
         ]);
+
+        // Get shipping address
+        $shippingAddress = '';
+        if ($request->filled('address_id')) {
+            $address = $user->addresses()->find($request->address_id);
+            if ($address) {
+                $shippingAddress = $address->address;
+            }
+        } elseif ($request->filled('shipping_address')) {
+            $shippingAddress = $request->shipping_address;
+        } else {
+            return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
+        }
 
         DB::beginTransaction();
 
@@ -227,12 +242,12 @@ class CartController extends Controller
             // Check stock again
             foreach ($cartDetails as $detail) {
                 if ($detail->product->productstock < $detail->quantity) {
-                    throw new \Exception('Insufficient stock for ' . $detail->product->productname);
+                    throw new \Exception('Stok tidak mencukupi untuk ' . $detail->product->productname);
                 }
             }
 
             $subtotal = $cartDetails->sum(function ($detail) {
-                return $detail->quantity * $detail->product->productprice;
+                return $detail->quantity * $detail->productprice;
             });
 
             $shippingCost = 15000;
@@ -243,7 +258,7 @@ class CartController extends Controller
                 'idcart' => $cart->id,
                 'order_number' => 'ORD-' . time() . '-' . $user->id,
                 'grandtotal' => $total,
-                'shipping_address' => $request->shipping_address,
+                'shipping_address' => $shippingAddress,
                 'status' => 'pending',
                 'notes' => $request->notes
             ]);
@@ -253,12 +268,12 @@ class CartController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => 'TRX-' . time() . '-' . $user->id,
                 'amount' => $total,
-                'paymentmethod' => $request->payment_method,
+                'payment_method' => $request->payment_method,
                 'transactionstatus' => 'pending'
             ]);
 
             // Update cart status
-            $cart->update(['checkoutstatus' => 'checked_out']);
+            $cart->update(['checkoutstatus' => 'completed']);
 
             // Update product stock
             foreach ($cartDetails as $detail) {
@@ -268,8 +283,8 @@ class CartController extends Controller
             // Create notification
             Notification::create([
                 'iduser' => $user->id,
-                'title' => 'Order Created',
-                'notification' => 'Your order #' . $order->order_number . ' has been created successfully',
+                'title' => 'Pesanan Dibuat',
+                'notification' => 'Pesanan #' . $order->order_number . ' berhasil dibuat',
                 'type' => 'order',
                 'readstatus' => false
             ]);
@@ -277,7 +292,7 @@ class CartController extends Controller
             DB::commit();
 
             return redirect()->route('customer.orders.show', $order)
-                ->with('success', 'Order placed successfully');
+                ->with('success', 'Pesanan berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', $e->getMessage());
@@ -294,7 +309,7 @@ class CartController extends Controller
 
         $count = 0;
         if ($cart) {
-            $count = $cart->cartDetails()->sum('quantity');
+            $count = $cart->cartDetails()->count(); // Count unique products, not quantities
         }
 
         return response()->json(['count' => $count]);
@@ -319,10 +334,10 @@ class CartController extends Controller
                 return [
                     'id' => $detail->id,
                     'product_name' => $detail->product->productname,
-                    'product_image' => $detail->product->images->first()?->imageurl,
-                    'productprice' => $detail->product->productprice,
+                    'product_image' => $detail->product->images->first()?->image,
+                    'productprice' => $detail->productprice,
                     'quantity' => $detail->quantity,
-                    'subtotal' => $detail->quantity * $detail->product->productprice
+                    'subtotal' => $detail->quantity * $detail->productprice
                 ];
             });
 

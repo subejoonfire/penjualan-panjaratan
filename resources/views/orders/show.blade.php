@@ -50,7 +50,7 @@
                         <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                             <div class="flex-shrink-0">
                                 @if($detail->product->images->count() > 0)
-                                    <img src="{{ url('storage/' . $detail->product->images->first()->imageurl) }}" 
+                                    <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}" 
                                          alt="{{ $detail->product->productname }}"
                                          class="w-16 h-16 object-cover rounded-lg">
                                 @else
@@ -65,7 +65,7 @@
                                 <div class="flex items-center justify-between mt-2">
                                     <span class="text-sm text-gray-600">Jumlah: {{ $detail->quantity }}</span>
                                     <span class="font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->productprice, 0, ',', '.') }}
+                                        Rp {{ number_format($detail->quantity * $detail->productprice, 0, ',', '.') }}
                                     </span>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                     <div class="space-y-3">
                         @php
                             $subtotal = $order->cart->cartDetails->sum(function($detail) {
-                                return $detail->quantity * $detail->product->productprice;
+                                return $detail->quantity * $detail->productprice;
                             });
                             $shipping = 15000;
                         @endphp
@@ -117,7 +117,7 @@
                     <div class="space-y-2">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Metode Pembayaran</span>
-                            <span class="text-gray-900 capitalize">{{ $order->transaction->paymentmethod }}</span>
+                            <span class="text-gray-900 capitalize">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Status Pembayaran</span>
@@ -149,7 +149,7 @@
                                 @method('PUT')
                                 <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                                    <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
+                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Diproses</option>
                                     <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Dikirim</option>
                                     <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Diterima</option>
                                     <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
@@ -160,12 +160,12 @@
                             </form>
                         @elseif(auth()->user()->role === 'seller')
                             <!-- Seller actions -->
-                            @if(in_array($order->status, ['pending', 'confirmed']))
+                            @if(in_array($order->status, ['pending', 'processing']))
                             <form action="{{ route('orders.status', $order) }}" method="POST" class="space-y-3">
                                 @csrf
                                 @method('PUT')
                                 <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Konfirmasi</option>
+                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Diproses</option>
                                     <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Kirim</option>
                                 </select>
                                 <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -175,14 +175,15 @@
                             @endif
                         @else
                             <!-- Customer actions -->
-                            @if(in_array($order->status, ['pending', 'confirmed']))
-                            <form action="{{ route('orders.cancel', $order) }}" method="POST" 
-                                  onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                            @if(in_array($order->status, ['pending', 'processing']))
+                            <button type="button" 
+                                  onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm').submit(); })"
+                                  class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                Batalkan Pesanan
+                            </button>
+                            <form id="cancelOrderForm" action="{{ route('orders.cancel', $order) }}" method="POST" class="hidden">
                                 @csrf
                                 @method('PUT')
-                                <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    Batalkan Pesanan
-                                </button>
                             </form>
                             @endif
                         @endif

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="max-w-7xl mx-auto">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-center">
@@ -113,7 +113,7 @@
                         <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                             <div class="flex items-center space-x-3">
                                 @if($product->images->count() > 0)
-                                                                                    <img src="{{ url('storage/' . $product->images->first()->imageurl) }}" 
+                                    <img src="{{ asset('storage/' . $product->images->first()->image) }}" 
                                          alt="{{ $product->productname }}"
                                          class="w-12 h-12 object-cover rounded-lg">
                                 @else

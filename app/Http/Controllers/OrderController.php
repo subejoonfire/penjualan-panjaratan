@@ -122,7 +122,7 @@ class OrderController extends Controller
 
         $request->validate([
             'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:transfer,cod,ewallet',
+            'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
             'notes' => 'nullable|string|max:500'
         ]);
 
@@ -160,12 +160,12 @@ class OrderController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => 'TRX-' . time() . '-' . $user->id,
                 'amount' => $total,
-                'paymentmethod' => $request->payment_method,
+                'payment_method' => $request->payment_method,
                 'transactionstatus' => 'pending'
             ]);
 
             // Update cart status
-            $cart->update(['checkoutstatus' => 'checked_out']);
+            $cart->update(['checkoutstatus' => 'completed']);
 
             // Update product stock
             foreach ($cartDetails as $detail) {

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Keranjang Belanja</h1>
@@ -20,14 +20,14 @@
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-medium text-gray-900">Item Keranjang ({{ $cartDetails->count() }})
                             </h3>
-                            <form action="{{ route('customer.cart.clear') }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-sm text-red-600 hover:text-red-500"
-                                    onclick="return confirm('Apakah Anda yakin ingin mengosongkan keranjang?')">
+                                                            <button type="button" class="text-sm text-red-600 hover:text-red-500"
+                                    onclick="confirmAction('Apakah Anda yakin ingin mengosongkan keranjang?', function() { document.getElementById('clearCartForm').submit(); })">
                                     Kosongkan Keranjang
                                 </button>
-                            </form>
+                                <form id="clearCartForm" action="{{ route('customer.cart.clear') }}" method="POST" class="hidden">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
                         </div>
                     </div>
 
@@ -38,7 +38,7 @@
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
                                     @if($detail->product->images->count() > 0)
-                                    <img src="{{ url('storage/' . $detail->product->images->first()->imageurl) }}"
+                                    <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}"
                                         alt="{{ $detail->product->productname }}"
                                         class="w-24 h-24 rounded-lg object-cover">
                                     @else
@@ -61,7 +61,7 @@
 
                                     <div class="mt-2 flex items-center space-x-4">
                                         <span class="text-lg font-bold text-blue-600">
-                                            Rp {{ number_format($detail->product->productprice) }}
+                                            Rp {{ number_format($detail->productprice) }}
                                         </span>
                                         @if($detail->product->productstock < $detail->quantity)
                                             <span class="text-sm text-red-600 font-medium">
@@ -73,10 +73,10 @@
 
                                 <!-- Quantity Controls -->
                                 <div class="flex items-center space-x-3">
-                                    <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
-                                        class="flex items-center space-x-2">
-                                        @csrf
-                                        @method('PUT')
+                                                                    <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
+                                    class="flex items-center space-x-2">
+                                    @csrf
+                                    @method('PUT')
                                         <button type="button" onclick="decreaseQuantity(this)"
                                             class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                             <i class="fas fa-minus text-xs"></i>
@@ -95,20 +95,19 @@
                                 <!-- Subtotal -->
                                 <div class="text-right">
                                     <p class="text-lg font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->productprice) }}
+                                        Rp {{ number_format($detail->quantity * $detail->productprice) }}
                                     </p>
                                 </div>
 
                                 <!-- Remove Button -->
                                 <div>
-                                    <form action="{{ route('customer.cart.remove', $detail) }}" method="POST"
-                                        class="inline-block">
+                                    <button type="button" class="text-red-600 hover:text-red-700 p-2"
+                                        onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <form id="removeItemForm{{ $detail->id }}" action="{{ route('customer.cart.remove', $detail) }}" method="POST" class="hidden">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-700 p-2"
-                                            onclick="return confirm('Hapus item ini dari keranjang?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -125,7 +124,7 @@
 
                     <div class="space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} item)</span>
+                            <span class="text-gray-600">Subtotal ({{ $cartDetails->count() }} produk)</span>
                             <span class="font-medium">Rp {{ number_format($subtotal) }}</span>
                         </div>
 
@@ -175,6 +174,8 @@
                                 Lanjut Belanja
                             </a>
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -217,5 +218,29 @@ function decreaseQuantity(button) {
         input.form.submit();
     }
 }
+
+// Refresh cart count after any cart action
+function refreshCartCount() {
+    fetch('{{ route('api.cart.count') }}')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.count;
+                cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+            }
+        })
+        .catch(error => console.error('Error refreshing cart count:', error));
+}
+
+// Refresh cart count after form submissions
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form[action*="cart"]');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            setTimeout(refreshCartCount, 1000); // Refresh after 1 second
+        });
+    });
+});
 </script>
 @endsection

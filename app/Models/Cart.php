@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Cart extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -120,6 +121,6 @@ class Cart extends Model
     // Scope untuk cart yang sudah checkout
     public function scopeCheckedOut($query)
     {
-        return $query->where('checkoutstatus', 'checkout');
+        return $query->where('checkoutstatus', 'completed');
     }
 }

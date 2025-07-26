@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
@@ -200,14 +200,13 @@
                                         Edit
                                     </a>
                                     @if($category->products_count === 0)
-                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
-                                        class="inline-block">
+                                    <button type="button" class="text-red-600 hover:text-red-900"
+                                        onclick="confirmAction('Apakah Anda yakin ingin menghapus kategori ini?', function() { document.getElementById('deleteCategoryForm{{ $category->id }}').submit(); })">
+                                        Hapus
+                                    </button>
+                                    <form id="deleteCategoryForm{{ $category->id }}" action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="hidden">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900"
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')">
-                                            Hapus
-                                        </button>
                                     </form>
                                     @else
                                     <span class="text-gray-400 cursor-not-allowed"

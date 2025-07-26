@@ -4,14 +4,14 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Produk</h1>
             <p class="mt-2 text-gray-600">Temukan produk menarik dari penjual kami</p>
         </div>
 
-        <div class="lg:grid lg:grid-cols-4 lg:gap-8">
+        <div class="lg:grid lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 lg:gap-6">
             <!-- Filters Sidebar -->
             <div class="hidden lg:block">
                 <div class="bg-white shadow rounded-lg p-6 sticky top-6">
@@ -82,7 +82,7 @@
             </div>
 
             <!-- Products Content -->
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-4 xl:col-span-5 2xl:col-span-6">
                 <!-- Sort & View Options -->
                 <div class="bg-white shadow rounded-lg p-4 mb-6">
                     <div class="flex items-center justify-between">
@@ -115,18 +115,14 @@
 
                 <!-- Products Grid -->
                 @if($products->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     @foreach($products as $product)
                     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
                         <!-- Product Image -->
                         <div class="aspect-w-1 aspect-h-1 relative">
                             <a href="{{ route('products.show', $product) }}">
-                                @if($product->primaryImage)
-                                <img src="{{ url('storage/'.$product->primaryImage->image) }}"
-                                    alt="{{ $product->productname }}"
-                                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                                @elseif($product->images->count() > 0)
-                                <img src="{{ url('storage/'.$product->images->first()->image) }}"
+                                @if($product->images->count() > 0)
+                                <img src="{{ asset('storage/' . $product->images->first()->image) }}"
                                     alt="{{ $product->productname }}"
                                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                                 @else

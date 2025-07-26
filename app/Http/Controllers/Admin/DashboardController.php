@@ -116,30 +116,8 @@ class DashboardController extends Controller
         $users = $query->withCount(['products', 'carts', 'notifications'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-        $usersAll = User::all();
 
-        return view('admin.users.index', compact('users', 'usersAll'));
-    }
-
-    /**
-     * Show user details
-     */
-    public function showUser($id)
-    {
-        $user = User::with(['products', 'carts.cartDetails', 'notifications'])
-            ->withCount(['products', 'carts', 'notifications'])
-            ->findOrFail($id);
-
-        return response()->json([
-            'user' => $user,
-            'stats' => [
-                'total_products' => $user->products_count,
-                'total_orders' => $user->carts_count,
-                'total_notifications' => $user->notifications_count,
-                'unread_notifications' => $user->notifications()->where('readstatus', false)->count(),
-                'recent_activity' => $user->updated_at,
-            ]
-        ]);
+        return view('admin.users.index', compact('users'));
     }
 
     /**
@@ -247,5 +225,55 @@ class DashboardController extends Controller
         }
 
         return back()->with('success', 'Notifikasi berhasil dikirim ke ' . $users->count() . ' pengguna.');
+    }
+
+    /**
+     * Get order details for modal
+     */
+    public function orderDetails(Order $order)
+    {
+        $order->load([
+            'cart.user', 
+            'cart.cartDetails.product.images', 
+            'cart.cartDetails.product.category',
+            'cart.cartDetails.product.seller',
+            'transaction'
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'order' => $order,
+            'html' => view('admin.orders.details', compact('order'))->render()
+        ]);
+    }
+
+    /**
+     * Update order status
+     */
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status pesanan berhasil diperbarui',
+            'order' => $order
+        ]);
+    }
+
+    /**
+     * Toggle product status (active/inactive)
+     */
+    public function toggleProductStatus(Product $product)
+    {
+        $product->update(['is_active' => !$product->is_active]);
+        
+        $status = $product->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        
+        return redirect()->back()->with('success', "Produk berhasil {$status}");
     }
 }

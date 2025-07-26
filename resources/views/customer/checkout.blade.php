@@ -8,7 +8,7 @@
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Pembayaran</h1>
-            <p class="mt-2 text-gray-600">Periksa pesanan Anda dan selesaikan pembayaran</p>
+            <p class="mt-2 text-gray-600">Review your order and complete your purchase</p>
         </div>
 
         <form action="{{ route('customer.checkout.process') }}" method="POST"
@@ -20,7 +20,7 @@
                 <!-- Order Items -->
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Daftar Barang ({{ $cartDetails->count() }})</h3>
+                        <h3 class="text-lg font-medium text-gray-900">Order Items ({{ $cartDetails->count() }})</h3>
                     </div>
                     <div class="divide-y divide-gray-200">
                         @foreach($cartDetails as $detail)
@@ -28,7 +28,7 @@
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
                                     @if($detail->product->images->count() > 0)
-                                    <img src="{{ url('storage/' . $detail->product->images->first()->imageurl) }}"
+                                    <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}"
                                         alt="{{ $detail->product->productname }}"
                                         class="w-16 h-16 rounded-lg object-cover">
                                     @else
@@ -40,14 +40,14 @@
                                 <div class="flex-1">
                                     <h4 class="text-sm font-medium text-gray-900">{{ $detail->product->productname }}
                                     </h4>
-                                    <p class="text-sm text-gray-600">Penjual: {{ $detail->product->seller->username }}
+                                    <p class="text-sm text-gray-600">Seller: {{ $detail->product->seller->username }}
                                     </p>
-                                    <p class="text-sm text-gray-600">Jumlah: {{ $detail->quantity }} × Rp {{
-                                        number_format($detail->product->productprice) }}</p>
+                                    <p class="text-sm text-gray-600">Qty: {{ $detail->quantity }} × Rp {{
+                                        number_format($detail->productprice) }}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->productprice) }}
+                                        Rp {{ number_format($detail->quantity * $detail->productprice) }}
                                     </p>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                                 'checked' : '' }}>
                                 <div class="flex-1">
                                     <div class="text-sm font-medium text-gray-900">
-                                        {{ $address->address_label ?? 'Alamat ' . $loop->iteration }}
+                                        Alamat {{ $loop->iteration }}
                                         @if($address->is_default)
                                         <span
                                             class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
@@ -81,8 +81,7 @@
                                         @endif
                                     </div>
                                     <div class="text-sm text-gray-600 mt-1">
-                                        {{ $address->address }}<br>
-                                        {{ $address->city }}, {{ $address->postal_code }}
+                                        {{ $address->address }}
                                     </div>
                                 </div>
                             </label>
@@ -93,7 +92,7 @@
                         <!-- Manual Address Input -->
                         <div class="mt-6">
                             <label class="flex items-start space-x-3 cursor-pointer">
-                                <input type="radio" name="address_type" value="manual"
+                                <input type="radio" name="address_type" value="manual" id="manual_address"
                                     class="mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" {{
                                     $addresses->count() === 0 ? 'checked' : '' }}>
                                 <div class="flex-1">
@@ -104,7 +103,7 @@
                             <div class="mt-4 manual-address {{ $addresses->count() > 0 ? 'hidden' : '' }}">
                                 <textarea name="shipping_address" rows="3"
                                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    placeholder="Masukkan alamat lengkap pengiriman...">{{ old('shipping_address') }}</textarea>
+                                    placeholder="Masukkan alamat pengiriman lengkap...">{{ old('shipping_address') }}</textarea>
                                 @error('shipping_address')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -121,7 +120,7 @@
                     <div class="p-6">
                         <div class="space-y-4">
                             <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="transfer"
+                                <input type="radio" name="payment_method" value="bank_transfer"
                                     class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
                                 <div class="flex items-center">
                                     <i class="fas fa-university text-blue-600 text-lg mr-3"></i>
@@ -138,19 +137,19 @@
                                 <div class="flex items-center">
                                     <i class="fas fa-money-bill-wave text-green-600 text-lg mr-3"></i>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">Bayar di Tempat (COD)</div>
-                                        <div class="text-sm text-gray-600">Bayar saat pesanan diterima</div>
+                                        <div class="text-sm font-medium text-gray-900">Bayar di Tempat</div>
+                                        <div class="text-sm text-gray-600">Bayar saat menerima pesanan</div>
                                     </div>
                                 </div>
                             </label>
 
                             <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="ewallet"
+                                <input type="radio" name="payment_method" value="e_wallet"
                                     class="text-blue-600 focus:ring-blue-500 border-gray-300">
                                 <div class="flex items-center">
                                     <i class="fas fa-mobile-alt text-purple-600 text-lg mr-3"></i>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">Dompet Digital</div>
+                                        <div class="text-sm font-medium text-gray-900">E-Wallet</div>
                                         <div class="text-sm text-gray-600">OVO, GoPay, DANA, dll.</div>
                                     </div>
                                 </div>
@@ -182,7 +181,7 @@
 
                     <div class="space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} barang)</span>
+                            <span class="text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} item)</span>
                             <span class="font-medium">Rp {{ number_format($subtotal) }}</span>
                         </div>
                         <div class="flex justify-between">
@@ -217,10 +216,10 @@
                     <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-shield-alt text-green-500 mr-2"></i>
-                            <span class="text-sm text-gray-600">Pembayaran Aman</span>
+                            <span class="text-sm text-gray-600">Checkout aman</span>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">
-                            Informasi pembayaran Anda terenkripsi dan aman.
+                            Informasi pembayaran Anda dienkripsi dan aman.
                         </p>
                     </div>
                 </div>

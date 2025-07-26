@@ -150,7 +150,7 @@ class DashboardController extends Controller
         
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'review' => 'nullable|string|max:1000'
+            'productreviews' => 'nullable|string|max:1000'
         ]);
         
         // Check if user has purchased this product
@@ -174,7 +174,7 @@ class DashboardController extends Controller
         if ($existingReview) {
             $existingReview->update([
                 'rating' => $request->rating,
-                'review' => $request->review
+                'productreviews' => $request->productreviews
             ]);
             
             return back()->with('success', 'Review updated successfully');
@@ -183,7 +183,7 @@ class DashboardController extends Controller
                 'iduser' => $user->id,
                 'idproduct' => $product->id,
                 'rating' => $request->rating,
-                'review' => $request->review
+                'productreviews' => $request->productreviews
             ]);
             
             return back()->with('success', 'Review added successfully');

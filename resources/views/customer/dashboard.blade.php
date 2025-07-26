@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Dasbor Pembeli - Penjualan Panjaratan')
+@section('title', 'Dashboard Pembeli - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Dasbor</h1>
@@ -135,7 +135,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-purple-600">Notifikasi</p>
-                            <p class="text-sm text-gray-500">{{ $unreadNotifications ?? 0 }} belum dibaca</p>
+                            <p class="text-sm text-gray-500">{{ $unreadNotifications }} belum dibaca</p>
                         </div>
                     </a>
                 </div>
@@ -211,12 +211,12 @@
                 <h3 class="text-lg font-medium text-gray-900">Produk yang Pernah Anda Ulas</h3>
             </div>
             <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
                     @foreach($favoriteProducts as $product)
                     <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                         <div class="aspect-w-1 aspect-h-1">
                             @if($product->images->count() > 0)
-                            <img src="{{ url('storage/' . $product->images->first()->imageurl) }}"
+                                                            <img src="{{ asset('storage/' . $product->images->first()->image) }}"
                                 alt="{{ $product->productname }}" class="w-full h-48 object-cover">
                             @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
@@ -232,10 +232,9 @@
                                 $avgRating = $product->reviews->avg('rating');
                                 @endphp
                                 <div class="flex items-center">
-                                    @for($i = 1; $i <= 5; $i++) <i
-                                        class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}">
-                                        </i>
-                                        @endfor
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                    @endfor
                                 </div>
                                 <span class="ml-2 text-xs text-gray-500">({{ $product->reviews->count() }})</span>
                             </div>

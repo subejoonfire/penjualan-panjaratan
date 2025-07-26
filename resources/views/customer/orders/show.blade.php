@@ -26,7 +26,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-lg font-medium text-gray-900">Status Pesanan</h3>
-                        <p class="text-sm text-gray-600">Dipesan pada {{ $order->created_at->format('d M Y, H:i') }}</p>
+                        <p class="text-sm text-gray-600">Ditempatkan pada {{ $order->created_at->format('F d, Y \a\t
+                            H:i') }}</p>
                     </div>
                     <div class="text-right">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
@@ -39,15 +40,14 @@
                             {{ ucfirst($order->status) }}
                         </span>
                         @if($order->status === 'pending')
-                        <form action="{{ route('customer.orders.cancel', $order) }}" method="POST"
-                            class="inline-block mt-2">
+                        <button type="button"
+                            onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm').submit(); })"
+                            class="text-sm text-red-600 hover:text-red-500 mt-2">
+                            Batalkan Pesanan
+                        </button>
+                        <form id="cancelOrderForm" action="{{ route('customer.orders.cancel', $order) }}" method="POST" class="hidden">
                             @csrf
                             @method('PUT')
-                            <button type="submit"
-                                onclick="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')"
-                                class="text-sm text-red-600 hover:text-red-500">
-                                Batalkan Pesanan
-                            </button>
                         </form>
                         @endif
                     </div>
@@ -60,7 +60,7 @@
                         <div class="flex items-center">
                             <div
                                 class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-                                {{ in_array($order->status, ['pending', 'confirmed', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
+                                {{ in_array($order->status, ['pending', 'processing', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
                                 <i class="fas fa-clock text-sm"></i>
                             </div>
                             <span class="ml-2 text-sm font-medium text-gray-900">Tertunda</span>
@@ -69,18 +69,18 @@
                         <!-- Arrow -->
                         <div class="flex-1 mx-4">
                             <div
-                                class="h-0.5 {{ in_array($order->status, ['confirmed', 'shipped', 'delivered']) ? 'bg-blue-600' : 'bg-gray-300' }}">
+                                class="h-0.5 {{ in_array($order->status, ['processing', 'shipped', 'delivered']) ? 'bg-blue-600' : 'bg-gray-300' }}">
                             </div>
                         </div>
 
-                        <!-- Confirmed -->
+                        <!-- Processing -->
                         <div class="flex items-center">
                             <div
                                 class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-                                {{ in_array($order->status, ['confirmed', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
+                                {{ in_array($order->status, ['processing', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
                                 <i class="fas fa-check text-sm"></i>
                             </div>
-                            <span class="ml-2 text-sm font-medium text-gray-900">Dikonfirmasi</span>
+                            <span class="ml-2 text-sm font-medium text-gray-900">Diproses</span>
                         </div>
 
                         <!-- Arrow -->
@@ -134,7 +134,7 @@
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0 h-16 w-16">
                                     @if($item->product->images->count() > 0)
-                                    <img src="{{ url('storage/' . $item->product->images->first()->imageurl) }}"
+                                    <img src="{{ asset('storage/' . $item->product->images->first()->image) }}"
                                         alt="{{ $item->product->productname }}"
                                         class="h-16 w-16 rounded-lg object-cover">
                                     @else
@@ -157,9 +157,9 @@
                                 <div class="text-right">
                                     <p class="text-sm text-gray-900">Jumlah: {{ $item->quantity }}</p>
                                     <p class="text-sm font-medium text-gray-900">Rp {{
-                                        number_format($item->product->productprice) }}</p>
+                                        number_format($item->productprice) }}</p>
                                     <p class="text-sm text-gray-500">Subtotal: Rp {{ number_format($item->quantity *
-                                        $item->product->productprice) }}</p>
+                                        $item->productprice) }}</p>
                                 </div>
                                 @if($order->status === 'delivered')
                                 <div class="flex-shrink-0">
@@ -174,7 +174,7 @@
                                         onclick="openReviewModal('{{ $item->product->id }}', '{{ $item->product->productname }}')"
                                         class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200">
                                         <i class="fas fa-star mr-1"></i>
-                                        Ulas
+                                        Review
                                     </button>
                                     @endif
                                 </div>
@@ -202,7 +202,7 @@
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Metode Pembayaran</dt>
-                                <dd class="text-sm text-gray-900">{{ ucfirst($order->transaction->paymentmethod) }}</dd>
+                                <dd class="text-sm text-gray-900">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Status Pembayaran</dt>
@@ -240,7 +240,7 @@
                                 <dt class="text-sm text-gray-500">Subtotal</dt>
                                 <dd class="text-sm text-gray-900">Rp {{
                                     number_format($order->cart->cartDetails->sum(function($item) { return
-                                    $item->quantity * $item->product->productprice; })) }}</dd>
+                                    $item->quantity * $item->productprice; })) }}</dd>
                             </div>
                             <div class="flex justify-between">
                                 <dt class="text-sm text-gray-500">Pengiriman</dt>

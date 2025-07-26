@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Manajemen Pesanan</h1>
@@ -216,7 +216,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">
                                     Rp {{ number_format($myProducts->sum(function($item) { return $item->quantity *
-                                    $item->product->productprice; })) }}
+                                    $item->productprice; })) }}
                                 </div>
                                 <div class="text-sm text-gray-500">
                                     {{ $myProducts->sum('quantity') }} items
@@ -225,12 +225,19 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($order->status === 'pending') bg-yellow-100 text-yellow-800
-                                        @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
+                                        @elseif($order->status === 'processing') bg-blue-100 text-blue-800
                                         @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
                                         @elseif($order->status === 'delivered') bg-green-100 text-green-800
                                         @elseif($order->status === 'cancelled') bg-red-100 text-red-800
                                         @endif">
-                                    {{ ucfirst($order->status) }}
+                                    @switch($order->status)
+                                        @case('pending') Menunggu @break
+                                        @case('processing') Diproses @break
+                                        @case('shipped') Dikirim @break
+                                        @case('delivered') Diterima @break
+                                        @case('cancelled') Dibatalkan @break
+                                        @default {{ ucfirst($order->status) }}
+                                    @endswitch
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -243,7 +250,7 @@
                                         class="text-blue-600 hover:text-blue-900">
                                         Lihat
                                     </button>
-                                    @if(in_array($order->status, ['pending', 'confirmed']))
+                                    @if(in_array($order->status, ['pending', 'processing']))
                                     <button onclick="updateOrderStatus('{{ $order->id }}')"
                                         class="text-green-600 hover:text-green-900">
                                         Perbarui
@@ -307,7 +314,7 @@
                     <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
                     <select id="newStatus"
                         class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Diproses</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                     </select>

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Manajemen Pesanan</h1>
@@ -18,28 +18,36 @@
                     <div class="flex-1 min-w-64">
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Pesanan</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                               placeholder="Cari berdasarkan nomor pesanan..."
-                               class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            placeholder="Cari berdasarkan nomor pesanan..."
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="min-w-48">
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <select name="status" id="status"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Status</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Terkonfirmasi</option>
-                            <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Dikirim</option>
-                            <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Diterima</option>
-                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Menunggu
+                            </option>
+                            <option value="processing" {{ request('status')==='processing' ? 'selected' : '' }}>Diproses
+                            </option>
+                            <option value="shipped" {{ request('status')==='shipped' ? 'selected' : '' }}>Dikirim
+                            </option>
+                            <option value="delivered" {{ request('status')==='delivered' ? 'selected' : '' }}>Diterima
+                            </option>
+                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Dibatalkan
+                            </option>
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Filter
                         </button>
                         @if(request()->hasAny(['search', 'status']))
-                            <a href="{{ route('admin.orders.index') }}" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                                Bersihkan
-                            </a>
+                        <a href="{{ route('admin.orders.index') }}"
+                            class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                            Bersihkan
+                        </a>
                         @endif
                     </div>
                 </form>
@@ -77,7 +85,8 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Menunggu</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'pending')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'pending')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -94,8 +103,9 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Terkonfirmasi</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'confirmed')->count() }}</dd>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Diproses</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'processing')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -113,7 +123,8 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Diterima</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'delivered')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'delivered')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -131,7 +142,8 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Dibatalkan</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'cancelled')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status',
+                                    'cancelled')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -145,93 +157,114 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pesanan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pelanggan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Item</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pembayaran</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($orders as $order)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ $order->order_number }}</div>
-                                    <div class="text-sm text-gray-500">ID: {{ $order->id }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8">
-                                            <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                                                <i class="fas fa-user text-gray-600 text-xs"></i>
-                                            </div>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $order->cart->user->username }}</div>
-                                            <div class="text-sm text-gray-500">{{ $order->cart->user->email }}</div>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $order->order_number }}</div>
+                                <div class="text-sm text-gray-500">ID: {{ $order->id }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8">
+                                        <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-600 text-xs"></i>
                                         </div>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $order->cart->cartDetails->count() }} items</div>
-                                    <div class="text-sm text-gray-500">{{ $order->cart->cartDetails->sum('quantity') }} qty</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Rp {{ number_format($order->grandtotal) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ ucfirst($order->transaction->paymentmethod ?? 'N/A') }}</div>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $order->cart->user->username
+                                            }}</div>
+                                        <div class="text-sm text-gray-500">{{ $order->cart->user->email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $order->cart->cartDetails->count() }} items</div>
+                                <div class="text-sm text-gray-500">{{ $order->cart->cartDetails->sum('quantity') }} qty
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                Rp {{ number_format($order->grandtotal) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ ucfirst(str_replace('_', ' ',
+                                    $order->transaction->payment_method ?? 'N/A')) }}</div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($order->transaction && $order->transaction->transactionstatus === 'paid') bg-green-100 text-green-800
                                         @elseif($order->transaction && $order->transaction->transactionstatus === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($order->transaction && $order->transaction->transactionstatus === 'failed') bg-red-100 text-red-800
                                         @else bg-gray-100 text-gray-800
                                         @endif">
-                                        {{ ucfirst($order->transaction->transactionstatus ?? 'N/A') }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {{ ucfirst($order->transaction->transactionstatus ?? 'N/A') }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($order->status === 'pending') bg-yellow-100 text-yellow-800
-                                        @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
+                                        @elseif($order->status === 'processing') bg-blue-100 text-blue-800
                                         @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
                                         @elseif($order->status === 'delivered') bg-green-100 text-green-800
                                         @elseif($order->status === 'cancelled') bg-red-100 text-red-800
                                         @endif">
-                                        {{ ucfirst($order->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $order->created_at->format('d M Y') }}
-                                    <div class="text-xs text-gray-400">{{ $order->created_at->format('H:i') }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <button onclick="viewOrderDetails('{{ $order->id }}')" class="text-blue-600 hover:text-blue-900">
-                                            Lihat
-                                        </button>
-                                        <button onclick="updateOrderStatus('{{ $order->id }}')" class="text-green-600 hover:text-green-900">
-                                            Perbarui
-                                        </button>
-                                        @if($order->status === 'pending')
-                                            <button onclick="cancelOrder('{{ $order->id }}')" class="text-red-600 hover:text-red-900">
-                                                Batalkan
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                                    @switch($order->status)
+                                    @case('pending') Menunggu @break
+                                    @case('processing') Diproses @break
+                                    @case('shipped') Dikirim @break
+                                    @case('delivered') Diterima @break
+                                    @case('cancelled') Dibatalkan @break
+                                    @default {{ ucfirst($order->status) }}
+                                    @endswitch
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $order->created_at->format('d M Y') }}
+                                <div class="text-xs text-gray-400">{{ $order->created_at->format('H:i') }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button onclick="viewOrderDetails('{{ $order->id }}')"
+                                        class="text-blue-600 hover:text-blue-900 transition-colors">
+                                        <i class="fas fa-eye mr-1"></i>Lihat
+                                    </button>
+                                    <button onclick="updateOrderStatus('{{ $order->id }}')"
+                                        class="text-green-600 hover:text-green-900 transition-colors">
+                                        <i class="fas fa-edit mr-1"></i>Update
+                                    </button>
+                                    @if($order->status === 'pending')
+                                    <button onclick="cancelOrder('{{ $order->id }}')"
+                                        class="text-red-600 hover:text-red-900 transition-colors">
+                                        <i class="fas fa-times mr-1"></i>Batal
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" class="px-6 py-12 text-center">
-                                    <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-4"></i>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pesanan Ditemukan</h3>
-                                    <p class="text-gray-600">Tidak ada pesanan yang cocok dengan kriteria filter Anda.</p>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="8" class="px-6 py-12 text-center">
+                                <i class="fas fa-shopping-cart text-gray-400 text-4xl mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pesanan</h3>
+                                <p class="text-gray-600">Tidak ada pesanan yang sesuai dengan kriteria filter.</p>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -239,25 +272,25 @@
 
             <!-- Pagination -->
             @if($orders->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200">
-                    {{ $orders->appends(request()->query())->links() }}
-                </div>
+            <div class="px-6 py-4 border-t border-gray-200">
+                {{ $orders->appends(request()->query())->links() }}
+            </div>
             @endif
         </div>
     </div>
 </div>
 
 <!-- Order Details Modal -->
-<div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white">
+<div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-4 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white my-8">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-                <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Order Details</h3>
-                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times"></i>
+                <h3 id="orderModalTitle" class="text-xl font-medium text-gray-900">Detail Pesanan</h3>
+                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div id="orderModalContent" class="max-h-96 overflow-y-auto">
+            <div id="orderModalContent" class="max-h-[70vh] overflow-y-auto">
                 <!-- Order details will be loaded here -->
             </div>
         </div>
@@ -265,31 +298,35 @@
 </div>
 
 <!-- Update Status Modal -->
-<div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+<div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Update Order Status</h3>
-                <button onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600">
+                <h3 class="text-lg font-medium text-gray-900">Update Status Pesanan</h3>
+                <button onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="statusForm">
                 <div class="mb-4">
-                    <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
-                    <select id="newStatus" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
+                    <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
+                    <select id="newStatus"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="pending">Menunggu</option>
+                        <option value="processing">Diproses</option>
+                        <option value="shipped">Dikirim</option>
+                        <option value="delivered">Diterima</option>
+                        <option value="cancelled">Dibatalkan</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeStatusModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                        Cancel
+                    <button type="button" onclick="closeStatusModal()"
+                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition-colors">
+                        Batal
                     </button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-spinner fa-spin mr-2 hidden" id="updateLoader"></i>
                         Update Status
                     </button>
                 </div>
@@ -299,30 +336,53 @@
 </div>
 
 <script>
-let currentOrderId = null;
+    let currentOrderId = null;
+
+// CSRF Token Setup
+const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
 function viewOrderDetails(orderId) {
     currentOrderId = orderId;
-    document.getElementById('orderModalTitle').innerText = `Order Details - #${orderId}`;
+    document.getElementById('orderModalTitle').innerText = `Detail Pesanan #${orderId}`;
     document.getElementById('orderModalContent').innerHTML = `
         <div class="text-center py-8">
-            <i class="fas fa-spinner fa-spin text-gray-400 text-2xl mb-4"></i>
-            <p class="text-gray-600">Loading order details...</p>
+            <i class="fas fa-spinner fa-spin text-blue-500 text-3xl mb-4"></i>
+            <p class="text-gray-600">Memuat detail pesanan...</p>
         </div>
     `;
     document.getElementById('orderModal').classList.remove('hidden');
     
-    // In a real application, you would make an AJAX call here to fetch order details
-    setTimeout(() => {
-        document.getElementById('orderModalContent').innerHTML = `
-            <div class="space-y-4">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Order Information</h4>
-                    <p class="text-sm text-gray-600">Order details would be loaded via AJAX here</p>
+    // AJAX call to fetch order details
+    fetch(`/admin/orders/${orderId}/details`, {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('orderModalContent').innerHTML = data.html;
+        } else {
+            document.getElementById('orderModalContent').innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                    <p class="text-red-600">Gagal memuat detail pesanan</p>
                 </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('orderModalContent').innerHTML = `
+            <div class="text-center py-8">
+                <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                <p class="text-red-600">Terjadi kesalahan saat memuat detail pesanan</p>
             </div>
         `;
-    }, 1000);
+    });
 }
 
 function updateOrderStatus(orderId) {
@@ -331,9 +391,42 @@ function updateOrderStatus(orderId) {
 }
 
 function cancelOrder(orderId) {
-    if (confirm('Are you sure you want to cancel this order?')) {
-        alert('Order cancellation functionality would be implemented here');
-    }
+    confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() {
+        updateStatus(orderId, 'cancelled');
+    });
+}
+
+function updateStatus(orderId, status) {
+    const loader = document.getElementById('updateLoader');
+    if (loader) loader.classList.remove('hidden');
+    
+    fetch(`/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: status })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (loader) loader.classList.add('hidden');
+        
+        if (data.success) {
+            showNotification(data.message, 'success');
+            closeStatusModal();
+            // Refresh page to show updated status
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showNotification('Gagal memperbarui status pesanan', 'error');
+        }
+    })
+    .catch(error => {
+        if (loader) loader.classList.add('hidden');
+        console.error('Error:', error);
+        showNotification('Terjadi kesalahan saat memperbarui status', 'error');
+    });
 }
 
 function closeOrderModal() {
@@ -346,16 +439,47 @@ function closeStatusModal() {
     currentOrderId = null;
 }
 
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Status form submission
 document.getElementById('statusForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const newStatus = document.getElementById('newStatus').value;
     
     if (currentOrderId && newStatus) {
-        // In a real application, you would make an AJAX call here
-        alert(`Order status would be updated to: ${newStatus}`);
+        updateStatus(currentOrderId, newStatus);
+    }
+});
+
+// Close modals when clicking outside
+document.getElementById('orderModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeOrderModal();
+    }
+});
+
+document.getElementById('statusModal').addEventListener('click', function(e) {
+    if (e.target === this) {
         closeStatusModal();
-        // Refresh page or update UI
-        // window.location.reload();
     }
 });
 </script>
