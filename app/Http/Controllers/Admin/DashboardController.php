@@ -175,7 +175,7 @@ class DashboardController extends Controller
      */
     public function transactions(Request $request)
     {
-        $query = Transaction::with(['order.cart.user']);
+        $query = Transaction::with(['order.cart.user', 'order.cart.cartDetails.product.images', 'order.cart.cartDetails.product.seller']);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -190,6 +190,134 @@ class DashboardController extends Controller
         $transactions = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return view('admin.transactions.index', compact('transactions'));
+    }
+
+    /**
+     * Get transaction details for modal
+     */
+    public function transactionDetails(Transaction $transaction)
+    {
+        $transaction->load([
+            'order.cart.user', 
+            'order.cart.cartDetails.product.images', 
+            'order.cart.cartDetails.product.seller'
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'transaction' => $transaction,
+            'html' => view('admin.transactions.details', compact('transaction'))->render()
+        ]);
+    }
+
+    /**
+     * Update transaction status
+     */
+    public function updateTransactionStatus(Request $request, Transaction $transaction)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,paid,cancelled,failed'
+        ]);
+
+        $transaction->update(['transactionstatus' => $request->status]);
+
+        // If transaction is paid, also update order status to processing
+        if ($request->status === 'paid' && $transaction->order) {
+            $transaction->order->update(['status' => 'processing']);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status transaksi berhasil diperbarui',
+            'transaction' => $transaction
+        ]);
+    }
+
+    /**
+     * Delete transaction
+     */
+    public function deleteTransaction(Transaction $transaction)
+    {
+        try {
+            $transaction->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus transaksi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Export transactions
+     */
+    public function exportTransactions(Request $request)
+    {
+        $query = Transaction::with(['order.cart.user']);
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('transactionstatus', $request->status);
+        }
+
+        // Search by transaction number
+        if ($request->filled('search')) {
+            $query->where('transaction_number', 'like', '%' . $request->search . '%');
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->get();
+
+        $filename = 'transactions_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($transactions) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV Headers
+            fputcsv($file, [
+                'ID Transaksi',
+                'Nomor Transaksi', 
+                'Pelanggan',
+                'Email',
+                'Metode Pembayaran',
+                'Jumlah',
+                'Status',
+                'Tanggal Transaksi'
+            ]);
+
+            // CSV Data
+            foreach ($transactions as $transaction) {
+                $customerName = $transaction->order && $transaction->order->cart && $transaction->order->cart->user 
+                    ? $transaction->order->cart->user->username 
+                    : 'N/A';
+                $customerEmail = $transaction->order && $transaction->order->cart && $transaction->order->cart->user 
+                    ? $transaction->order->cart->user->email 
+                    : 'N/A';
+
+                fputcsv($file, [
+                    $transaction->id,
+                    $transaction->transaction_number,
+                    $customerName,
+                    $customerEmail,
+                    $transaction->payment_method,
+                    $transaction->amount,
+                    $transaction->transactionstatus,
+                    $transaction->created_at->format('d/m/Y H:i')
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

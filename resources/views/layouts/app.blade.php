@@ -50,6 +50,9 @@
                                 <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                                     <i class="fas fa-shopping-cart mr-2"></i>Pesanan
                                 </a>
+                                <a href="{{ route('admin.transactions.index') }}" class="nav-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
+                                    <i class="fas fa-credit-card mr-2"></i>Transaksi
+                                </a>
                             @elseif(auth()->user()->isSeller())
                                 <a href="{{ route('seller.dashboard') }}" class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-tachometer-alt mr-2"></i>Dashboard

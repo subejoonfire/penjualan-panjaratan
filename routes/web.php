@@ -35,6 +35,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/orders/{order}/details', [AdminDashboardController::class, 'orderDetails'])->name('orders.details');
     Route::put('/orders/{order}/status', [AdminDashboardController::class, 'updateOrderStatus'])->name('orders.update-status');
     Route::get('/transactions', [AdminDashboardController::class, 'transactions'])->name('transactions.index');
+    Route::get('/transactions/{transaction}/details', [AdminDashboardController::class, 'transactionDetails'])->name('transactions.details');
+    Route::put('/transactions/{transaction}/status', [AdminDashboardController::class, 'updateTransactionStatus'])->name('transactions.update-status');
+    Route::delete('/transactions/{transaction}', [AdminDashboardController::class, 'deleteTransaction'])->name('transactions.destroy');
+    Route::get('/transactions/export', [AdminDashboardController::class, 'exportTransactions'])->name('transactions.export');
     Route::post('/notifications/send', [AdminDashboardController::class, 'sendNotification'])->name('notifications.send');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::post('/categories/bulk-delete', [\App\Http\Controllers\Admin\CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
