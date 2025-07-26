@@ -61,7 +61,7 @@
 
                                     <div class="mt-2 flex items-center space-x-4">
                                         <span class="text-lg font-bold text-blue-600">
-                                            Rp {{ number_format($detail->product->productprice) }}
+                                            Rp {{ number_format($detail->productprice) }}
                                         </span>
                                         @if($detail->product->productstock < $detail->quantity)
                                             <span class="text-sm text-red-600 font-medium">
@@ -95,7 +95,7 @@
                                 <!-- Subtotal -->
                                 <div class="text-right">
                                     <p class="text-lg font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->productprice) }}
+                                        Rp {{ number_format($detail->quantity * $detail->productprice) }}
                                     </p>
                                 </div>
 
@@ -176,23 +176,7 @@
                             </a>
                     </div>
 
-                    <!-- Promo Code -->
-                    <div class="mt-6 pt-6 border-t">
-                        <form action="{{ route('customer.cart.apply-coupon') }}" method="POST">
-                            @csrf
-                            <label for="coupon_code" class="block text-sm font-medium text-gray-700 mb-2">
-                                Kode Promo
-                            </label>
-                            <div class="flex space-x-2">
-                                <input type="text" name="coupon_code" id="coupon_code" placeholder="Masukkan kode promo"
-                                    class="flex-1 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <button type="submit"
-                                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                                    Terapkan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+
                 </div>
             </div>
         </div>

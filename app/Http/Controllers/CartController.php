@@ -23,18 +23,28 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart) {
-            return view('customer.cart.index', ['cartDetails' => collect(), 'total' => 0]);
+            return view('customer.cart.index', [
+                'cartDetails' => collect(), 
+                'subtotal' => 0,
+                'shippingCost' => 0,
+                'tax' => 0,
+                'total' => 0
+            ]);
         }
 
         $cartDetails = $cart->cartDetails()
-            ->with(['product.images', 'product.seller'])
+            ->with(['product.images', 'product.seller', 'product.category'])
             ->get();
 
-        $total = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->productprice;
+        $subtotal = $cartDetails->sum(function ($detail) {
+            return $detail->quantity * $detail->productprice;
         });
 
-        return view('customer.cart.index', compact('cartDetails', 'total'));
+        $shippingCost = 15000; // Fixed shipping cost
+        $tax = 0; // No tax for now
+        $total = $subtotal + $shippingCost + $tax;
+
+        return view('customer.cart.index', compact('cartDetails', 'subtotal', 'shippingCost', 'tax', 'total'));
     }
 
     /**
@@ -84,7 +94,8 @@ class CartController extends Controller
             CartDetail::create([
                 'idcart' => $cart->id,
                 'idproduct' => $product->id,
-                'quantity' => $request->quantity
+                'quantity' => $request->quantity,
+                'productprice' => $product->productprice
             ]);
         }
 
@@ -172,7 +183,7 @@ class CartController extends Controller
         }
 
         $subtotal = $cartDetails->sum(function ($detail) {
-            return $detail->quantity * $detail->product->productprice;
+            return $detail->quantity * $detail->productprice;
         });
 
         $shippingCost = 15000; // Fixed shipping cost
@@ -222,7 +233,7 @@ class CartController extends Controller
             }
 
             $subtotal = $cartDetails->sum(function ($detail) {
-                return $detail->quantity * $detail->product->productprice;
+                return $detail->quantity * $detail->productprice;
             });
 
             $shippingCost = 15000;
@@ -243,7 +254,7 @@ class CartController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => 'TRX-' . time() . '-' . $user->id,
                 'amount' => $total,
-                'paymentmethod' => $request->payment_method,
+                'payment_method' => $request->payment_method,
                 'transactionstatus' => 'pending'
             ]);
 
@@ -310,9 +321,9 @@ class CartController extends Controller
                     'id' => $detail->id,
                     'product_name' => $detail->product->productname,
                     'product_image' => $detail->product->images->first()?->image,
-                    'productprice' => $detail->product->productprice,
+                    'productprice' => $detail->productprice,
                     'quantity' => $detail->quantity,
-                    'subtotal' => $detail->quantity * $detail->product->productprice
+                    'subtotal' => $detail->quantity * $detail->productprice
                 ];
             });
 

@@ -43,11 +43,11 @@
                                     <p class="text-sm text-gray-600">Seller: {{ $detail->product->seller->username }}
                                     </p>
                                     <p class="text-sm text-gray-600">Qty: {{ $detail->quantity }} × Rp {{
-                                        number_format($detail->product->productprice) }}</p>
+                                        number_format($detail->productprice) }}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">
-                                        Rp {{ number_format($detail->quantity * $detail->product->productprice) }}
+                                        Rp {{ number_format($detail->quantity * $detail->productprice) }}
                                     </p>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                                 'checked' : '' }}>
                                 <div class="flex-1">
                                     <div class="text-sm font-medium text-gray-900">
-                                        {{ $address->address_label ?? 'Address ' . $loop->iteration }}
+                                        Alamat {{ $loop->iteration }}
                                         @if($address->is_default)
                                         <span
                                             class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
@@ -81,8 +81,7 @@
                                         @endif
                                     </div>
                                     <div class="text-sm text-gray-600 mt-1">
-                                        {{ $address->address }}<br>
-                                        {{ $address->city }}, {{ $address->postal_code }}
+                                        {{ $address->address }}
                                     </div>
                                 </div>
                             </label>

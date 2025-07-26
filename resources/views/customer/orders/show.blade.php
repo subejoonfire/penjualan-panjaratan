@@ -158,9 +158,9 @@
                                 <div class="text-right">
                                     <p class="text-sm text-gray-900">Jumlah: {{ $item->quantity }}</p>
                                     <p class="text-sm font-medium text-gray-900">Rp {{
-                                        number_format($item->product->productprice) }}</p>
+                                        number_format($item->productprice) }}</p>
                                     <p class="text-sm text-gray-500">Subtotal: Rp {{ number_format($item->quantity *
-                                        $item->product->productprice) }}</p>
+                                        $item->productprice) }}</p>
                                 </div>
                                 @if($order->status === 'delivered')
                                 <div class="flex-shrink-0">
@@ -203,7 +203,7 @@
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Metode Pembayaran</dt>
-                                <dd class="text-sm text-gray-900">{{ ucfirst($order->transaction->paymentmethod) }}</dd>
+                                <dd class="text-sm text-gray-900">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Status Pembayaran</dt>
@@ -241,7 +241,7 @@
                                 <dt class="text-sm text-gray-500">Subtotal</dt>
                                 <dd class="text-sm text-gray-900">Rp {{
                                     number_format($order->cart->cartDetails->sum(function($item) { return
-                                    $item->quantity * $item->product->productprice; })) }}</dd>
+                                    $item->quantity * $item->productprice; })) }}</dd>
                             </div>
                             <div class="flex justify-between">
                                 <dt class="text-sm text-gray-500">Pengiriman</dt>
