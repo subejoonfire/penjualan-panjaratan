@@ -151,9 +151,9 @@
                             </div>
                             @elseif($order->status === 'delivered')
                             <div class="mt-2">
-                                <a href="{{ route('customer.orders.review', $order) }}"
+                                <a href="{{ route('customer.orders.show', $order) }}"
                                     class="text-sm text-blue-600 hover:text-blue-700">
-                                    Beri Ulasan
+                                    Lihat Detail
                                 </a>
                             </div>
                             @endif
