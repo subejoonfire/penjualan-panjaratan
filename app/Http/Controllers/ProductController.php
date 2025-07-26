@@ -119,8 +119,8 @@ class ProductController extends Controller
         $canReview = false;
         if (auth()->check() && auth()->user()->isCustomer()) {
             $hasPurchased = auth()->user()->carts()
-                ->whereHas('order.transaction', function ($query) {
-                    $query->where('transactionstatus', 'paid');
+                ->whereHas('order', function ($query) {
+                    $query->where('status', 'delivered');
                 })
                 ->whereHas('cartDetails', function ($query) use ($product) {
                     $query->where('idproduct', $product->id);

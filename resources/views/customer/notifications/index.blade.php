@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Notifikasi - Penjualan Panjaratan')
+@section('title', 'Notifications - Penjualan Panjaratan')
 
 @section('content')
 <div class="py-6">
@@ -10,14 +10,14 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Notifikasi</h1>
-                    <p class="mt-2 text-gray-600">Dapatkan info terbaru tentang pesanan dan aktivitas akun Anda</p>
+                    <p class="mt-2 text-gray-600">Tetap terupdate dengan pesanan dan aktivitas akun Anda</p>
                 </div>
-                @if($userNotifications->where('readstatus', false)->count() > 0)
+                @if($notifications->where('readstatus', false)->count() > 0)
                     <form action="{{ route('customer.notifications.mark-all-read') }}" method="POST">
                         @csrf
                         @method('PUT')
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Tandai Semua Sudah Dibaca
+                            Tandai Semua Sebagai Dibaca
                         </button>
                     </form>
                 @endif
@@ -25,10 +25,10 @@
         </div>
 
         <!-- Notifications List -->
-        @if($userNotifications->count() > 0)
+        @if($notifications->count() > 0)
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="divide-y divide-gray-200">
-                    @foreach($userNotifications as $notification)
+                    @foreach($notifications as $notification)
                         <div class="px-6 py-4 hover:bg-gray-50 {{ !$notification->readstatus ? 'bg-blue-50' : '' }}">
                             <div class="flex items-start space-x-4">
                                 <!-- Notification Icon -->
@@ -76,7 +76,7 @@
                                                     @csrf
                                                     @method('PUT')
                                                     <button type="submit" class="text-blue-600 hover:text-blue-500 text-sm">
-                                                        Tandai Sudah Dibaca
+                                                        Tandai Sebagai Dibaca
                                                     </button>
                                                 </form>
                                             @endif
@@ -89,9 +89,9 @@
                 </div>
 
                 <!-- Pagination -->
-                @if($userNotifications->hasPages())
+                @if($notifications->hasPages())
                     <div class="px-6 py-4 border-t border-gray-200">
-                        {{ $userNotifications->links() }}
+                        {{ $notifications->links() }}
                     </div>
                 @endif
             </div>
@@ -101,11 +101,11 @@
                 <div class="px-6 py-12 text-center">
                     <i class="fas fa-bell text-gray-400 text-6xl mb-4"></i>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Notifikasi</h3>
-                    <p class="text-gray-600 mb-6">Anda belum memiliki notifikasi. Jika ada pesanan atau pembaruan akun, notifikasi akan muncul di sini.</p>
+                    <p class="text-gray-600 mb-6">Anda belum memiliki notifikasi. Ketika Anda membuat pesanan atau ada pembaruan pada akun Anda, Anda akan melihatnya di sini.</p>
                     <a href="{{ route('products.index') }}" 
                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                         <i class="fas fa-search mr-2"></i>
-                        Lihat Produk
+                        Jelajahi Produk
                     </a>
                 </div>
             </div>

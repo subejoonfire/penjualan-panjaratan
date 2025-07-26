@@ -315,7 +315,7 @@
                 @else
                 <div class="px-6 py-8 text-center">
                     <i class="fas fa-star text-gray-400 text-3xl mb-2"></i>
-                    <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+                    <p class="text-gray-500">Belum ada ulasan. Jadilah yang pertama memberikan ulasan untuk produk ini!</p>
                 </div>
                 @endif
             </div>
@@ -327,13 +327,13 @@
         <div class="mt-8">
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Write a Review</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Tulis Ulasan</h3>
                 </div>
                 <div class="px-6 py-6">
                     <form action="{{ route('customer.products.reviews.store', $product) }}" method="POST">
                         @csrf
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Penilaian</label>
                             <div class="flex items-center space-x-1">
                                 @for($i = 1; $i <= 5; $i++)
                                 <button type="button" onclick="setRating({{ $i }})" 
@@ -349,10 +349,10 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="productreviews" class="block text-sm font-medium text-gray-700 mb-2">Review (Optional)</label>
+                            <label for="productreviews" class="block text-sm font-medium text-gray-700 mb-2">Ulasan (Opsional)</label>
                             <textarea name="productreviews" id="productreviews" rows="4" 
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="Share your experience with this product...">{{ old('productreviews') }}</textarea>
+                                placeholder="Bagikan pengalaman Anda dengan produk ini...">{{ old('productreviews') }}</textarea>
                             @error('productreviews')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -360,7 +360,7 @@
 
                         <div class="flex justify-end">
                             <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                Submit Review
+                                Kirim Ulasan
                             </button>
                         </div>
                     </form>
@@ -371,7 +371,7 @@
         <div class="mt-8">
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
                 <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
-                <p class="text-gray-600">You need to purchase this product before you can write a review.</p>
+                <p class="text-gray-600">Anda perlu membeli dan menerima produk ini sebelum dapat memberikan ulasan.</p>
             </div>
         </div>
         @endif

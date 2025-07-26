@@ -35,6 +35,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/orders/{order}/details', [AdminDashboardController::class, 'orderDetails'])->name('orders.details');
     Route::put('/orders/{order}/status', [AdminDashboardController::class, 'updateOrderStatus'])->name('orders.update-status');
     Route::get('/transactions', [AdminDashboardController::class, 'transactions'])->name('transactions.index');
+    Route::get('/transactions/{transaction}/details', [AdminDashboardController::class, 'transactionDetails'])->name('transactions.details');
+    Route::put('/transactions/{transaction}/status', [AdminDashboardController::class, 'updateTransactionStatus'])->name('transactions.update-status');
+    Route::delete('/transactions/{transaction}', [AdminDashboardController::class, 'deleteTransaction'])->name('transactions.destroy');
+    Route::get('/transactions/export', [AdminDashboardController::class, 'exportTransactions'])->name('transactions.export');
     Route::post('/notifications/send', [AdminDashboardController::class, 'sendNotification'])->name('notifications.send');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::post('/categories/bulk-delete', [\App\Http\Controllers\Admin\CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
@@ -88,9 +92,35 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
     Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
     Route::get('/notifications/unread', function () {
+        $user = auth()->user();
+        $notifications = $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'title' => $notification->title,
+                    'notification' => $notification->notification,
+                    'type' => $notification->type,
+                    'readstatus' => $notification->readstatus,
+                    'created_at' => $notification->created_at->diffForHumans()
+                ];
+            });
+        
         return response()->json([
-            'count' => auth()->user()->unreadNotifications()->count()
+            'count' => $user->notifications()->where('readstatus', false)->count(), // Show total count, not just unread
+            'notifications' => $notifications
         ]);
     })->name('notifications.unread');
+    
+    Route::put('/notifications/{notification}/read', function ($notificationId) {
+        $user = auth()->user();
+        $notification = $user->notifications()->findOrFail($notificationId);
+        $notification->update(['readstatus' => true]);
+        
+        return response()->json(['success' => true]);
+    })->name('notifications.read');
+    
     Route::get('/products/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search.suggestions');
 });

@@ -50,6 +50,9 @@
                                 <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                                     <i class="fas fa-shopping-cart mr-2"></i>Pesanan
                                 </a>
+                                <a href="{{ route('admin.transactions.index') }}" class="nav-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
+                                    <i class="fas fa-credit-card mr-2"></i>Transaksi
+                                </a>
                             @elseif(auth()->user()->isSeller())
                                 <a href="{{ route('seller.dashboard') }}" class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
                                     <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
@@ -94,11 +97,16 @@
                                     <div class="px-4 py-2 border-b">
                                         <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
                                     </div>
-                                    <div class="max-h-64 overflow-y-auto">
+                                    <div id="notificationList" class="max-h-64 overflow-y-auto">
                                         <!-- Notifications will be loaded here -->
                                         <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                            Tidak ada notifikasi baru
+                                            Memuat notifikasi...
                                         </div>
+                                    </div>
+                                    <div class="px-4 py-2 border-t border-gray-200">
+                                        <a href="{{ route('customer.notifications.index') }}" class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                            Lihat Semua Notifikasi
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -117,6 +125,11 @@
                                     <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         <i class="fas fa-user mr-2"></i>Profil
                                     </a>
+                                    @if(auth()->user()->isCustomer())
+                                    <a href="{{ route('customer.notifications.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                                    </a>
+                                    @endif
                                     <form method="POST" action="{{ route('logout') }}" class="block">
                                         @csrf
                                         <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -176,29 +189,10 @@
 
     @stack('scripts')
 
-    <!-- Load Cart Count for Customers -->
+    <!-- Load Cart Count for Customers and Notifications for All Users -->
     @auth
-        @if(auth()->user()->isCustomer())
         <script>
-            // Load cart count on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                loadCartCount();
-            });
-
-            function loadCartCount() {
-                fetch('{{ route('api.cart.count') }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount) {
-                            cartCount.textContent = data.count;
-                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
-                        }
-                    })
-                    .catch(error => console.error('Error loading cart count:', error));
-            }
-
-            // Load notification count
+            // Load notification count for all users
             function loadNotificationCount() {
                 fetch('{{ route('api.notifications.unread') }}')
                     .then(response => response.json())
@@ -212,10 +206,95 @@
                     .catch(error => console.error('Error loading notification count:', error));
             }
 
+            // Load notifications when dropdown is opened
+            function loadNotifications() {
+                fetch('{{ route('api.notifications.unread') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const notificationList = document.getElementById('notificationList');
+                        if (notificationList) {
+                            if (data.notifications && data.notifications.length > 0) {
+                                notificationList.innerHTML = data.notifications.map(notification => `
+                                    <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onclick="markNotificationAsRead(${notification.id})">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-bell text-blue-500 text-sm"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900">${notification.title}</p>
+                                                <p class="text-sm text-gray-600">${notification.notification}</p>
+                                                <p class="text-xs text-gray-500 mt-1">${notification.created_at}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('');
+                            } else {
+                                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading notifications:', error);
+                        const notificationList = document.getElementById('notificationList');
+                        if (notificationList) {
+                            notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
+                        }
+                    });
+            }
+
+            // Mark notification as read
+            function markNotificationAsRead(notificationId) {
+                fetch(`/api/notifications/${notificationId}/read`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadNotificationCount(); // Refresh count
+                        loadNotifications(); // Refresh list
+                    }
+                })
+                .catch(error => console.error('Error marking notification as read:', error));
+            }
+
             // Load notification count on page load
-            loadNotificationCount();
+            document.addEventListener('DOMContentLoaded', function() {
+                loadNotificationCount();
+                
+                // Add click event to notification button
+                const notificationButton = document.querySelector('.notification-count').closest('button');
+                if (notificationButton) {
+                    notificationButton.addEventListener('click', function() {
+                        setTimeout(loadNotifications, 100); // Small delay to ensure dropdown is open
+                    });
+                }
+            });
+
+            @if(auth()->user()->isCustomer())
+            // Load cart count for customers only
+            function loadCartCount() {
+                fetch('{{ route('api.cart.count') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.count;
+                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error loading cart count:', error));
+            }
+
+            // Load cart count on page load for customers
+            document.addEventListener('DOMContentLoaded', function() {
+                loadCartCount();
+            });
+            @endif
         </script>
-        @endif
     @endauth
 
     <!-- Custom Styles -->
