@@ -100,6 +100,11 @@
                                             Memuat notifikasi...
                                         </div>
                                     </div>
+                                    <div class="px-4 py-2 border-t border-gray-200">
+                                        <a href="{{ route('customer.notifications.index') }}" class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                            Lihat Semua Notifikasi
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
@@ -117,6 +122,11 @@
                                     <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         <i class="fas fa-user mr-2"></i>Profil
                                     </a>
+                                    @if(auth()->user()->isCustomer())
+                                    <a href="{{ route('customer.notifications.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                                    </a>
+                                    @endif
                                     <form method="POST" action="{{ route('logout') }}" class="block">
                                         @csrf
                                         <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -176,29 +186,10 @@
 
     @stack('scripts')
 
-    <!-- Load Cart Count for Customers -->
+    <!-- Load Cart Count for Customers and Notifications for All Users -->
     @auth
-        @if(auth()->user()->isCustomer())
         <script>
-            // Load cart count on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                loadCartCount();
-            });
-
-            function loadCartCount() {
-                fetch('{{ route('api.cart.count') }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount) {
-                            cartCount.textContent = data.count;
-                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
-                        }
-                    })
-                    .catch(error => console.error('Error loading cart count:', error));
-            }
-
-            // Load notification count
+            // Load notification count for all users
             function loadNotificationCount() {
                 fetch('{{ route('api.notifications.unread') }}')
                     .then(response => response.json())
@@ -212,21 +203,7 @@
                     .catch(error => console.error('Error loading notification count:', error));
             }
 
-            // Load notification count on page load
-            loadNotificationCount();
-            
             // Load notifications when dropdown is opened
-            document.addEventListener('DOMContentLoaded', function() {
-                const notificationButton = document.querySelector('[x-data*="open"] button');
-                const notificationList = document.getElementById('notificationList');
-                
-                if (notificationButton && notificationList) {
-                    notificationButton.addEventListener('click', function() {
-                        loadNotifications();
-                    });
-                }
-            });
-            
             function loadNotifications() {
                 fetch('{{ route('api.notifications.unread') }}')
                     .then(response => response.json())
@@ -235,7 +212,7 @@
                         if (notificationList) {
                             if (data.notifications && data.notifications.length > 0) {
                                 notificationList.innerHTML = data.notifications.map(notification => `
-                                    <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
+                                    <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onclick="markNotificationAsRead(${notification.id})">
                                         <div class="flex items-start space-x-3">
                                             <div class="flex-shrink-0">
                                                 <i class="fas fa-bell text-blue-500 text-sm"></i>
@@ -261,8 +238,60 @@
                         }
                     });
             }
+
+            // Mark notification as read
+            function markNotificationAsRead(notificationId) {
+                fetch(`/api/notifications/${notificationId}/read`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadNotificationCount(); // Refresh count
+                        loadNotifications(); // Refresh list
+                    }
+                })
+                .catch(error => console.error('Error marking notification as read:', error));
+            }
+
+            // Load notification count on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                loadNotificationCount();
+                
+                // Add click event to notification button
+                const notificationButton = document.querySelector('.notification-count').closest('button');
+                if (notificationButton) {
+                    notificationButton.addEventListener('click', function() {
+                        setTimeout(loadNotifications, 100); // Small delay to ensure dropdown is open
+                    });
+                }
+            });
+
+            @if(auth()->user()->isCustomer())
+            // Load cart count for customers only
+            function loadCartCount() {
+                fetch('{{ route('api.cart.count') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.count;
+                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error loading cart count:', error));
+            }
+
+            // Load cart count on page load for customers
+            document.addEventListener('DOMContentLoaded', function() {
+                loadCartCount();
+            });
+            @endif
         </script>
-        @endif
     @endauth
 
     <!-- Custom Styles -->

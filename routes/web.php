@@ -105,9 +105,18 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
             });
         
         return response()->json([
-            'count' => $user->unreadNotifications()->count(),
+            'count' => $user->notifications()->count(), // Show total count, not just unread
             'notifications' => $notifications
         ]);
     })->name('notifications.unread');
+    
+    Route::put('/notifications/{notification}/read', function ($notificationId) {
+        $user = auth()->user();
+        $notification = $user->notifications()->findOrFail($notificationId);
+        $notification->update(['readstatus' => true]);
+        
+        return response()->json(['success' => true]);
+    })->name('notifications.read');
+    
     Route::get('/products/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search.suggestions');
 });

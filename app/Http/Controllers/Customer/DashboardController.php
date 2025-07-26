@@ -214,6 +214,10 @@ class DashboardController extends Controller
         
         $notification->update(['readstatus' => true]);
         
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+        
         return back()->with('success', 'Notifikasi ditandai sebagai telah dibaca');
     }
     
@@ -227,6 +231,10 @@ class DashboardController extends Controller
         $user->notifications()
             ->where('readstatus', false)
             ->update(['readstatus' => true]);
+        
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
         
         return back()->with('success', 'Semua notifikasi ditandai sebagai telah dibaca');
     }
