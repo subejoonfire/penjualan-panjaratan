@@ -64,7 +64,7 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('iduser')->constrained('users')->onDelete('cascade'); // Relasi ke users
-            $table->enum('checkoutstatus', ['active', 'checkout', 'completed'])->default('active'); // Status checkout
+            $table->enum('checkoutstatus', ['active', 'completed'])->default('active'); // Status checkout
             $table->timestamps();
         });
 

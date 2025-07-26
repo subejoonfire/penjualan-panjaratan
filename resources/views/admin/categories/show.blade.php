@@ -113,15 +113,15 @@
                             Edit Category
                         </a>
                         @if($stats['total_products'] === 0)
-                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="w-full">
+                        <button type="button"
+                            onclick="confirmAction('Apakah Anda yakin ingin menghapus kategori ini?', function() { document.getElementById('deleteCategoryForm').submit(); })"
+                            class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                            <i class="fas fa-trash mr-2"></i>
+                            Delete Category
+                        </button>
+                        <form id="deleteCategoryForm" action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="hidden">
                             @csrf
                             @method('DELETE')
-                            <button type="submit"
-                                onclick="confirmAction('Apakah Anda yakin ingin menghapus kategori ini?', function() { this.closest('form').submit(); })"
-                                class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
-                                <i class="fas fa-trash mr-2"></i>
-                                Delete Category
-                            </button>
                         </form>
                         @else
                         <div

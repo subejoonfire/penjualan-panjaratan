@@ -165,7 +165,7 @@ class OrderController extends Controller
             ]);
 
             // Update cart status
-            $cart->update(['checkoutstatus' => 'checked_out']);
+            $cart->update(['checkoutstatus' => 'completed']);
 
             // Update product stock
             foreach ($cartDetails as $detail) {

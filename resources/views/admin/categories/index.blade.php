@@ -200,14 +200,13 @@
                                         Edit
                                     </a>
                                     @if($category->products_count === 0)
-                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
-                                        class="inline-block">
+                                    <button type="button" class="text-red-600 hover:text-red-900"
+                                        onclick="confirmAction('Apakah Anda yakin ingin menghapus kategori ini?', function() { document.getElementById('deleteCategoryForm{{ $category->id }}').submit(); })">
+                                        Hapus
+                                    </button>
+                                    <form id="deleteCategoryForm{{ $category->id }}" action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="hidden">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="text-red-600 hover:text-red-900"
-                                            onclick="confirmAction('Apakah Anda yakin ingin menghapus kategori ini?', function() { this.closest('form').submit(); })">
-                                            Hapus
-                                        </button>
                                     </form>
                                     @else
                                     <span class="text-gray-400 cursor-not-allowed"

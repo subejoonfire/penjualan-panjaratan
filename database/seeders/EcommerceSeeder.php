@@ -251,7 +251,7 @@ class EcommerceSeeder extends Seeder
             // Setiap customer memiliki 1 cart aktif
             $cart = Cart::create([
                 'iduser' => $customer->id,
-                'checkoutstatus' => $faker->randomElement(['active', 'checkout']),
+                'checkoutstatus' => $faker->randomElement(['active', 'completed']),
             ]);
 
             // Setiap cart memiliki 1-5 item
@@ -275,7 +275,7 @@ class EcommerceSeeder extends Seeder
      */
     private function seedOrders($faker)
     {
-        $carts = Cart::where('checkoutstatus', 'checkout')->get();
+        $carts = Cart::where('checkoutstatus', 'completed')->get();
 
         foreach ($carts as $cart) {
             $cartDetails = CartDetail::where('idcart', $cart->id)->get();

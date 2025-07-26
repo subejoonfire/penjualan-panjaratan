@@ -121,6 +121,6 @@ class Cart extends Model
     // Scope untuk cart yang sudah checkout
     public function scopeCheckedOut($query)
     {
-        return $query->where('checkoutstatus', 'checkout');
+        return $query->where('checkoutstatus', 'completed');
     }
 }
