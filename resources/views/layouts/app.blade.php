@@ -94,10 +94,10 @@
                                     <div class="px-4 py-2 border-b">
                                         <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
                                     </div>
-                                    <div class="max-h-64 overflow-y-auto">
+                                    <div id="notificationList" class="max-h-64 overflow-y-auto">
                                         <!-- Notifications will be loaded here -->
                                         <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                            Tidak ada notifikasi baru
+                                            Memuat notifikasi...
                                         </div>
                                     </div>
                                 </div>
@@ -214,6 +214,53 @@
 
             // Load notification count on page load
             loadNotificationCount();
+            
+            // Load notifications when dropdown is opened
+            document.addEventListener('DOMContentLoaded', function() {
+                const notificationButton = document.querySelector('[x-data*="open"] button');
+                const notificationList = document.getElementById('notificationList');
+                
+                if (notificationButton && notificationList) {
+                    notificationButton.addEventListener('click', function() {
+                        loadNotifications();
+                    });
+                }
+            });
+            
+            function loadNotifications() {
+                fetch('{{ route('api.notifications.unread') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const notificationList = document.getElementById('notificationList');
+                        if (notificationList) {
+                            if (data.notifications && data.notifications.length > 0) {
+                                notificationList.innerHTML = data.notifications.map(notification => `
+                                    <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-bell text-blue-500 text-sm"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900">${notification.title}</p>
+                                                <p class="text-sm text-gray-600">${notification.notification}</p>
+                                                <p class="text-xs text-gray-500 mt-1">${notification.created_at}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('');
+                            } else {
+                                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading notifications:', error);
+                        const notificationList = document.getElementById('notificationList');
+                        if (notificationList) {
+                            notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
+                        }
+                    });
+            }
         </script>
         @endif
     @endauth

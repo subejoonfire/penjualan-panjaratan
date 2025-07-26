@@ -138,7 +138,7 @@ class DashboardController extends Controller
             'readstatus' => false
         ]);
         
-        return back()->with('success', 'Order cancelled successfully');
+        return back()->with('success', 'Pesanan berhasil dibatalkan');
     }
     
     /**
@@ -153,17 +153,15 @@ class DashboardController extends Controller
             'productreviews' => 'nullable|string|max:1000'
         ]);
         
-        // Check if user has purchased this product
+        // Check if user has purchased this product (has delivered order)
         $hasPurchased = Order::whereHas('cart', function($query) use ($user) {
             $query->where('iduser', $user->id);
         })->whereHas('cart.cartDetails', function($query) use ($product) {
             $query->where('idproduct', $product->id);
-        })->whereHas('transaction', function($query) {
-            $query->where('transactionstatus', 'paid');
-        })->exists();
+        })->where('status', 'delivered')->exists();
         
         if (!$hasPurchased) {
-            return back()->with('error', 'You can only review products you have purchased');
+            return back()->with('error', 'Anda hanya dapat memberikan ulasan untuk produk yang telah Anda beli dan terima');
         }
         
         // Check if user already reviewed this product
@@ -177,7 +175,7 @@ class DashboardController extends Controller
                 'productreviews' => $request->productreviews
             ]);
             
-            return back()->with('success', 'Review updated successfully');
+            return back()->with('success', 'Ulasan berhasil diperbarui');
         } else {
             ProductReview::create([
                 'iduser' => $user->id,
@@ -186,7 +184,7 @@ class DashboardController extends Controller
                 'productreviews' => $request->productreviews
             ]);
             
-            return back()->with('success', 'Review added successfully');
+            return back()->with('success', 'Ulasan berhasil ditambahkan');
         }
     }
     
@@ -216,7 +214,7 @@ class DashboardController extends Controller
         
         $notification->update(['readstatus' => true]);
         
-        return back()->with('success', 'Notification marked as read');
+        return back()->with('success', 'Notifikasi ditandai sebagai telah dibaca');
     }
     
     /**
@@ -230,6 +228,6 @@ class DashboardController extends Controller
             ->where('readstatus', false)
             ->update(['readstatus' => true]);
         
-        return back()->with('success', 'All notifications marked as read');
+        return back()->with('success', 'Semua notifikasi ditandai sebagai telah dibaca');
     }
 }

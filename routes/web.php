@@ -88,8 +88,25 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
     Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
     Route::get('/notifications/unread', function () {
+        $user = auth()->user();
+        $notifications = $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'title' => $notification->title,
+                    'notification' => $notification->notification,
+                    'type' => $notification->type,
+                    'readstatus' => $notification->readstatus,
+                    'created_at' => $notification->created_at->diffForHumans()
+                ];
+            });
+        
         return response()->json([
-            'count' => auth()->user()->unreadNotifications()->count()
+            'count' => $user->unreadNotifications()->count(),
+            'notifications' => $notifications
         ]);
     })->name('notifications.unread');
     Route::get('/products/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search.suggestions');
