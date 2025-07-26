@@ -176,6 +176,48 @@
 
     @stack('scripts')
 
+    <!-- Load Cart Count for Customers -->
+    @auth
+        @if(auth()->user()->isCustomer())
+        <script>
+            // Load cart count on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                loadCartCount();
+            });
+
+            function loadCartCount() {
+                fetch('{{ route('api.cart.count') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.count;
+                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error loading cart count:', error));
+            }
+
+            // Load notification count
+            function loadNotificationCount() {
+                fetch('{{ route('api.notifications.unread') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const notificationCount = document.querySelector('.notification-count');
+                        if (notificationCount) {
+                            notificationCount.textContent = data.count;
+                            notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error loading notification count:', error));
+            }
+
+            // Load notification count on page load
+            loadNotificationCount();
+        </script>
+        @endif
+    @endauth
+
     <!-- Custom Styles -->
     <style>
         .nav-link {

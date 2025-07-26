@@ -120,7 +120,7 @@
                     <div class="p-6">
                         <div class="space-y-4">
                             <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="transfer"
+                                <input type="radio" name="payment_method" value="bank_transfer"
                                     class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
                                 <div class="flex items-center">
                                     <i class="fas fa-university text-blue-600 text-lg mr-3"></i>
@@ -144,7 +144,7 @@
                             </label>
 
                             <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="ewallet"
+                                <input type="radio" name="payment_method" value="e_wallet"
                                     class="text-blue-600 focus:ring-blue-500 border-gray-300">
                                 <div class="flex items-center">
                                     <i class="fas fa-mobile-alt text-purple-600 text-lg mr-3"></i>

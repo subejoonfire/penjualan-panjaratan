@@ -217,7 +217,7 @@ class CartController extends Controller
         $request->validate([
             'address_id' => 'nullable|exists:user_addresses,id',
             'shipping_address' => 'nullable|string',
-            'payment_method' => 'required|in:transfer,cod,ewallet',
+            'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
             'notes' => 'nullable|string|max:500'
         ]);
 
@@ -309,7 +309,7 @@ class CartController extends Controller
 
         $count = 0;
         if ($cart) {
-            $count = $cart->cartDetails()->sum('quantity');
+            $count = $cart->cartDetails()->count(); // Count unique products, not quantities
         }
 
         return response()->json(['count' => $count]);

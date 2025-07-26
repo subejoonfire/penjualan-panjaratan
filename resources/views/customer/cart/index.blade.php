@@ -124,7 +124,7 @@
 
                     <div class="space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} item)</span>
+                            <span class="text-gray-600">Subtotal ({{ $cartDetails->count() }} produk)</span>
                             <span class="font-medium">Rp {{ number_format($subtotal) }}</span>
                         </div>
 
@@ -218,5 +218,29 @@ function decreaseQuantity(button) {
         input.form.submit();
     }
 }
+
+// Refresh cart count after any cart action
+function refreshCartCount() {
+    fetch('{{ route('api.cart.count') }}')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.count;
+                cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+            }
+        })
+        .catch(error => console.error('Error refreshing cart count:', error));
+}
+
+// Refresh cart count after form submissions
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form[action*="cart"]');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            setTimeout(refreshCartCount, 1000); // Refresh after 1 second
+        });
+    });
+});
 </script>
 @endsection
