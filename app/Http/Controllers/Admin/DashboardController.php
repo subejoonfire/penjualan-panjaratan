@@ -232,7 +232,13 @@ class DashboardController extends Controller
      */
     public function orderDetails(Order $order)
     {
-        $order->load(['cart.user', 'cart.cartDetails.product.images', 'transaction']);
+        $order->load([
+            'cart.user', 
+            'cart.cartDetails.product.images', 
+            'cart.cartDetails.product.category',
+            'cart.cartDetails.product.seller',
+            'transaction'
+        ]);
         
         return response()->json([
             'success' => true,

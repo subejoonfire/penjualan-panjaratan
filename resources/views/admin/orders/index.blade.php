@@ -26,7 +26,7 @@
                         <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Status</option>
                             <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Terkonfirmasi</option>
+                            <option value="processing" {{ request('status') === 'processing' ? 'selected' : '' }}>Diproses</option>
                             <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Dikirim</option>
                             <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Diterima</option>
                             <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
@@ -94,8 +94,8 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Terkonfirmasi</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'confirmed')->count() }}</dd>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Diproses</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ $orders->where('status', 'processing')->count() }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -183,7 +183,7 @@
                                     Rp {{ number_format($order->grandtotal) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ ucfirst($order->transaction->paymentmethod ?? 'N/A') }}</div>
+                                    <div class="text-sm text-gray-900">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method ?? 'N/A')) }}</div>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($order->transaction && $order->transaction->transactionstatus === 'paid') bg-green-100 text-green-800
                                         @elseif($order->transaction && $order->transaction->transactionstatus === 'pending') bg-yellow-100 text-yellow-800
@@ -196,12 +196,19 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($order->status === 'pending') bg-yellow-100 text-yellow-800
-                                        @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
+                                        @elseif($order->status === 'processing') bg-blue-100 text-blue-800
                                         @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
                                         @elseif($order->status === 'delivered') bg-green-100 text-green-800
                                         @elseif($order->status === 'cancelled') bg-red-100 text-red-800
                                         @endif">
-                                        {{ ucfirst($order->status) }}
+                                        @switch($order->status)
+                                            @case('pending') Menunggu @break
+                                            @case('processing') Diproses @break
+                                            @case('shipped') Dikirim @break
+                                            @case('delivered') Diterima @break
+                                            @case('cancelled') Dibatalkan @break
+                                            @default {{ ucfirst($order->status) }}
+                                        @endswitch
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
