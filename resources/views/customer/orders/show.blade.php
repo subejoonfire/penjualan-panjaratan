@@ -61,7 +61,7 @@
                         <div class="flex items-center">
                             <div
                                 class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-                                {{ in_array($order->status, ['pending', 'confirmed', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
+                                {{ in_array($order->status, ['pending', 'processing', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
                                 <i class="fas fa-clock text-sm"></i>
                             </div>
                             <span class="ml-2 text-sm font-medium text-gray-900">Tertunda</span>
@@ -70,18 +70,18 @@
                         <!-- Arrow -->
                         <div class="flex-1 mx-4">
                             <div
-                                class="h-0.5 {{ in_array($order->status, ['confirmed', 'shipped', 'delivered']) ? 'bg-blue-600' : 'bg-gray-300' }}">
+                                class="h-0.5 {{ in_array($order->status, ['processing', 'shipped', 'delivered']) ? 'bg-blue-600' : 'bg-gray-300' }}">
                             </div>
                         </div>
 
-                        <!-- Confirmed -->
+                        <!-- Processing -->
                         <div class="flex items-center">
                             <div
                                 class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-                                {{ in_array($order->status, ['confirmed', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
+                                {{ in_array($order->status, ['processing', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
                                 <i class="fas fa-check text-sm"></i>
                             </div>
-                            <span class="ml-2 text-sm font-medium text-gray-900">Dikonfirmasi</span>
+                            <span class="ml-2 text-sm font-medium text-gray-900">Diproses</span>
                         </div>
 
                         <!-- Arrow -->

@@ -160,12 +160,12 @@
                             </form>
                         @elseif(auth()->user()->role === 'seller')
                             <!-- Seller actions -->
-                            @if(in_array($order->status, ['pending', 'confirmed']))
+                            @if(in_array($order->status, ['pending', 'processing']))
                             <form action="{{ route('orders.status', $order) }}" method="POST" class="space-y-3">
                                 @csrf
                                 @method('PUT')
                                 <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Konfirmasi</option>
+                                    <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Diproses</option>
                                     <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Kirim</option>
                                 </select>
                                 <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -175,7 +175,7 @@
                             @endif
                         @else
                             <!-- Customer actions -->
-                            @if(in_array($order->status, ['pending', 'confirmed']))
+                            @if(in_array($order->status, ['pending', 'processing']))
                             <form action="{{ route('orders.cancel', $order) }}" method="POST" 
                                   onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
                                 @csrf

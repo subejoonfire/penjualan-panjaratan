@@ -143,7 +143,7 @@
                                 <form action="{{ route('customer.orders.cancel', $order) }}" method="POST"
                                     class="inline-block">
                                     @csrf
-                                    @method('PATCH')
+                                    @method('PUT')
                                     <button type="submit" class="text-sm text-red-600 hover:text-red-700"
                                         onclick="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
                                         Batalkan Pesanan
