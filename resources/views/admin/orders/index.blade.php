@@ -362,9 +362,9 @@ function updateOrderStatus(orderId) {
 }
 
 function cancelOrder(orderId) {
-    if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+    confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() {
         updateStatus(orderId, 'cancelled');
-    }
+    });
 }
 
 function updateStatus(orderId, status) {

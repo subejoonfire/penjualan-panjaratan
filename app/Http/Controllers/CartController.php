@@ -60,12 +60,12 @@ class CartController extends Controller
 
         // Check if product is active
         if (!$product->is_active) {
-            return back()->with('error', 'Product is not available');
+            return back()->with('error', 'Produk tidak tersedia');
         }
 
         // Check stock
         if ($product->productstock < $request->quantity) {
-            return back()->with('error', 'Insufficient stock');
+            return back()->with('error', 'Stok tidak mencukupi');
         }
 
         // Get or create active cart
@@ -86,7 +86,7 @@ class CartController extends Controller
             $newQuantity = $existingDetail->quantity + $request->quantity;
 
             if ($newQuantity > $product->productstock) {
-                return back()->with('error', 'Insufficient stock');
+                return back()->with('error', 'Stok tidak mencukupi');
             }
 
             $existingDetail->update(['quantity' => $newQuantity]);
@@ -99,7 +99,7 @@ class CartController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Product added to cart successfully');
+        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
     }
 
     /**
@@ -120,12 +120,12 @@ class CartController extends Controller
 
         // Check stock
         if ($cartDetail->product->productstock < $request->quantity) {
-            return back()->with('error', 'Insufficient stock');
+            return back()->with('error', 'Stok tidak mencukupi');
         }
 
         $cartDetail->update(['quantity' => $request->quantity]);
 
-        return back()->with('success', 'Cart updated successfully');
+        return back()->with('success', 'Keranjang berhasil diperbarui');
     }
 
     /**
@@ -142,7 +142,7 @@ class CartController extends Controller
 
         $cartDetail->delete();
 
-        return back()->with('success', 'Item removed from cart');
+        return back()->with('success', 'Item berhasil dihapus dari keranjang');
     }
 
     /**
@@ -157,7 +157,7 @@ class CartController extends Controller
             $cart->cartDetails()->delete();
         }
 
-        return back()->with('success', 'Cart cleared successfully');
+        return back()->with('success', 'Keranjang berhasil dikosongkan');
     }
 
     /**
@@ -169,7 +169,7 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart || $cart->cartDetails()->count() === 0) {
-            return redirect()->route('customer.cart.index')->with('error', 'Cart is empty');
+            return redirect()->route('customer.cart.index')->with('error', 'Keranjang belanja kosong');
         }
 
         $cartDetails = $cart->cartDetails()->with(['product.images'])->get();
@@ -178,7 +178,7 @@ class CartController extends Controller
         foreach ($cartDetails as $detail) {
             if ($detail->product->productstock < $detail->quantity) {
                 return redirect()->route('customer.cart.index')
-                    ->with('error', 'Insufficient stock for ' . $detail->product->productname);
+                    ->with('error', 'Stok tidak mencukupi untuk ' . $detail->product->productname);
             }
         }
 
@@ -211,14 +211,28 @@ class CartController extends Controller
         $cart = $user->activeCart;
 
         if (!$cart || $cart->cartDetails()->count() === 0) {
-            return back()->with('error', 'Cart is empty');
+            return back()->with('error', 'Keranjang belanja kosong');
         }
 
         $request->validate([
-            'shipping_address' => 'required|string',
+            'address_id' => 'nullable|exists:user_addresses,id',
+            'shipping_address' => 'nullable|string',
             'payment_method' => 'required|in:transfer,cod,ewallet',
             'notes' => 'nullable|string|max:500'
         ]);
+
+        // Get shipping address
+        $shippingAddress = '';
+        if ($request->filled('address_id')) {
+            $address = $user->addresses()->find($request->address_id);
+            if ($address) {
+                $shippingAddress = $address->address;
+            }
+        } elseif ($request->filled('shipping_address')) {
+            $shippingAddress = $request->shipping_address;
+        } else {
+            return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
+        }
 
         DB::beginTransaction();
 
@@ -228,7 +242,7 @@ class CartController extends Controller
             // Check stock again
             foreach ($cartDetails as $detail) {
                 if ($detail->product->productstock < $detail->quantity) {
-                    throw new \Exception('Insufficient stock for ' . $detail->product->productname);
+                    throw new \Exception('Stok tidak mencukupi untuk ' . $detail->product->productname);
                 }
             }
 
@@ -244,7 +258,7 @@ class CartController extends Controller
                 'idcart' => $cart->id,
                 'order_number' => 'ORD-' . time() . '-' . $user->id,
                 'grandtotal' => $total,
-                'shipping_address' => $request->shipping_address,
+                'shipping_address' => $shippingAddress,
                 'status' => 'pending',
                 'notes' => $request->notes
             ]);
@@ -269,8 +283,8 @@ class CartController extends Controller
             // Create notification
             Notification::create([
                 'iduser' => $user->id,
-                'title' => 'Order Created',
-                'notification' => 'Your order #' . $order->order_number . ' has been created successfully',
+                'title' => 'Pesanan Dibuat',
+                'notification' => 'Pesanan #' . $order->order_number . ' berhasil dibuat',
                 'type' => 'order',
                 'readstatus' => false
             ]);
@@ -278,7 +292,7 @@ class CartController extends Controller
             DB::commit();
 
             return redirect()->route('customer.orders.show', $order)
-                ->with('success', 'Order placed successfully');
+                ->with('success', 'Pesanan berhasil dibuat');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', $e->getMessage());

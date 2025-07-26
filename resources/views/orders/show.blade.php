@@ -176,13 +176,14 @@
                         @else
                             <!-- Customer actions -->
                             @if(in_array($order->status, ['pending', 'processing']))
-                            <form action="{{ route('orders.cancel', $order) }}" method="POST" 
-                                  onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                            <button type="button" 
+                                  onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm').submit(); })"
+                                  class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                Batalkan Pesanan
+                            </button>
+                            <form id="cancelOrderForm" action="{{ route('orders.cancel', $order) }}" method="POST" class="hidden">
                                 @csrf
                                 @method('PUT')
-                                <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    Batalkan Pesanan
-                                </button>
                             </form>
                             @endif
                         @endif

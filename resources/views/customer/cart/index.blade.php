@@ -20,14 +20,14 @@
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-medium text-gray-900">Item Keranjang ({{ $cartDetails->count() }})
                             </h3>
-                            <form action="{{ route('customer.cart.clear') }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-sm text-red-600 hover:text-red-500"
-                                    onclick="return confirm('Apakah Anda yakin ingin mengosongkan keranjang?')">
+                                                            <button type="button" class="text-sm text-red-600 hover:text-red-500"
+                                    onclick="confirmAction('Apakah Anda yakin ingin mengosongkan keranjang?', function() { document.getElementById('clearCartForm').submit(); })">
                                     Kosongkan Keranjang
                                 </button>
-                            </form>
+                                <form id="clearCartForm" action="{{ route('customer.cart.clear') }}" method="POST" class="hidden">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
                         </div>
                     </div>
 
@@ -101,14 +101,13 @@
 
                                 <!-- Remove Button -->
                                 <div>
-                                    <form action="{{ route('customer.cart.remove', $detail) }}" method="POST"
-                                        class="inline-block">
+                                    <button type="button" class="text-red-600 hover:text-red-700 p-2"
+                                        onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <form id="removeItemForm{{ $detail->id }}" action="{{ route('customer.cart.remove', $detail) }}" method="POST" class="hidden">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-700 p-2"
-                                            onclick="return confirm('Hapus item ini dari keranjang?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
                                     </form>
                                 </div>
                             </div>

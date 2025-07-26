@@ -40,15 +40,14 @@
                             {{ ucfirst($order->status) }}
                         </span>
                         @if($order->status === 'pending')
-                        <form action="{{ route('customer.orders.cancel', $order) }}" method="POST"
-                            class="inline-block mt-2">
+                        <button type="button"
+                            onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm').submit(); })"
+                            class="text-sm text-red-600 hover:text-red-500 mt-2">
+                            Batalkan Pesanan
+                        </button>
+                        <form id="cancelOrderForm" action="{{ route('customer.orders.cancel', $order) }}" method="POST" class="hidden">
                             @csrf
                             @method('PUT')
-                            <button type="submit"
-                                onclick="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')"
-                                class="text-sm text-red-600 hover:text-red-500">
-                                Batalkan Pesanan
-                            </button>
                         </form>
                         @endif
                     </div>

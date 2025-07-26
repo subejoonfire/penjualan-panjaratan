@@ -59,7 +59,7 @@
                 <!-- Shipping Address -->
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Shipping Address</h3>
+                        <h3 class="text-lg font-medium text-gray-900">Alamat Pengiriman</h3>
                     </div>
                     <div class="p-6">
                         @if($addresses->count() > 0)
@@ -92,18 +92,18 @@
                         <!-- Manual Address Input -->
                         <div class="mt-6">
                             <label class="flex items-start space-x-3 cursor-pointer">
-                                <input type="radio" name="address_type" value="manual"
+                                <input type="radio" name="address_type" value="manual" id="manual_address"
                                     class="mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" {{
                                     $addresses->count() === 0 ? 'checked' : '' }}>
                                 <div class="flex-1">
-                                    <div class="text-sm font-medium text-gray-900">Enter new address</div>
+                                    <div class="text-sm font-medium text-gray-900">Masukkan alamat baru</div>
                                 </div>
                             </label>
 
                             <div class="mt-4 manual-address {{ $addresses->count() > 0 ? 'hidden' : '' }}">
                                 <textarea name="shipping_address" rows="3"
                                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    placeholder="Enter your full shipping address...">{{ old('shipping_address') }}</textarea>
+                                    placeholder="Masukkan alamat pengiriman lengkap...">{{ old('shipping_address') }}</textarea>
                                 @error('shipping_address')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -115,7 +115,7 @@
                 <!-- Payment Method -->
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Payment Method</h3>
+                        <h3 class="text-lg font-medium text-gray-900">Metode Pembayaran</h3>
                     </div>
                     <div class="p-6">
                         <div class="space-y-4">
@@ -125,8 +125,8 @@
                                 <div class="flex items-center">
                                     <i class="fas fa-university text-blue-600 text-lg mr-3"></i>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">Bank Transfer</div>
-                                        <div class="text-sm text-gray-600">Transfer to our bank account</div>
+                                        <div class="text-sm font-medium text-gray-900">Transfer Bank</div>
+                                        <div class="text-sm text-gray-600">Transfer ke rekening bank kami</div>
                                     </div>
                                 </div>
                             </label>
@@ -137,8 +137,8 @@
                                 <div class="flex items-center">
                                     <i class="fas fa-money-bill-wave text-green-600 text-lg mr-3"></i>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">Cash on Delivery</div>
-                                        <div class="text-sm text-gray-600">Pay when you receive the order</div>
+                                        <div class="text-sm font-medium text-gray-900">Bayar di Tempat</div>
+                                        <div class="text-sm text-gray-600">Bayar saat menerima pesanan</div>
                                     </div>
                                 </div>
                             </label>
@@ -150,7 +150,7 @@
                                     <i class="fas fa-mobile-alt text-purple-600 text-lg mr-3"></i>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">E-Wallet</div>
-                                        <div class="text-sm text-gray-600">OVO, GoPay, DANA, etc.</div>
+                                        <div class="text-sm text-gray-600">OVO, GoPay, DANA, dll.</div>
                                     </div>
                                 </div>
                             </label>
@@ -164,12 +164,12 @@
                 <!-- Order Notes -->
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Order Notes (Optional)</h3>
+                        <h3 class="text-lg font-medium text-gray-900">Catatan Pesanan (Opsional)</h3>
                     </div>
                     <div class="p-6">
                         <textarea name="notes" rows="3"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="Any special instructions for your order...">{{ old('notes') }}</textarea>
+                            placeholder="Instruksi khusus untuk pesanan Anda...">{{ old('notes') }}</textarea>
                     </div>
                 </div>
             </div>
@@ -181,11 +181,11 @@
 
                     <div class="space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} items)</span>
+                            <span class="text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} item)</span>
                             <span class="font-medium">Rp {{ number_format($subtotal) }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Shipping</span>
+                            <span class="text-gray-600">Ongkos Kirim</span>
                             <span class="font-medium">Rp {{ number_format($shippingCost) }}</span>
                         </div>
                         <div class="border-t pt-3">
@@ -200,7 +200,7 @@
                         <button type="submit"
                             class="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-credit-card mr-2"></i>
-                            Place Order
+                            Buat Pesanan
                         </button>
                     </div>
 
@@ -208,7 +208,7 @@
                         <a href="{{ route('customer.cart.index') }}"
                             class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-md font-medium hover:bg-gray-200 text-center block">
                             <i class="fas fa-arrow-left mr-2"></i>
-                            Back to Cart
+                            Kembali ke Keranjang
                         </a>
                     </div>
 
@@ -216,10 +216,10 @@
                     <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                         <div class="flex items-center">
                             <i class="fas fa-shield-alt text-green-500 mr-2"></i>
-                            <span class="text-sm text-gray-600">Secure checkout</span>
+                            <span class="text-sm text-gray-600">Checkout aman</span>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">
-                            Your payment information is encrypted and secure.
+                            Informasi pembayaran Anda dienkripsi dan aman.
                         </p>
                     </div>
                 </div>

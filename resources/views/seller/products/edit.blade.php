@@ -280,7 +280,7 @@
 });
 
 function deleteImage(imageId) {
-    if (confirm('Apakah Anda yakin ingin menghapus gambar ini?')) {
+                    confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
         // In a real application, you would make an AJAX call here
         fetch(`/seller/products/images/${imageId}`, {
             method: 'DELETE',

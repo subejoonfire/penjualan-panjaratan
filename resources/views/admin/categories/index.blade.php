@@ -204,8 +204,8 @@
                                         class="inline-block">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900"
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')">
+                                        <button type="button" class="text-red-600 hover:text-red-900"
+                                            onclick="confirmAction('Apakah Anda yakin ingin menghapus kategori ini?', function() { this.closest('form').submit(); })">
                                             Hapus
                                         </button>
                                     </form>

@@ -266,7 +266,7 @@ function closeUserModal() {
 }
 
 function suspendUser(userId) {
-    if (confirm('Apakah Anda yakin ingin mensuspend pengguna ini?')) {
+                    confirmAction('Apakah Anda yakin ingin mensuspend pengguna ini?', function() {
         showNotification('Fitur suspend pengguna akan diimplementasikan', 'info');
     }
 }

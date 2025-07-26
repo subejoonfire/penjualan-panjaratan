@@ -140,14 +140,13 @@
                             <p class="text-lg font-bold text-gray-900">Rp {{ number_format($order->grandtotal) }}</p>
                             @if($order->status === 'pending')
                             <div class="mt-2 space-x-2">
-                                <form action="{{ route('customer.orders.cancel', $order) }}" method="POST"
-                                    class="inline-block">
+                                <button type="button" class="text-sm text-red-600 hover:text-red-700"
+                                    onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm{{ $order->id }}').submit(); })">
+                                    Batalkan Pesanan
+                                </button>
+                                <form id="cancelOrderForm{{ $order->id }}" action="{{ route('customer.orders.cancel', $order) }}" method="POST" class="hidden">
                                     @csrf
                                     @method('PUT')
-                                    <button type="submit" class="text-sm text-red-600 hover:text-red-700"
-                                        onclick="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
-                                        Batalkan Pesanan
-                                    </button>
                                 </form>
                             </div>
                             @elseif($order->status === 'delivered')
