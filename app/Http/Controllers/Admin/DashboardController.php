@@ -219,7 +219,13 @@ class DashboardController extends Controller
             'status' => 'required|in:pending,paid,cancelled,failed'
         ]);
 
+        $previousStatus = $transaction->transactionstatus;
         $transaction->update(['transactionstatus' => $request->status]);
+
+        // Jika status diubah ke paid dan sebelumnya bukan paid, panggil markAsPaid
+        if ($request->status === 'paid' && $previousStatus !== 'paid') {
+            $transaction->markAsPaid();
+        }
 
         // If transaction is paid, also update order status to processing
         if ($request->status === 'paid' && $transaction->order) {
