@@ -8,15 +8,22 @@
         filter: grayscale(30%) brightness(90%);
         transition: all 0.3s ease;
     }
-    
+
     .product-inactive:hover {
         filter: grayscale(20%) brightness(95%);
         transform: translateY(-2px);
     }
-    
+
     .product-active:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 </style>
 @endpush
@@ -68,7 +75,8 @@
                             class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Status</option>
                             <option value="active" {{ request('status')==='active' ? 'selected' : '' }}>Aktif</option>
-                            <option value="inactive" {{ request('status')==='inactive' ? 'selected' : '' }}>Tidak Aktif</option>
+                            <option value="inactive" {{ request('status')==='inactive' ? 'selected' : '' }}>Tidak Aktif
+                            </option>
                         </select>
                     </div>
                     <div class="flex items-end">
@@ -89,16 +97,17 @@
 
         <!-- Products Grid -->
         @if($products->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
             @foreach($products as $product)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 flex flex-col h-full {{ !$product->is_active ? 'product-inactive opacity-75 bg-gray-50 border border-gray-200' : 'product-active hover:shadow-lg' }}">
+            <div
+                class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full {{ !$product->is_active ? 'opacity-75' : '' }}">
                 <!-- Product Image -->
-                <div class="aspect-w-1 aspect-h-1 relative">
+                <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
                     @if($product->primaryImage)
                     <img src="{{ url('storage/'.$product->primaryImage->image) }}" alt="{{ $product->productname }}"
                         class="w-full h-36 object-cover">
                     @else
-                    <div class="w-full h-36 bg-gray-200 flex items-center justify-center {{ !$product->is_active ? 'bg-gray-300' : '' }}">
+                    <div class="w-full h-48 flex items-center justify-center">
                         <i class="fas fa-image text-gray-400 text-2xl"></i>
                     </div>
                     @endif
@@ -107,104 +116,126 @@
                     @endif
                     <!-- Status Badge -->
                     <div class="absolute top-2 left-2">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
                         </span>
                     </div>
                     <!-- Stock Badge -->
-                    @if($product->productstock < 10)
-                    <div class="absolute top-2 right-2">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $product->productstock === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
-                            {{ $product->productstock === 0 ? 'Stok Habis' : 'Stok Rendah' }}
-                        </span>
-                    </div>
-                    @endif
+                    @if($product->productstock <= 0) <div
+                        class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                        Habis
                 </div>
-                <!-- Product Details & Actions -->
-                <div class="flex flex-col flex-1 justify-between p-3">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 mb-1 truncate">
-                            {{ $product->productname }}
-                        </h3>
-                        <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                        <p class="text-xs text-gray-500 mb-2">
-                            @php
-                                $desc = strip_tags($product->productdescription ?? $product->productdesc ?? '');
-                                $words = str_word_count($desc, 2);
-                                $wordKeys = array_keys($words);
-                                if(count($words) > 15) {
-                                    $desc = substr($desc, 0, $wordKeys[15]) . '...';
-                                }
-                            @endphp
-                            {{ $desc }}
-                        </p>
-                        <div class="flex items-center gap-2 mb-2">
-                            <!-- Rating -->
-                            @php $avgRating = $product->reviews()->count() > 0 ? $product->reviews()->avg('rating') : 0; @endphp
-                            <div class="flex items-center">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star text-[10px] {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
-                                @endfor
-                            </div>
-                            <span class="text-[11px] text-gray-500">({{ $product->reviews()->count() }})</span>
-                            <span class="text-[11px] text-gray-500 ml-2">Terjual: {{ $product->sold_count }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-xs font-bold text-blue-600">Rp {{ number_format($product->productprice) }}</span>
-                            <span class="text-[11px] text-gray-500">Stok: {{ $product->productstock }}</span>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 mt-2">
-                        <a href="{{ route('products.show', $product) }}"
-                            class="flex-1 bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium hover:bg-gray-200 text-center">
-                            Lihat
-                        </a>
-                        <a href="{{ route('seller.products.edit', $product) }}"
-                            class="flex-1 bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-medium hover:bg-blue-700 text-center">
-                            Edit
-                        </a>
-                    </div>
-                </div>
+                @elseif($product->productstock <= 10) <div
+                    class="absolute top-2 right-2 bg-yellow-600 text-white text-xs px-2 py-1 rounded">
+                    Stok Terbatas
             </div>
-            @endforeach
-        </div>
-    </div>
-
-    <!-- Pagination -->
-    @if($products->hasPages())
-    <div class="mt-8">
-        {{ $products->links() }}
-    </div>
-    @endif
-    @else
-    <!-- Empty State -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-12 text-center">
-            <i class="fas fa-box text-gray-400 text-6xl mb-4"></i>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Produk Ditemukan</h3>
-            <p class="text-gray-600 mb-6">
-                @if(request()->hasAny(['search', 'category', 'status']))
-                Tidak ada produk yang sesuai dengan kriteria filter Anda. Coba sesuaikan filter Anda.
-                @else
-                Anda belum menambahkan produk apapun. Mulai dengan membuat listing produk pertama Anda.
-                @endif
-            </p>
-            @if(!request()->hasAny(['search', 'category', 'status']))
-            <a href="{{ route('seller.products.create') }}"
-                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                <i class="fas fa-plus mr-2"></i>
-                Tambah Produk Pertama
-            </a>
-            @else
-            <a href="{{ route('seller.products.index') }}"
-                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700">
-                <i class="fas fa-refresh mr-2"></i>
-                Bersihkan Filter
-            </a>
             @endif
         </div>
+
+        <!-- Product Info & Actions -->
+        <div class="flex flex-col flex-1 justify-between p-3">
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem]">
+                    {{ $product->productname }}
+                    @if(!$product->is_active)
+                    <span class="text-xs text-red-500 font-normal">(Tidak Aktif)</span>
+                    @endif
+                </h3>
+                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
+                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
+                    @php
+                    $desc = strip_tags($product->productdesc);
+                    $words = explode(' ', $desc);
+                    if(count($words) > 15) {
+                    $desc = implode(' ', array_slice($words, 0, 15)) . '...';
+                    }
+                    @endphp
+                    {{ $desc }}
+                </p>
+                <div class="mb-2">
+                    <span class="text-sm font-bold text-blue-600">
+                        Rp {{ number_format($product->productprice) }}
+                    </span>
+                </div>
+                <!-- Rating and Sales -->
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center">
+                        @php
+                        $avgRating = $product->reviews->avg('rating') ?? 0;
+                        $reviewsCount = $product->reviews->count();
+                        @endphp
+                        <div class="flex items-center">
+                            @for($i = 1; $i <= 5; $i++) <i
+                                class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}">
+                                </i>
+                                @endfor
+                        </div>
+                        <span class="ml-1 text-xs text-gray-500">({{ $reviewsCount }})</span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        Terjual {{ $product->sold_count ?? 0 }}
+                    </div>
+                </div>
+                <!-- Stock Info -->
+                <div class="text-xs text-gray-500 mb-2">
+                    Stok: {{ $product->productstock }} • {{ $product->images->count() }} gambar
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 mt-2">
+                <div class="flex gap-2 w-full">
+                    <a href="{{ route('products.show', $product) }}"
+                        class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
+                        Lihat
+                    </a>
+                    <a href="{{ route('seller.products.edit', $product) }}"
+                        class="flex-1 {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }} px-2 py-1.5 rounded text-xs font-medium text-center">
+                        Edit
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    @endif
+    @endforeach
+</div>
+</div>
+
+<!-- Pagination -->
+@if($products->hasPages())
+<div class="mt-8">
+    {{ $products->links() }}
+</div>
+@endif
+@else
+<!-- Empty State -->
+<div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-12 text-center">
+        <i class="fas fa-box text-gray-400 text-6xl mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Produk Ditemukan</h3>
+        <p class="text-gray-600 mb-6">
+            @if(request()->hasAny(['search', 'category', 'status']))
+            Tidak ada produk yang sesuai dengan kriteria filter Anda. Coba sesuaikan filter Anda.
+            @else
+            Anda belum menambahkan produk apapun. Mulai dengan membuat listing produk pertama Anda.
+            @endif
+        </p>
+        @if(!request()->hasAny(['search', 'category', 'status']))
+        <a href="{{ route('seller.products.create') }}"
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>
+            Tambah Produk Pertama
+        </a>
+        @else
+        <a href="{{ route('seller.products.index') }}"
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700">
+            <i class="fas fa-refresh mr-2"></i>
+            Bersihkan Filter
+        </a>
+        @endif
+    </div>
+</div>
+@endif
 </div>
 </div>
 @endsection
