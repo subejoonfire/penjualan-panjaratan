@@ -102,7 +102,7 @@ class EcommerceSeeder extends Seeder
         for ($i = 1; $i <= 20; $i++) {
             User::create([
                 'username' => "customer{$i}",
-                'email' => $faker->unique()->safeEmail,
+                'email' => "customer{$i}@panjaratan.com",
                 'phone' => $faker->phoneNumber,
                 'nickname' => $faker->name,
                 'password' => Hash::make('customer123'),

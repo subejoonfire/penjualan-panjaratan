@@ -37,12 +37,12 @@
             @csrf
             <div class="rounded-md shadow-sm -space-y-px">
                 <div class="relative">
-                    <label for="email" class="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required
-                        class="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm @error('email') border-red-300 @enderror"
-                        placeholder="Alamat Email" value="{{ old('email') }}">
+                    <label for="login" class="sr-only">Username atau Email</label>
+                    <input id="login" name="login" type="text" autocomplete="username" required
+                        class="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm @error('login') border-red-300 @enderror"
+                        placeholder="Username atau Email" value="{{ old('login') }}">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-envelope text-gray-400"></i>
+                        <i class="fas fa-user text-gray-400"></i>
                     </div>
                 </div>
                 <div class="relative">
@@ -115,7 +115,7 @@
     <script>
         // Auto-focus on first input
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('email').focus();
+            document.getElementById('login').focus();
         });
 
         // Demo account quick login (for development)
@@ -124,17 +124,17 @@
                 switch(e.key) {
                     case '1':
                         e.preventDefault();
-                        document.getElementById('email').value = 'admin@panjaratan.com';
+                        document.getElementById('login').value = 'admin';
                         document.getElementById('password').value = 'admin123';
                         break;
                     case '2':
                         e.preventDefault();
-                        document.getElementById('email').value = 'seller1@panjaratan.com';
+                        document.getElementById('login').value = 'seller1';
                         document.getElementById('password').value = 'seller123';
                         break;
                     case '3':
                         e.preventDefault();
-                        document.getElementById('email').value = 'customer1@panjaratan.com';
+                        document.getElementById('login').value = 'customer1';
                         document.getElementById('password').value = 'customer123';
                         break;
                 }
