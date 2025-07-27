@@ -415,7 +415,94 @@ class DashboardController extends Controller
         if ($image->product->iduserseller !== $user->id) {
             abort(403, 'Unauthorized');
         }
-        $image->setAsPrimary();
-        return redirect()->route('seller.products.edit', $image->product)->with('success', 'Gambar utama berhasil diubah.');
+        
+        // Reset all images for this product to not primary
+        ProductImage::where('idproduct', $image->idproduct)->update(['is_primary' => false]);
+        
+        // Set this image as primary
+        $image->update(['is_primary' => true]);
+        
+        return response()->json(['success' => true, 'message' => 'Gambar utama berhasil diubah']);
+    }
+
+    /**
+     * Display notifications for seller
+     */
+    public function notifications(Request $request)
+    {
+        $user = Auth::user();
+        $query = $user->notifications();
+
+        // Filter by read status
+        if ($request->filled('status')) {
+            if ($request->status === 'unread') {
+                $query->where('readstatus', false);
+            } elseif ($request->status === 'read') {
+                $query->where('readstatus', true);
+            }
+        }
+
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $notifications = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Get notification statistics
+        $stats = [
+            'total' => $user->notifications()->count(),
+            'unread' => $user->notifications()->where('readstatus', false)->count(),
+            'today' => $user->notifications()->whereDate('created_at', today())->count(),
+        ];
+
+        // Get notification types for filter
+        $types = $user->notifications()
+            ->select('type')
+            ->distinct()
+            ->pluck('type')
+            ->filter()
+            ->toArray();
+
+        return view('seller.notifications.index', compact('notifications', 'stats', 'types'));
+    }
+
+    /**
+     * Show specific notification
+     */
+    public function showNotification($notificationId)
+    {
+        $user = Auth::user();
+        $notification = $user->notifications()->findOrFail($notificationId);
+
+        // Mark as read
+        if (!$notification->readstatus) {
+            $notification->update(['readstatus' => true]);
+        }
+
+        return view('seller.notifications.show', compact('notification'));
+    }
+
+    /**
+     * Mark notification as read
+     */
+    public function markAsRead($notificationId)
+    {
+        $user = Auth::user();
+        $notification = $user->notifications()->findOrFail($notificationId);
+        $notification->update(['readstatus' => true]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        $user->notifications()->where('readstatus', false)->update(['readstatus' => true]);
+
+        return response()->json(['success' => true]);
     }
 }

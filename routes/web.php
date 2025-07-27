@@ -53,6 +53,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/transactions/{transaction}', [AdminDashboardController::class, 'deleteTransaction'])->name('transactions.destroy');
     Route::get('/transactions/export', [AdminDashboardController::class, 'exportTransactions'])->name('transactions.export');
     Route::post('/notifications/send', [AdminDashboardController::class, 'sendNotification'])->name('notifications.send');
+    Route::get('/notifications', [AdminDashboardController::class, 'notifications'])->name('notifications.index');
+    Route::get('/notifications/{notification}', [AdminDashboardController::class, 'showNotification'])->name('notifications.show');
+    Route::put('/notifications/{notification}/read', [AdminDashboardController::class, 'markAsRead'])->name('notifications.read');
+    Route::put('/notifications/mark-all-read', [AdminDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::post('/categories/bulk-delete', [\App\Http\Controllers\Admin\CategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
 });
@@ -70,6 +74,10 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::get('/sales', [SellerDashboardController::class, 'sales'])->name('sales');
     Route::post('/products/{product}/images', [SellerDashboardController::class, 'uploadImage'])->name('products.images.upload');
     Route::put('/products/images/{image}/primary', [SellerDashboardController::class, 'setPrimaryImage'])->name('products.images.primary');
+    Route::get('/notifications', [SellerDashboardController::class, 'notifications'])->name('notifications.index');
+    Route::get('/notifications/{notification}', [SellerDashboardController::class, 'showNotification'])->name('notifications.show');
+    Route::put('/notifications/{notification}/read', [SellerDashboardController::class, 'markAsRead'])->name('notifications.read');
+    Route::put('/notifications/mark-all-read', [SellerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
 
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {

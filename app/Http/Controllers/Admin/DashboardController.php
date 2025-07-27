@@ -404,4 +404,85 @@ class DashboardController extends Controller
         
         return redirect()->back()->with('success', "Produk berhasil {$status}");
     }
+
+    /**
+     * Display notifications for admin
+     */
+    public function notifications(Request $request)
+    {
+        $user = auth()->user();
+        $query = $user->notifications();
+
+        // Filter by read status
+        if ($request->filled('status')) {
+            if ($request->status === 'unread') {
+                $query->where('readstatus', false);
+            } elseif ($request->status === 'read') {
+                $query->where('readstatus', true);
+            }
+        }
+
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $notifications = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Get notification statistics
+        $stats = [
+            'total' => $user->notifications()->count(),
+            'unread' => $user->notifications()->where('readstatus', false)->count(),
+            'today' => $user->notifications()->whereDate('created_at', today())->count(),
+        ];
+
+        // Get notification types for filter
+        $types = $user->notifications()
+            ->select('type')
+            ->distinct()
+            ->pluck('type')
+            ->filter()
+            ->toArray();
+
+        return view('admin.notifications.index', compact('notifications', 'stats', 'types'));
+    }
+
+    /**
+     * Show specific notification
+     */
+    public function showNotification($notificationId)
+    {
+        $user = auth()->user();
+        $notification = $user->notifications()->findOrFail($notificationId);
+
+        // Mark as read
+        if (!$notification->readstatus) {
+            $notification->update(['readstatus' => true]);
+        }
+
+        return view('admin.notifications.show', compact('notification'));
+    }
+
+    /**
+     * Mark notification as read
+     */
+    public function markAsRead($notificationId)
+    {
+        $user = auth()->user();
+        $notification = $user->notifications()->findOrFail($notificationId);
+        $notification->update(['readstatus' => true]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllAsRead()
+    {
+        $user = auth()->user();
+        $user->notifications()->where('readstatus', false)->update(['readstatus' => true]);
+
+        return response()->json(['success' => true]);
+    }
 }

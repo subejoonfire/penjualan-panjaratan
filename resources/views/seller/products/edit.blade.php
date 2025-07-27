@@ -595,6 +595,32 @@
         updateSelectedInfo(); // Update initial state
     });
 
+function setPrimaryImage(imageId) {
+    confirmAction('Jadikan gambar ini sebagai gambar utama?', function() {
+        fetch(`/seller/products/images/${imageId}/primary`, {
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                showAlert('Gambar utama berhasil diubah', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                throw new Error('Failed to set primary image');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Terjadi kesalahan saat mengubah gambar utama', 'error');
+        });
+    });
+}
+
 function deleteImage(imageId) {
     confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
         fetch(`/seller/products/images/${imageId}`, {

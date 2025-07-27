@@ -127,10 +127,22 @@
                                     </div>
                                 </div>
                                 <div class="px-4 py-2 border-t border-gray-200">
-                                    <a href="{{ route('customer.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                        Lihat Semua Notifikasi
-                                    </a>
+                                    @if(auth()->user()->isAdmin())
+                                        <a href="{{ route('admin.notifications.index') }}"
+                                            class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                            Lihat Semua Notifikasi
+                                        </a>
+                                    @elseif(auth()->user()->isSeller())
+                                        <a href="{{ route('seller.notifications.index') }}"
+                                            class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                            Lihat Semua Notifikasi
+                                        </a>
+                                    @else
+                                        <a href="{{ route('customer.notifications.index') }}"
+                                            class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                            Lihat Semua Notifikasi
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -152,7 +164,17 @@
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-user mr-2"></i>Profil
                                 </a>
-                                @if(auth()->user()->isCustomer())
+                                @if(auth()->user()->isAdmin())
+                                <a href="{{ route('admin.notifications.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-bell mr-2"></i>Notifikasi
+                                </a>
+                                @elseif(auth()->user()->isSeller())
+                                <a href="{{ route('seller.notifications.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-bell mr-2"></i>Notifikasi
+                                </a>
+                                @else
                                 <a href="{{ route('customer.notifications.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-bell mr-2"></i>Notifikasi
@@ -243,20 +265,74 @@
                         const notificationList = document.getElementById('notificationList');
                         if (notificationList) {
                             if (data.notifications && data.notifications.length > 0) {
-                                notificationList.innerHTML = data.notifications.map(notification => `
-                                    <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onclick="markNotificationAsRead(${notification.id})">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="flex-shrink-0">
-                                                <i class="fas fa-bell text-blue-500 text-sm"></i>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-sm font-medium text-gray-900">${notification.title}</p>
-                                                <p class="text-sm text-gray-600">${notification.notification}</p>
-                                                <p class="text-xs text-gray-500 mt-1">${notification.created_at}</p>
+                                notificationList.innerHTML = data.notifications.map(notification => {
+                                    // Get notification icon based on type
+                                    let icon = 'fas fa-bell';
+                                    let iconColor = 'text-blue-500';
+                                    
+                                    switch(notification.type) {
+                                        case 'order':
+                                            icon = 'fas fa-shopping-cart';
+                                            iconColor = 'text-green-500';
+                                            break;
+                                        case 'payment':
+                                            icon = 'fas fa-credit-card';
+                                            iconColor = 'text-yellow-500';
+                                            break;
+                                        case 'product':
+                                            icon = 'fas fa-box';
+                                            iconColor = 'text-purple-500';
+                                            break;
+                                        case 'promotion':
+                                            icon = 'fas fa-percentage';
+                                            iconColor = 'text-red-500';
+                                            break;
+                                        case 'system':
+                                            icon = 'fas fa-cog';
+                                            iconColor = 'text-gray-500';
+                                            break;
+                                        case 'review':
+                                            icon = 'fas fa-star';
+                                            iconColor = 'text-orange-500';
+                                            break;
+                                        default:
+                                            icon = 'fas fa-bell';
+                                            iconColor = 'text-blue-500';
+                                    }
+                                    
+                                    // Truncate notification text
+                                    const maxLength = 60;
+                                    let displayText = notification.notification;
+                                    let showMore = '';
+                                    
+                                    if (displayText.length > maxLength) {
+                                        displayText = displayText.substring(0, maxLength) + '...';
+                                        showMore = '<span class="text-blue-600 hover:text-blue-800 text-xs cursor-pointer ml-1">lihat</span>';
+                                    }
+                                    
+                                    return `
+                                        <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.readstatus ? '' : 'bg-blue-50'}" onclick="viewNotificationDetail(${notification.id})">
+                                            <div class="flex items-start space-x-3">
+                                                <div class="flex-shrink-0">
+                                                    <i class="${icon} ${iconColor} text-sm"></i>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title}</p>
+                                                    <p class="text-sm text-gray-600">${displayText}${showMore}</p>
+                                                    <div class="flex items-center justify-between mt-1">
+                                                        <p class="text-xs text-gray-500">${notification.created_at}</p>
+                                                        ${!notification.readstatus ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Baru</span>' : ''}
+                                                    </div>
+                                                </div>
+                                                <div class="flex-shrink-0">
+                                                    <button onclick="event.stopPropagation(); markNotificationAsRead(${notification.id})" class="text-gray-400 hover:text-gray-600">
+                                                        <i class="fas fa-chevron-right text-xs"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                `).join('');
+                                    `;
+                                }).join('');
                             } else {
                                 notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
                             }
@@ -269,6 +345,27 @@
                             notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
                         }
                     });
+            }
+
+            // View notification detail
+            function viewNotificationDetail(notificationId) {
+                // Mark as read and redirect to detail page
+                fetch(`/api/notifications/${notificationId}/read`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to appropriate notification detail page based on user role
+                        const userRole = '{{ auth()->user()->role }}';
+                        window.location.href = `/${userRole}/notifications/${notificationId}`;
+                    }
+                })
+                .catch(error => console.error('Error viewing notification:', error));
             }
 
             // Mark notification as read
