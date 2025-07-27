@@ -127,7 +127,7 @@
 
 <script>
 function removeFromWishlist(productId) {
-    if (confirm('Hapus produk dari wishlist?')) {
+    confirmAction('Hapus produk dari wishlist?', function() {
         fetch(`/customer/wishlist/remove/${productId}`, {
             method: 'DELETE',
             headers: {
@@ -140,14 +140,14 @@ function removeFromWishlist(productId) {
             if (data.success) {
                 location.reload();
             } else {
-                alert('Gagal menghapus dari wishlist');
+                showAlert('Gagal menghapus dari wishlist', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan');
+            showAlert('Terjadi kesalahan', 'error');
         });
-    }
+    });
 }
 
 // Handle add to cart forms
@@ -182,14 +182,14 @@ document.querySelectorAll('.add-to-cart-form').forEach(form => {
                     button.disabled = false;
                 }, 2000);
             } else {
-                alert(data.message || 'Gagal menambahkan ke keranjang');
+                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
                 button.innerHTML = originalText;
                 button.disabled = false;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan');
+            showAlert('Terjadi kesalahan', 'error');
             button.innerHTML = originalText;
             button.disabled = false;
         });

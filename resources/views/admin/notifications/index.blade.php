@@ -232,7 +232,7 @@ function markAsRead(notificationId) {
 }
 
 function markAllAsRead() {
-    if (confirm('Tandai semua notifikasi sebagai dibaca?')) {
+    confirmAction('Tandai semua notifikasi sebagai dibaca?', function() {
         fetch('/admin/notifications/mark-all-read', {
             method: 'PUT',
             headers: {
@@ -247,7 +247,7 @@ function markAllAsRead() {
             }
         })
         .catch(error => console.error('Error:', error));
-    }
+    });
 }
 </script>
 @endsection

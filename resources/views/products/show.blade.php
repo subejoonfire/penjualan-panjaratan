@@ -541,7 +541,7 @@
                 showToast(data.message);
             } else {
                 text.textContent = originalText;
-                alert(data.message || 'Terjadi kesalahan');
+                showAlert(data.message || 'Terjadi kesalahan', 'error');
             }
             btn.disabled = false;
         })
@@ -549,7 +549,7 @@
             console.error('Error:', error);
             text.textContent = originalText;
             btn.disabled = false;
-            alert('Terjadi kesalahan');
+            showAlert('Terjadi kesalahan', 'error');
         });
     }
     

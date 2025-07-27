@@ -394,12 +394,6 @@
                         <option value="delivered">Selesai</option>
                     </select>
                 </div>
-                <div class="mb-4">
-                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Catatan (Opsional)</label>
-                    <textarea id="notes" rows="3"
-                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="Tambahkan catatan tentang update status ini..."></textarea>
-                </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeStatusModal()"
                         class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
@@ -472,8 +466,6 @@
     document.getElementById('statusForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const newStatus = document.getElementById('newStatus').value;
-        const notes = document.getElementById('notes').value;
-        
         if (currentOrderId && newStatus) {
             fetch(`/seller/orders/${currentOrderId}/status`, {
                 method: 'PUT',
@@ -482,22 +474,22 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    status: newStatus,
-                    notes: notes
+                    status: newStatus
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     closeStatusModal();
-                    location.reload();
+                    showAlert('Status pesanan berhasil diupdate', 'success');
+                    setTimeout(() => location.reload(), 1200);
                 } else {
-                    alert('Gagal mengupdate status pesanan');
+                    showAlert(data.message || 'Gagal mengupdate status pesanan', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan saat mengupdate status');
+                showAlert('Terjadi kesalahan saat mengupdate status', 'error');
             });
         }
     });
