@@ -149,7 +149,7 @@
                         <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
                             class="w-full {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-2 px-4 rounded-md transition-colors">
                             <i class="fas fa-heart mr-2"></i>
-                            <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'
+                            <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Produk Disukai' : 'Tambah ke Produk Disukai'
                                 }}</span>
                         </button>
 
@@ -530,11 +530,11 @@
                 if (data.action === 'added') {
                     btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
                     btn.classList.add('bg-red-600', 'hover:bg-red-700');
-                    text.textContent = 'Hapus dari Wishlist';
+                    text.textContent = 'Hapus dari Produk Disukai';
                 } else {
                     btn.classList.remove('bg-red-600', 'hover:bg-red-700');
                     btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-                    text.textContent = 'Tambah ke Wishlist';
+                    text.textContent = 'Tambah ke Produk Disukai';
                 }
                 
                 // Show toast notification

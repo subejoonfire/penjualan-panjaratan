@@ -55,65 +55,65 @@
 
                 <!-- Order Progress -->
                 <div class="mt-6">
-                    <div class="flex items-center">
+                    <div class="flex items-center justify-between">
                         <!-- Pending -->
-                        <div class="flex items-center">
+                        <div class="flex flex-col sm:flex-row items-center">
                             <div
-                                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                                 {{ in_array($order->status, ['pending', 'processing', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
-                                <i class="fas fa-clock text-sm"></i>
+                                <i class="fas fa-clock text-xs sm:text-sm"></i>
                             </div>
-                            <span class="ml-2 text-sm font-medium text-gray-900">Tertunda</span>
+                            <span class="mt-1 sm:mt-0 sm:ml-2 text-xs sm:text-sm font-medium text-gray-900 text-center">Tertunda</span>
                         </div>
 
                         <!-- Arrow -->
-                        <div class="flex-1 mx-4">
+                        <div class="flex-1 mx-1 sm:mx-4 mt-0 sm:mt-0">
                             <div
                                 class="h-0.5 {{ in_array($order->status, ['processing', 'shipped', 'delivered']) ? 'bg-blue-600' : 'bg-gray-300' }}">
                             </div>
                         </div>
 
                         <!-- Processing -->
-                        <div class="flex items-center">
+                        <div class="flex flex-col sm:flex-row items-center">
                             <div
-                                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                                 {{ in_array($order->status, ['processing', 'shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
-                                <i class="fas fa-check text-sm"></i>
+                                <i class="fas fa-check text-xs sm:text-sm"></i>
                             </div>
-                            <span class="ml-2 text-sm font-medium text-gray-900">Diproses</span>
+                            <span class="mt-1 sm:mt-0 sm:ml-2 text-xs sm:text-sm font-medium text-gray-900 text-center">Diproses</span>
                         </div>
 
                         <!-- Arrow -->
-                        <div class="flex-1 mx-4">
+                        <div class="flex-1 mx-1 sm:mx-4 mt-0 sm:mt-0">
                             <div
                                 class="h-0.5 {{ in_array($order->status, ['shipped', 'delivered']) ? 'bg-blue-600' : 'bg-gray-300' }}">
                             </div>
                         </div>
 
                         <!-- Shipped -->
-                        <div class="flex items-center">
+                        <div class="flex flex-col sm:flex-row items-center">
                             <div
-                                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                                 {{ in_array($order->status, ['shipped', 'delivered']) ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-500' }}">
-                                <i class="fas fa-truck text-sm"></i>
+                                <i class="fas fa-truck text-xs sm:text-sm"></i>
                             </div>
-                            <span class="ml-2 text-sm font-medium text-gray-900">Dikirim</span>
+                            <span class="mt-1 sm:mt-0 sm:ml-2 text-xs sm:text-sm font-medium text-gray-900 text-center">Dikirim</span>
                         </div>
 
                         <!-- Arrow -->
-                        <div class="flex-1 mx-4">
+                        <div class="flex-1 mx-1 sm:mx-4 mt-0 sm:mt-0">
                             <div class="h-0.5 {{ $order->status === 'delivered' ? 'bg-green-600' : 'bg-gray-300' }}">
                             </div>
                         </div>
 
                         <!-- Delivered -->
-                        <div class="flex items-center">
+                        <div class="flex flex-col sm:flex-row items-center">
                             <div
-                                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
                                 {{ $order->status === 'delivered' ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-500' }}">
-                                <i class="fas fa-home text-sm"></i>
+                                <i class="fas fa-home text-xs sm:text-sm"></i>
                             </div>
-                            <span class="ml-2 text-sm font-medium text-gray-900">Diterima</span>
+                            <span class="mt-1 sm:mt-0 sm:ml-2 text-xs sm:text-sm font-medium text-gray-900 text-center">Diterima</span>
                         </div>
                     </div>
                 </div>

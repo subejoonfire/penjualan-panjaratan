@@ -79,12 +79,14 @@
                 </a>
             @endif
             <!-- Notifikasi & Cart -->
-            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
                 <i class="fas fa-bell"></i>
+                <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1rem] h-4 flex items-center justify-center" style="display: none;">0</span>
             </a>
             @if(auth()->user()->isCustomer())
-            <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
+            <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1rem] h-4 flex items-center justify-center" style="display: none;">0</span>
             </a>
             @endif
             <!-- Profile Button -->
@@ -682,14 +684,15 @@
             .mobile-nav-bar {
                 display: flex;
                 flex-direction: row;
+                justify-content: center;
                 overflow-x: auto;
-                gap: 0.5rem;
+                gap: 0.25rem;
                 background: #fff;
                 border-bottom: 1px solid #e5e7eb;
                 position: sticky;
                 top: 0;
                 z-index: 50;
-                padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+                padding: 0.5rem 0.75rem;
                 box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
             }
             .mobile-nav-bar::-webkit-scrollbar {
@@ -700,12 +703,12 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                min-width: 48px;
-                min-height: 48px;
-                padding: 0.25rem 0.5rem;
+                min-width: 40px;
+                min-height: 44px;
+                padding: 0.25rem 0.375rem;
                 border-radius: 0.5rem;
                 color: #64748b;
-                font-size: 1.25rem;
+                font-size: 1.125rem;
                 background: none;
                 border: none;
             }

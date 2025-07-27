@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Wishlist - Produk Favorit')
+@section('title', 'Produk yang Disukai - Produk Favorit')
 
 @section('content')
 <div class="py-3 sm:py-6">
     <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
         <div class="mb-6 sm:mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Wishlist</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Produk yang Disukai</h1>
             <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Produk-produk yang Anda simpan sebagai favorit</p>
         </div>
 
