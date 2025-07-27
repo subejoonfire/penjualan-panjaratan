@@ -358,8 +358,8 @@
 </div>
 
 <!-- Order Details Modal -->
-<div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-10 mx-auto p-5 border max-w-6xl shadow-lg rounded-md bg-white">
+<div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50">
+    <div class="relative mx-auto p-5 border max-w-6xl w-full max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Detail Pesanan</h3>
@@ -367,7 +367,7 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div id="orderModalContent" class="max-h-96 overflow-y-auto">
+            <div id="orderModalContent">
                 <!-- Order details will be loaded here -->
             </div>
         </div>
@@ -375,8 +375,8 @@
 </div>
 
 <!-- Update Status Modal -->
-<div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+<div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50">
+    <div class="relative mx-auto p-5 border w-96 max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-medium text-gray-900">Update Status Pesanan</h3>

@@ -362,8 +362,8 @@
 </div>
 
 <!-- Transaction Details Modal -->
-<div id="transactionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-10 mx-auto p-5 border max-w-6xl shadow-lg rounded-md bg-white">
+<div id="transactionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50">
+    <div class="relative mx-auto p-5 border max-w-6xl w-full max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 id="transactionModalTitle" class="text-lg font-medium text-gray-900">Detail Transaksi</h3>
@@ -371,7 +371,7 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div id="transactionModalContent" class="max-h-96 overflow-y-auto">
+            <div id="transactionModalContent">
                 <!-- Transaction details will be loaded here -->
             </div>
         </div>
