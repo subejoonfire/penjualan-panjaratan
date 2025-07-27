@@ -96,31 +96,37 @@
                 <!-- Mobile Profile Dropdown -->
                 <div x-show="mobileProfileOpen" @click.away="mobileProfileOpen = false" x-transition
                     x-cloak
-                    class="absolute top-12 right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                    class="absolute top-12 right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border"
+                    style="background: white !important; border: 2px solid #ccc !important; min-height: 120px;">
                     <a href="{{ route('profile') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        style="display: block !important; color: #374151 !important;">
                         <i class="fas fa-user mr-2"></i>Profil
                     </a>
                     @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.notifications.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        style="display: block !important; color: #374151 !important;">
                         <i class="fas fa-bell mr-2"></i>Notifikasi
                     </a>
                     @elseif(auth()->user()->isSeller())
                     <a href="{{ route('seller.notifications.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        style="display: block !important; color: #374151 !important;">
                         <i class="fas fa-bell mr-2"></i>Notifikasi
                     </a>
                     @else
                     <a href="{{ route('customer.notifications.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        style="display: block !important; color: #374151 !important;">
                         <i class="fas fa-bell mr-2"></i>Notifikasi
                     </a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}" class="block">
                         @csrf
                         <button type="submit"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            style="display: block !important; width: 100% !important; text-align: left !important; color: #374151 !important; background: none !important; border: none !important;">
                             <i class="fas fa-sign-out-alt mr-2"></i>Keluar
                         </button>
                     </form>
@@ -540,6 +546,37 @@
     </script>
     @endauth
 
+    <!-- Mobile Dropdown Fallback Script -->
+    <script>
+        // Fallback for mobile dropdown if Alpine.js hasn't loaded yet
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add debugging
+            console.log('DOM loaded, checking mobile dropdown...');
+            
+            // Ensure mobile dropdown works
+            const mobileProfileBtn = document.querySelector('.mobile-nav-bar button[\\@click]');
+            if (mobileProfileBtn) {
+                console.log('Mobile profile button found');
+                
+                // Add click event as fallback
+                mobileProfileBtn.addEventListener('click', function(e) {
+                    console.log('Mobile profile button clicked');
+                    const dropdown = this.nextElementSibling;
+                    if (dropdown) {
+                        console.log('Dropdown found, toggling...');
+                        if (dropdown.style.display === 'none' || !dropdown.style.display) {
+                            dropdown.style.display = 'block';
+                            dropdown.style.opacity = '1';
+                            dropdown.style.visibility = 'visible';
+                        } else {
+                            dropdown.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
     <!-- Custom Styles -->
     <style>
         .nav-link {
@@ -595,6 +632,46 @@
             }
             .mobile-nav-bar {
                 display: flex !important;
+            }
+            
+            /* Ensure mobile dropdown is visible */
+            .mobile-nav-bar .relative {
+                position: relative !important;
+            }
+            .mobile-nav-bar .absolute {
+                position: absolute !important;
+                z-index: 9999 !important;
+                background: white !important;
+                border: 1px solid #e5e7eb !important;
+                border-radius: 8px !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+                min-width: 192px !important;
+                top: 60px !important;
+                right: 0 !important;
+            }
+            .mobile-nav-bar .absolute a,
+            .mobile-nav-bar .absolute button {
+                display: block !important;
+                padding: 12px 16px !important;
+                color: #374151 !important;
+                text-decoration: none !important;
+                border-bottom: 1px solid #f3f4f6 !important;
+                font-size: 14px !important;
+                width: 100% !important;
+                text-align: left !important;
+                background: transparent !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-top: none !important;
+                border-radius: 0 !important;
+            }
+            .mobile-nav-bar .absolute a:hover,
+            .mobile-nav-bar .absolute button:hover {
+                background: #f9fafb !important;
+            }
+            .mobile-nav-bar .absolute a:last-child,
+            .mobile-nav-bar .absolute form:last-child button {
+                border-bottom: none !important;
             }
         }
         @media (min-width: 769px) {
