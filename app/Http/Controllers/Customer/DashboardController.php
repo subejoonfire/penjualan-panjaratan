@@ -45,7 +45,7 @@ class DashboardController extends Controller
             ->get();
             
         // Get wishlist count
-        $wishlistCount = $user->wishlist()->count();
+        $wishlistCount = $user->wishlists()->count();
         
         // Get notification data for dashboard
         $unreadNotifications = $user->unread_notification_count;

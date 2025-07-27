@@ -84,6 +84,18 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class, 'iduser')->where('checkoutstatus', 'active');
     }
 
+    // Relasi ke Cart aktif sebagai property
+    public function cart()
+    {
+        return $this->activeCart();
+    }
+
+    // Relasi ke Order melalui Cart (Has Many Through)
+    public function orders()
+    {
+        return $this->hasManyThrough(Order::class, Cart::class, 'iduser', 'idcart', 'id', 'id');
+    }
+
     /**
      * Get notifications for the user
      */
@@ -122,7 +134,7 @@ class User extends Authenticatable
     // Relasi ke Wishlist (One to Many)
     public function wishlists()
     {
-        return $this->hasMany(Wishlist::class);
+        return $this->hasMany(Wishlist::class, 'user_id');
     }
 
     // Helper method untuk mengecek role
