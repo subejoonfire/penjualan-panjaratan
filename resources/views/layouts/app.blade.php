@@ -97,7 +97,7 @@
                         </a>
                         <a href="{{ route('customer.orders.index') }}"
                             class="nav-link {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
-                            <i class="fas fa-list-alt mr-2"></i>Pesanan Saya
+                            <i class="fas fa-list-alt mr-2"></i>Pesanan
                         </a>
                         @endif
                     </div>
