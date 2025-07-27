@@ -91,11 +91,6 @@
                             class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
                             <i class="fas fa-shopping-bag mr-2"></i>Belanja
                         </a>
-                        <a href="{{ route('customer.cart.index') }}"
-                            class="nav-link {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
-                            <i class="fas fa-shopping-cart mr-2"></i>Keranjang
-                            <span class="cart-count bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1">0</span>
-                        </a>
                         <a href="{{ route('customer.wishlist.index') }}"
                             class="nav-link {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
                             <i class="fas fa-heart mr-2"></i>Wishlist
@@ -150,6 +145,17 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Cart (Customer Only) -->
+                        @if(auth()->user()->isCustomer())
+                        <div class="relative">
+                            <a href="{{ route('customer.cart.index') }}"
+                                class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none {{ request()->routeIs('customer.cart.*') ? 'text-blue-600' : '' }}">
+                                <i class="fas fa-shopping-cart text-lg"></i>
+                                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center">0</span>
+                            </a>
+                        </div>
+                        @endif
 
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">

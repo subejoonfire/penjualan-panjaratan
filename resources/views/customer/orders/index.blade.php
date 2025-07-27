@@ -15,33 +15,27 @@
         <div class="bg-white shadow rounded-lg mb-6">
             <div class="p-6">
                 <form method="GET" action="{{ route('customer.orders.index') }}" class="flex flex-wrap gap-4">
-                    <div class="flex-1 min-w-64">
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Filter berdasarkan
-                            Status</label>
+                    <div class="flex-1 min-w-48">
+                        <label for="status" class="block text-xs font-medium text-gray-700 mb-1">Status</label>
                         <select name="status" id="status"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Status</option>
-                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Menunggu
-                            </option>
-                            <option value="confirmed" {{ request('status')==='confirmed' ? 'selected' : '' }}>
-                                Dikonfirmasi</option>
-                            <option value="shipped" {{ request('status')==='shipped' ? 'selected' : '' }}>Dikirim
-                            </option>
-                            <option value="delivered" {{ request('status')==='delivered' ? 'selected' : '' }}>Diterima
-                            </option>
-                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Dibatalkan
-                            </option>
+                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Menunggu</option>
+                            <option value="confirmed" {{ request('status')==='confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
+                            <option value="shipped" {{ request('status')==='shipped' ? 'selected' : '' }}>Dikirim</option>
+                            <option value="delivered" {{ request('status')==='delivered' ? 'selected' : '' }}>Diterima</option>
+                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Dibatalkan</option>
                         </select>
                     </div>
                     <div class="flex items-end">
                         <button type="submit"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Filter
+                            class="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <i class="fas fa-filter mr-1"></i>Filter
                         </button>
                         @if(request()->hasAny(['status']))
                         <a href="{{ route('customer.orders.index') }}"
-                            class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                            Hapus
+                            class="ml-2 bg-gray-600 text-white px-3 py-2 rounded-md hover:bg-gray-700 text-sm">
+                            <i class="fas fa-times mr-1"></i>Reset
                         </a>
                         @endif
                     </div>

@@ -41,18 +41,18 @@
 
         <!-- Filters -->
         <div class="bg-white shadow rounded-lg mb-6">
-            <div class="p-6">
-                <form method="GET" action="{{ route('seller.products.index') }}" class="flex flex-wrap gap-4">
-                    <div class="flex-1 min-w-64">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Produk</label>
+            <div class="p-4">
+                <form method="GET" action="{{ route('seller.products.index') }}" class="flex flex-wrap gap-3">
+                    <div class="flex-1 min-w-48">
+                        <label for="search" class="block text-xs font-medium text-gray-700 mb-1">Cari Produk</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                            placeholder="Cari berdasarkan nama produk..."
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            placeholder="Nama produk..."
+                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
-                    <div class="min-w-48">
-                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                    <div class="min-w-40">
+                        <label for="category" class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
                         <select name="category" id="category"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Kategori</option>
                             @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ request('category')==$category->id ? 'selected' : ''
@@ -62,25 +62,24 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="min-w-48">
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <div class="min-w-36">
+                        <label for="status" class="block text-xs font-medium text-gray-700 mb-1">Status</label>
                         <select name="status" id="status"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Status</option>
                             <option value="active" {{ request('status')==='active' ? 'selected' : '' }}>Aktif</option>
-                            <option value="inactive" {{ request('status')==='inactive' ? 'selected' : '' }}>Tidak Aktif
-                            </option>
+                            <option value="inactive" {{ request('status')==='inactive' ? 'selected' : '' }}>Tidak Aktif</option>
                         </select>
                     </div>
                     <div class="flex items-end">
                         <button type="submit"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Filter
+                            class="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <i class="fas fa-filter mr-1"></i>Filter
                         </button>
                         @if(request()->hasAny(['search', 'category', 'status']))
                         <a href="{{ route('seller.products.index') }}"
-                            class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                            Bersihkan
+                            class="ml-2 bg-gray-600 text-white px-3 py-2 rounded-md hover:bg-gray-700 text-sm">
+                            <i class="fas fa-times mr-1"></i>Reset
                         </a>
                         @endif
                     </div>

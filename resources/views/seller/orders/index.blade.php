@@ -164,21 +164,21 @@
 
         <!-- Filters -->
         <div class="bg-white shadow-lg rounded-lg mb-6 border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Filter Pesanan</h3>
+            <div class="px-6 py-3 border-b border-gray-200">
+                <h3 class="text-base font-medium text-gray-900">Filter Pesanan</h3>
             </div>
-            <div class="p-6">
-                <form method="GET" action="{{ route('seller.orders.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4">
+                <form method="GET" action="{{ route('seller.orders.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Cari Pesanan</label>
+                        <label for="search" class="block text-xs font-medium text-gray-700 mb-1">Cari Pesanan</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}"
-                            placeholder="Nomor pesanan, nama atau email pelanggan..."
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            placeholder="Nomor pesanan, nama pelanggan..."
+                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status Pesanan</label>
+                        <label for="status" class="block text-xs font-medium text-gray-700 mb-1">Status</label>
                         <select name="status" id="status"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Status</option>
                             <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
                             <option value="processing" {{ request('status') === 'processing' ? 'selected' : '' }}>Diproses</option>
@@ -189,13 +189,13 @@
                     </div>
                     <div class="flex items-end">
                         <button type="submit"
-                            class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2">
-                            <i class="fas fa-search mr-2"></i>Filter
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 text-sm">
+                            <i class="fas fa-search mr-1"></i>Filter
                         </button>
                         @if(request()->hasAny(['search', 'status']))
                         <a href="{{ route('seller.orders.index') }}"
-                            class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400">
-                            <i class="fas fa-times mr-2"></i>Reset
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 text-sm">
+                            <i class="fas fa-times mr-1"></i>Reset
                         </a>
                         @endif
                     </div>

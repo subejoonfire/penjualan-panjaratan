@@ -75,14 +75,14 @@
 
         <!-- Filters -->
         <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Filter Notifikasi</h3>
+            <div class="px-6 py-3 border-b border-gray-200">
+                <h3 class="text-base font-medium text-gray-900">Filter Notifikasi</h3>
             </div>
-            <div class="px-6 py-4">
-                <form method="GET" action="{{ route('admin.notifications.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="px-6 py-3">
+                <form method="GET" action="{{ route('admin.notifications.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select name="status" id="status" class="w-full border-gray-300 rounded-md shadow-sm">
+                        <label for="status" class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                        <select name="status" id="status" class="w-full text-sm border-gray-300 rounded-md shadow-sm">
                             <option value="">Semua Status</option>
                             <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>Belum Dibaca</option>
                             <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>Sudah Dibaca</option>
@@ -90,8 +90,8 @@
                     </div>
 
                     <div>
-                        <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Jenis</label>
-                        <select name="type" id="type" class="w-full border-gray-300 rounded-md shadow-sm">
+                        <label for="type" class="block text-xs font-medium text-gray-700 mb-1">Jenis</label>
+                        <select name="type" id="type" class="w-full text-sm border-gray-300 rounded-md shadow-sm">
                             <option value="">Semua Jenis</option>
                             @foreach($types as $type)
                                 <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>
@@ -102,12 +102,12 @@
                     </div>
 
                     <div class="flex items-end">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2">
-                            <i class="fas fa-filter mr-2"></i>Filter
+                        <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 text-sm">
+                            <i class="fas fa-filter mr-1"></i>Filter
                         </button>
                         <a href="{{ route('admin.notifications.index') }}" 
-                           class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
-                            <i class="fas fa-times mr-2"></i>Reset
+                           class="bg-gray-300 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-400 text-sm">
+                            <i class="fas fa-times mr-1"></i>Reset
                         </a>
                     </div>
                 </form>
