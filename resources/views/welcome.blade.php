@@ -20,7 +20,7 @@
         @endif
     </head>
     <body class="bg-gray-50 font-sans antialiased">
-        <div class="min-h-screen flex flex-col items-center justify-center py-8 px-2 sm:px-6 lg:px-8">
+        <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div class="max-w-md w-full space-y-8">
                 <div class="text-center">
                     <h1 class="text-4xl font-bold text-gray-900 mb-4">

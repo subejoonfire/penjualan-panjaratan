@@ -15,7 +15,7 @@
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full space-y-8 p-4 sm:p-8">
+    <div class="max-w-md w-full space-y-8 p-8">
         <!-- Header -->
         <div>
             <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">

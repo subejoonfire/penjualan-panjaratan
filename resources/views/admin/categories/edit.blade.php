@@ -114,7 +114,7 @@
                 </div>
 
                 <!-- Form Actions -->
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 md:space-x-4">
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <a href="{{ route('admin.categories.show', $category) }}"
                             class="text-blue-600 hover:text-blue-800 text-sm">
