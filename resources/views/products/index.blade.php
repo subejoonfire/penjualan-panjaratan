@@ -234,35 +234,55 @@
                             @endif
                         </div>
                         <!-- Product Info & Actions -->
-                        <div class="flex flex-col flex-1 justify-between p-4">
+                        <div class="flex flex-col flex-1 justify-between p-3">
                             <div>
-                                <h3 class="text-base font-semibold text-gray-900 mb-1 truncate">
+                                <h3 class="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem]">
                                     <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
                                         {{ $product->productname }}
                                     </a>
                                 </h3>
                                 <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                                <p class="text-xs text-gray-500 mb-3">
+                                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
                                     @php
                                         $desc = strip_tags($product->productdesc);
-                                        $words = str_word_count($desc, 2);
-                                        $wordKeys = array_keys($words);
-                                        if(count($words) > 30) {
-                                            $desc = substr($desc, 0, $wordKeys[30]) . '...';
+                                        $words = explode(' ', $desc);
+                                        if(count($words) > 15) {
+                                            $desc = implode(' ', array_slice($words, 0, 15)) . '...';
                                         }
                                     @endphp
                                     {{ $desc }}
                                 </p>
-                                <div class="mb-3">
-                                    <span class="text-lg font-bold text-blue-600">
+                                <div class="mb-2">
+                                    <span class="text-sm font-bold text-blue-600">
                                         Rp {{ number_format($product->productprice) }}
                                     </span>
+                                </div>
+                                <!-- Rating and Sales -->
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        @php
+                                            $avgRating = $product->reviews->avg('rating') ?? 0;
+                                            $reviewsCount = $product->reviews->count();
+                                        @endphp
+                                        <div class="flex items-center">
+                                            @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                            @endfor
+                                        </div>
+                                        <span class="ml-1 text-xs text-gray-500">({{ $reviewsCount }})</span>
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        @php
+                                            $soldCount = $product->orderDetails->where('order.status', 'delivered')->sum('quantity') ?? 0;
+                                        @endphp
+                                        Terjual {{ $soldCount }}
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex flex-col gap-2 mt-2">
                                 <div class="flex gap-2 w-full">
                                     <a href="{{ route('products.show', $product) }}"
-                                        class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-xs font-medium hover:bg-gray-200 text-center">
+                                        class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
                                         Detail
                                     </a>
                                     @auth
@@ -271,20 +291,20 @@
                                         @csrf
                                         <input type="hidden" name="quantity" value="1">
                                         <button type="submit"
-                                            class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
-                                            <i class="fas fa-shopping-cart"></i>
+                                            class="w-full bg-blue-600 text-white px-2 py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
+                                            <i class="fas fa-shopping-cart text-xs"></i>
                                         </button>
                                     </form>
                                     @else
                                     <button disabled 
-                                        class="w-full bg-gray-400 text-white px-3 py-2 rounded-md cursor-not-allowed text-xs flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart"></i>
+                                        class="w-full bg-gray-400 text-white px-2 py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
+                                        <i class="fas fa-shopping-cart text-xs"></i>
                                     </button>
                                     @endif
                                     @else
                                     <a href="{{ route('login') }}"
-                                        class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 text-center flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart"></i>
+                                        class="flex-1 bg-blue-600 text-white px-2 py-1.5 rounded text-xs font-medium hover:bg-blue-700 text-center flex items-center justify-center">
+                                        <i class="fas fa-shopping-cart text-xs"></i>
                                     </a>
                                     @endauth
                                 </div>
@@ -393,3 +413,12 @@
     });
 </script>
 @endsection
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>

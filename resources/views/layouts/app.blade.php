@@ -28,7 +28,7 @@
     <div class="min-h-screen flex flex-col">
         @auth
         <!-- Mobile Nav Bar -->
-        <nav class="mobile-nav-bar" style="display:none">
+        <nav class="mobile-nav-bar" style="display:none" x-data="{ mobileProfileOpen: false }">
             @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
@@ -87,10 +87,45 @@
                 <i class="fas fa-shopping-cart"></i>
             </a>
             @endif
-            <!-- Profile -->
-            <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
-                <i class="fas fa-user"></i>
-            </a>
+            <!-- Profile with Dropdown -->
+            <div class="relative">
+                <button @click="mobileProfileOpen = !mobileProfileOpen" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                    <i class="fas fa-user"></i>
+                </button>
+                
+                <!-- Mobile Profile Dropdown -->
+                <div x-show="mobileProfileOpen" @click.away="mobileProfileOpen = false" x-transition
+                    x-cloak
+                    class="absolute bottom-12 right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                    <a href="{{ route('profile') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user mr-2"></i>Profil
+                    </a>
+                    @if(auth()->user()->isAdmin())
+                    <a href="{{ route('admin.notifications.index') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                    </a>
+                    @elseif(auth()->user()->isSeller())
+                    <a href="{{ route('seller.notifications.index') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                    </a>
+                    @else
+                    <a href="{{ route('customer.notifications.index') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                    </a>
+                    @endif
+                    <form method="POST" action="{{ route('logout') }}" class="block">
+                        @csrf
+                        <button type="submit"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Keluar
+                        </button>
+                    </form>
+                </div>
+            </div>
         </nav>
         <!-- Desktop Nav -->
         <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
