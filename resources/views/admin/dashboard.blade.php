@@ -6,33 +6,33 @@
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p class="mt-2 text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ??
+        <div class="mb-6 md:mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ??
                 auth()->user()->username }}!</p>
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
             <!-- Total Users -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-4 md:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
                                 <i class="fas fa-users text-white text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-4 md:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pengguna</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ number_format($totalUsers) }}</dd>
+                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pengguna</dt>
+                                <dd class="text-base md:text-lg font-medium text-gray-900">{{ number_format($totalUsers) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3">
-                    <div class="text-sm">
+                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
+                    <div class="text-xs md:text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalCustomers) }}</span>
                         <span class="text-gray-500"> pelanggan, </span>
                         <span class="text-blue-600 font-medium">{{ number_format($totalSellers) }}</span>
@@ -43,23 +43,23 @@
 
             <!-- Total Products -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-4 md:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
                                 <i class="fas fa-box text-white text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-4 md:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Produk</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
+                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Produk</dt>
+                                <dd class="text-base md:text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3">
-                    <div class="text-sm">
+                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
+                    <div class="text-xs md:text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalActiveProducts) }}</span>
                         <span class="text-gray-500"> produk aktif</span>
                     </div>
@@ -68,23 +68,23 @@
 
             <!-- Total Orders -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-4 md:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
                                 <i class="fas fa-shopping-cart text-white text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-4 md:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
+                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
+                                <dd class="text-base md:text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3">
-                    <div class="text-sm">
+                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
+                    <div class="text-xs md:text-sm">
                         <span class="text-yellow-600 font-medium">{{ $orderStats['pending'] ?? 0 }}</span>
                         <span class="text-gray-500"> menunggu</span>
                     </div>
@@ -93,24 +93,24 @@
 
             <!-- Total Revenue -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-4 md:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
                                 <i class="fas fa-chart-line text-white text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-4 md:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
-                                <dd class="text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue, 0, ',',
+                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
+                                <dd class="text-base md:text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue, 0, ',',
                                     '.') }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3">
-                    <div class="text-sm">
+                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
+                    <div class="text-xs md:text-sm">
                         <span class="text-green-600 font-medium">{{ $transactionStats['paid'] ?? 0 }}</span>
                         <span class="text-gray-500"> transaksi terbayar</span>
                     </div>
