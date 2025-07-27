@@ -27,117 +27,6 @@
 <body class="bg-gray-50 font-sans antialiased">
     <div class="min-h-screen flex flex-col">
         @auth
-        <!-- Mobile Header with Logo -->
-        <div class="mobile-header bg-white shadow-sm border-b border-gray-200" style="display:none">
-            <div class="flex items-center justify-between px-4 py-3">
-                <!-- Logo -->
-                <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="flex items-center">
-                    <i class="fas fa-store text-xl text-blue-600 mr-2"></i>
-                    <span class="text-lg font-bold text-gray-800">Penjualan Panjaratan</span>
-                </a>
-                
-                <!-- Mobile Profile & Actions -->
-                <div class="flex items-center space-x-3" x-data="{ mobileDropdownOpen: false }">
-                    <!-- Notifications -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open"
-                            class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
-                            <i class="fas fa-bell text-lg"></i>
-                            <span
-                                class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
-                        </button>
-
-                        <!-- Notification Dropdown -->
-                        <div x-show="open" @click.away="open = false" x-transition
-                            x-cloak
-                            class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
-                            <div class="px-4 py-2 border-b">
-                                <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
-                            </div>
-                            <div id="notificationList" class="max-h-64 overflow-y-auto">
-                                <!-- Notifications will be loaded here -->
-                                <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                    Memuat notifikasi...
-                                </div>
-                            </div>
-                            <div class="px-4 py-2 border-t border-gray-200">
-                                @if(auth()->user()->isAdmin())
-                                    <a href="{{ route('admin.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                        Lihat Semua Notifikasi
-                                    </a>
-                                @elseif(auth()->user()->isSeller())
-                                    <a href="{{ route('seller.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                        Lihat Semua Notifikasi
-                                    </a>
-                                @else
-                                    <a href="{{ route('customer.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                        Lihat Semua Notifikasi
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cart (Customer Only) -->
-                    @if(auth()->user()->isCustomer())
-                    <div class="relative">
-                        <a href="{{ route('customer.cart.index') }}"
-                            class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none {{ request()->routeIs('customer.cart.*') ? 'text-blue-600' : '' }}">
-                            <i class="fas fa-shopping-cart text-lg"></i>
-                            <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
-                        </a>
-                    </div>
-                    @endif
-
-                    <!-- Mobile Profile Dropdown -->
-                    <div class="relative">
-                        <button @click="mobileDropdownOpen = !mobileDropdownOpen"
-                            class="flex items-center space-x-1 text-gray-700 hover:text-gray-900 focus:outline-none">
-                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span class="text-white text-sm font-medium">{{ substr(auth()->user()->nickname ?? auth()->user()->username, 0, 1) }}</span>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
-
-                        <div x-show="mobileDropdownOpen" @click.away="mobileDropdownOpen = false" x-transition
-                            x-cloak
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                            <a href="{{ route('profile') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user mr-2"></i>Profil
-                            </a>
-                            @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.notifications.index') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-bell mr-2"></i>Notifikasi
-                            </a>
-                            @elseif(auth()->user()->isSeller())
-                            <a href="{{ route('seller.notifications.index') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-bell mr-2"></i>Notifikasi
-                            </a>
-                            @else
-                            <a href="{{ route('customer.notifications.index') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-bell mr-2"></i>Notifikasi
-                            </a>
-                            @endif
-                            <form method="POST" action="{{ route('logout') }}" class="block">
-                                @csrf
-                                <button type="submit"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Keluar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Mobile Nav Bar -->
         <nav class="mobile-nav-bar" style="display:none">
             @if(auth()->user()->isAdmin())
@@ -189,8 +78,20 @@
                     <i class="fas fa-list-alt"></i>
                 </a>
             @endif
+            <!-- Notifikasi & Cart -->
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
+                <i class="fas fa-bell"></i>
+            </a>
+            @if(auth()->user()->isCustomer())
+            <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            @endif
+            <!-- Profile -->
+            <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+            </a>
         </nav>
-
         <!-- Desktop Nav -->
         <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
             <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
@@ -374,27 +275,6 @@
                 </div>
             </div>
         </nav>
-        @else
-        <!-- Guest Header with Logo -->
-        <div class="guest-header bg-white shadow-sm border-b border-gray-200">
-            <div class="flex items-center justify-between px-4 py-3">
-                <!-- Logo -->
-                <a href="{{ route('products.index') }}" class="flex items-center">
-                    <i class="fas fa-store text-xl md:text-2xl text-blue-600 mr-2 md:mr-3"></i>
-                    <span class="text-lg md:text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
-                </a>
-                
-                <!-- Login/Register -->
-                <div class="flex items-center space-x-2">
-                    <a href="{{ route('login') }}" class="text-sm px-3 py-1 text-blue-600 hover:text-blue-700">
-                        Masuk
-                    </a>
-                    <a href="{{ route('register') }}" class="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Daftar
-                    </a>
-                </div>
-            </div>
-        </div>
         @endauth
 
         <!-- Main Content -->
@@ -638,12 +518,6 @@
         }
         /* Mobile nav bar */
         @media (max-width: 768px) {
-            .mobile-header {
-                display: block;
-            }
-            .guest-header {
-                display: block;
-            }
             .mobile-nav-bar {
                 display: flex;
                 flex-direction: row;
@@ -653,7 +527,7 @@
                 border-bottom: 1px solid #e5e7eb;
                 position: sticky;
                 top: 0;
-                z-index: 40;
+                z-index: 50;
                 padding: 0.5rem 0.5rem 0.5rem 0.5rem;
                 box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
             }
@@ -673,7 +547,6 @@
                 font-size: 1.25rem;
                 background: none;
                 border: none;
-                text-decoration: none;
             }
             .mobile-nav-item.active {
                 background: #e0e7ff;
@@ -688,19 +561,8 @@
             .mobile-nav-bar {
                 display: flex !important;
             }
-            .mobile-header {
-                position: sticky;
-                top: 0;
-                z-index: 50;
-            }
         }
         @media (min-width: 769px) {
-            .mobile-header {
-                display: none !important;
-            }
-            .guest-header {
-                display: none !important;
-            }
             .mobile-nav-bar {
                 display: none !important;
             }
