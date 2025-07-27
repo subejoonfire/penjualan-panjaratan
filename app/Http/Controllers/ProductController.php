@@ -48,11 +48,7 @@ class ProductController extends Controller
                 $query->orderBy('productname', 'asc');
                 break;
             case 'popular':
-                $query->withCount(['cartDetails as sold_count' => function ($q) {
-                    $q->whereHas('cart.order.transaction', function ($transaction) {
-                        $transaction->where('transactionstatus', 'paid');
-                    });
-                }])->orderBy('sold_count', 'desc');
+                $query->withSoldCount()->orderBy('sold_count', 'desc');
                 break;
             default: // latest
                 $query->orderBy('created_at', 'desc');
@@ -183,11 +179,7 @@ class ProductController extends Controller
                 $query->orderBy('productname', 'asc');
                 break;
             case 'popular':
-                $query->withCount(['cartDetails as sold_count' => function ($q) {
-                    $q->whereHas('cart.order.transaction', function ($transaction) {
-                        $transaction->where('transactionstatus', 'paid');
-                    });
-                }])->orderBy('sold_count', 'desc');
+                $query->withSoldCount()->orderBy('sold_count', 'desc');
                 break;
             default: // latest
                 $query->orderBy('created_at', 'desc');

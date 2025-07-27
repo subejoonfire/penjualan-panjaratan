@@ -165,7 +165,7 @@
                     </div>
                     <div>
                         <p class="text-xs {{ !$product->is_active ? 'text-gray-400' : 'text-gray-500' }}">Terjual</p>
-                        <p class="text-sm font-medium {{ !$product->is_active ? 'text-gray-600' : 'text-gray-900' }}">{{ $product->sold_count ?? 0 }}</p>
+                                                                        <p class="text-sm font-medium {{ !$product->is_active ? 'text-gray-600' : 'text-gray-900' }}">{{ $product->sold_count }}</p>
                     </div>
                     <div>
                         <p class="text-xs {{ !$product->is_active ? 'text-gray-400' : 'text-gray-500' }}">Rating</p>

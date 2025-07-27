@@ -112,7 +112,7 @@ class DashboardController extends Controller
     public function products(Request $request)
     {
         $user = Auth::user();
-        $query = $user->products()->with(['category', 'images']);
+        $query = $user->products()->with(['category', 'images'])->withSoldCount();
 
         // Filter by category
         if ($request->filled('category')) {
@@ -371,15 +371,7 @@ class DashboardController extends Controller
             'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
         ]);
 
-        $previousStatus = $order->status;
         $order->update(['status' => $request->status]);
-
-        // Increment sold_count jika status berubah ke delivered dan sebelumnya bukan delivered
-        if ($request->status === 'delivered' && $previousStatus !== 'delivered') {
-            foreach ($order->cart->cartDetails as $cartDetail) {
-                $cartDetail->product->incrementSoldCount($cartDetail->quantity);
-            }
-        }
 
         return response()->json([
             'success' => true,

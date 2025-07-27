@@ -23,7 +23,7 @@ class OrderObserver
             $this->sendStatusNotification($customer->id, $order, $oldStatus, $newStatus);
             
             // Also send notification to seller if needed
-            $orderDetails = $order->cart->details;
+            $orderDetails = $order->cart->cartDetails;
             $sellers = [];
             
             foreach ($orderDetails as $detail) {
@@ -62,7 +62,7 @@ class OrderObserver
             'iduser' => $userId,
             'title' => $title,
             'notification' => $message,
-            'type' => 'order_status',
+            'type' => 'order',
             'readstatus' => false,
             'created_at' => now(),
             'updated_at' => now()
@@ -87,7 +87,7 @@ class OrderObserver
             'iduser' => $sellerId,
             'title' => $title,
             'notification' => $message,
-            'type' => 'order_update',
+            'type' => 'order',
             'readstatus' => false,
             'created_at' => now(),
             'updated_at' => now()

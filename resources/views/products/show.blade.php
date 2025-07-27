@@ -247,7 +247,7 @@
                         <div class="text-sm text-gray-500">Dilihat</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900">{{ $product->sold_count ?? 0 }}</div>
+                                                        <div class="text-2xl font-bold text-gray-900">{{ $product->sold_count }}</div>
                         <div class="text-sm text-gray-500">Terjual</div>
                     </div>
                     <div class="text-center">

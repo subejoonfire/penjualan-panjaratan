@@ -25,7 +25,7 @@ class Product extends Model
         'iduserseller',
         'is_active',
         'view_count',
-        'sold_count',
+
     ];
 
     /**
@@ -142,9 +142,23 @@ class Product extends Model
         $this->increment('view_count');
     }
 
-    // Helper method untuk increment sold count
-    public function incrementSoldCount($quantity = 1)
+    // Helper method untuk mendapatkan jumlah terjual (dari orders yang delivered)
+    public function getSoldCountAttribute()
     {
-        $this->increment('sold_count', $quantity);
+        return $this->cartDetails()
+            ->whereHas('cart.order', function ($query) {
+                $query->where('status', 'delivered');
+            })
+            ->sum('quantity');
+    }
+
+    // Helper method untuk scope sold count
+    public function scopeWithSoldCount($query)
+    {
+        return $query->withSum(['cartDetails as sold_count' => function($q) {
+            $q->whereHas('cart.order', function($query) {
+                $query->where('status', 'delivered');
+            });
+        }], 'quantity');
     }
 }
