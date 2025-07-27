@@ -18,6 +18,7 @@ use App\Models\Order;
 use App\Models\Transaction;
 use App\Models\DetailTransaction;
 use App\Models\Notification;
+use App\Models\Wishlist;
 
 class EcommerceSeeder extends Seeder
 {
@@ -61,6 +62,9 @@ class EcommerceSeeder extends Seeder
 
         // 11. Seed Notifications
         $this->seedNotifications($faker);
+
+        // 12. Seed Wishlists
+        $this->seedWishlists($faker);
     }
 
     /**
@@ -387,6 +391,68 @@ class EcommerceSeeder extends Seeder
                     'type' => $type,
                     'readstatus' => $faker->boolean(60),
                 ]);
+            }
+        }
+    }
+
+    /**
+     * Seed Wishlists
+     */
+    private function seedWishlists($faker)
+    {
+        $customers = User::where('role', 'customer')->get();
+        $products = Product::where('is_active', true)->get();
+
+        foreach ($customers as $customer) {
+            // Tidak semua customer memiliki wishlist, hanya 70% yang memiliki wishlist
+            if ($faker->boolean(70)) {
+                // Setiap customer yang memiliki wishlist akan memiliki 1-8 produk dalam wishlist
+                $wishlistCount = $faker->numberBetween(1, 8);
+                $selectedProducts = $products->random($wishlistCount);
+
+                foreach ($selectedProducts as $product) {
+                    // Cek apakah kombinasi user_id dan product_id sudah ada (karena ada unique constraint)
+                    $existingWishlist = Wishlist::where('user_id', $customer->id)
+                        ->where('product_id', $product->id)
+                        ->first();
+
+                    if (!$existingWishlist) {
+                        Wishlist::create([
+                            'user_id' => $customer->id,
+                            'product_id' => $product->id,
+                            'created_at' => $faker->dateTimeBetween('-3 months', 'now'),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Tambahkan beberapa wishlist khusus untuk produk-produk populer
+        $popularProducts = Product::where('is_active', true)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        foreach ($popularProducts as $product) {
+            // Setiap produk populer akan ditambahkan ke wishlist oleh 5-15 customer random
+            $fansCount = $faker->numberBetween(5, 15);
+            $randomCustomers = $customers->random($fansCount);
+
+            foreach ($randomCustomers as $customer) {
+                // Cek apakah sudah ada di wishlist
+                $existingWishlist = Wishlist::where('user_id', $customer->id)
+                    ->where('product_id', $product->id)
+                    ->first();
+
+                if (!$existingWishlist) {
+                    Wishlist::create([
+                        'user_id' => $customer->id,
+                        'product_id' => $product->id,
+                        'created_at' => $faker->dateTimeBetween('-2 months', 'now'),
+                        'updated_at' => now(),
+                    ]);
+                }
             }
         }
     }
