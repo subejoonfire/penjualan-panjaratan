@@ -122,6 +122,17 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Tabel Wishlists - Daftar keinginan/favorit produk
+        Schema::create('wishlists', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Relasi ke users
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade'); // Relasi ke products
+            $table->timestamps();
+            
+            // Ensure user can't add same product to wishlist twice
+            $table->unique(['user_id', 'product_id']);
+        });
+
         Schema::table('users', function (Blueprint $table) {
             $table->softDeletes();
         });
@@ -180,6 +191,11 @@ return new class extends Migration
         Schema::table('notifications', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        // Add soft deletes to wishlists table
+        Schema::table('wishlists', function (Blueprint $table) {
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -188,6 +204,7 @@ return new class extends Migration
     public function down(): void
     {
         // Drop tables in reverse order due to foreign key constraints
+        Schema::dropIfExists('wishlists');
         Schema::dropIfExists('notifications');
         Schema::dropIfExists('detail_transactions');
         Schema::dropIfExists('transactions');
@@ -199,6 +216,11 @@ return new class extends Migration
         Schema::dropIfExists('products');
         Schema::dropIfExists('user_addresses');
         Schema::dropIfExists('categories');
+        
+        Schema::table('wishlists', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
         Schema::table('notifications', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
