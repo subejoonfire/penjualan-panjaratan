@@ -15,6 +15,51 @@
     .group:hover .image-overlay-button {
         opacity: 1;
     }
+    
+    /* Drag and Drop Styles */
+    #dropArea {
+        transition: all 0.3s ease;
+    }
+    
+    #dropArea.dragover {
+        border-color: #3B82F6 !important;
+        background-color: #EFF6FF !important;
+        transform: scale(1.02);
+    }
+    
+    .upload-preview {
+        transition: all 0.3s ease;
+    }
+    
+    .upload-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .file-remove-btn {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .upload-preview:hover .file-remove-btn {
+        opacity: 1;
+    }
+    
+    /* Animation for new uploads */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .upload-preview {
+        animation: fadeInUp 0.4s ease;
+    }
 </style>
 @endpush
 
@@ -160,7 +205,7 @@
                             <label for="productprice" class="block text-sm font-medium text-gray-700 mb-2">
                                 Harga (Rp) <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="productprice" id="productprice" min="0" step="1000"
+                            <input type="number" name="productprice" id="productprice" min="0" step="any"
                                 value="{{ old('productprice', $product->productprice) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                           @error('productprice') border-red-300 @enderror" placeholder="0">
                             @error('productprice')
@@ -246,22 +291,67 @@
                     <p class="text-sm text-gray-600">Unggah gambar produk tambahan (opsional)</p>
                 </div>
                 <div class="px-6 py-6">
+                    <!-- Upload Info -->
+                    <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-medium">Info Upload Gambar:</p>
+                                <ul class="mt-1 space-y-1">
+                                    <li>• Maksimal 5 gambar baru (total maksimal 6 dengan gambar utama)</li>
+                                    <li>• Format: JPG, PNG, GIF</li>
+                                    <li>• Ukuran maksimal: 2MB per gambar</li>
+                                    <li>• Gambar saat ini: <span id="currentImageCount">{{ $product->images->count() }}</span></li>
+                                    <li id="remainingSlotsInfo">• Sisa slot untuk gambar baru: <span id="remainingSlots">{{ 6 - $product->images->count() }}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
-                        <label for="images" class="block text-sm font-medium text-gray-700 mb-2">
-                            Gambar Produk
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tambah Gambar Produk
                         </label>
-                        <input type="file" name="images[]" id="images" multiple accept="image/*" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                      @error('images') border-red-300 @enderror">
+                        
+                        <!-- Hidden file input -->
+                        <input type="file" name="images[]" id="images" multiple accept="image/*" class="hidden">
+                        
+                        <!-- Drag and Drop Area -->
+                        <div id="dropArea" class="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors duration-300 bg-gray-50 hover:bg-blue-50">
+                            <div id="dropContent">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Drag & Drop gambar di sini</h3>
+                                <p class="text-sm text-gray-600 mb-4">atau</p>
+                                <button type="button" id="browseBtn" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <i class="fas fa-folder-open mr-2"></i>
+                                    Pilih Gambar
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    Maksimal 5 gambar, ukuran masing-masing maksimal 2MB
+                                </p>
+                            </div>
+                            
+                            <!-- Upload Progress -->
+                            <div id="uploadProgress" class="hidden">
+                                <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+                                <p class="text-sm text-blue-600">Memproses gambar...</p>
+                            </div>
+                        </div>
+                        
                         @error('images')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                        <p class="mt-1 text-sm text-gray-500">
-                            Pilih beberapa gambar (JPG, PNG, maksimal 2MB per gambar)
-                        </p>
+                        
+                        <!-- Selected Files Info -->
+                        <div id="selectedFilesInfo" class="mt-2 hidden">
+                            <p class="text-sm text-gray-600">
+                                <span id="selectedCount">0</span> gambar dipilih
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Image Preview -->
-                    <div id="imagePreview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 hidden"></div>
+                    <div id="imagePreview" class="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
                 </div>
             </div>
 
@@ -290,45 +380,237 @@
 </div>
 
 <script>
-    document.getElementById('images').addEventListener('change', function(e) {
-        const preview = document.getElementById('imagePreview');
-        const files = e.target.files;
-
+    // Drag and Drop Upload Implementation
+    const dropArea = document.getElementById('dropArea');
+    const dropContent = document.getElementById('dropContent');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const fileInput = document.getElementById('images');
+    const browseBtn = document.getElementById('browseBtn');
+    const preview = document.getElementById('imagePreview');
+    const selectedFilesInfo = document.getElementById('selectedFilesInfo');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    let selectedFiles = [];
+    const maxFiles = 5;
+    const maxFileSize = 2 * 1024 * 1024; // 2MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    
+    // Browse button click
+    browseBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+    
+    // Drag and drop events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        dropArea.classList.add('border-blue-500', 'bg-blue-50', 'dragover');
+        dropArea.classList.remove('border-gray-300');
+    }
+    
+    function unhighlight() {
+        dropArea.classList.remove('border-blue-500', 'bg-blue-50', 'dragover');
+        dropArea.classList.add('border-gray-300');
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    }
+    
+    function handleFiles(files) {
+        const fileArray = Array.from(files);
+        const validFiles = [];
+        const errors = [];
+        
+        // Get current image count
+        const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
+        const totalAllowed = 6; // Maximum total images
+        const remainingSlots = totalAllowed - currentImageCount - selectedFiles.length;
+        
+        // Validate files
+        fileArray.forEach((file, index) => {
+            if (!allowedTypes.includes(file.type)) {
+                errors.push(`File "${file.name}" bukan format gambar yang valid`);
+                return;
+            }
+            
+            if (file.size > maxFileSize) {
+                errors.push(`File "${file.name}" terlalu besar (maksimal 2MB)`);
+                return;
+            }
+            
+            if (validFiles.length >= remainingSlots) {
+                errors.push(`Tidak bisa menambah lebih banyak gambar. Sisa slot: ${remainingSlots}`);
+                return;
+            }
+            
+            if (selectedFiles.length + validFiles.length >= maxFiles) {
+                errors.push(`Maksimal ${maxFiles} gambar baru yang bisa dipilih`);
+                return;
+            }
+            
+            validFiles.push(file);
+        });
+        
+        // Show errors if any
+        if (errors.length > 0) {
+            showAlert(errors.join('<br>'), 'error');
+            return;
+        }
+        
+        // Add valid files
+        selectedFiles = [...selectedFiles, ...validFiles];
+        
+        // Update file input with selected files
+        updateFileInput();
+        
+        // Update UI
+        updateSelectedInfo();
+        updatePreview();
+        
+        if (selectedFiles.length > 0) {
+            showAlert(`${validFiles.length} gambar berhasil ditambahkan`, 'success');
+        }
+    }
+    
+    function updateFileInput() {
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        fileInput.files = dt.files;
+    }
+    
+    function updateSelectedInfo() {
+        if (selectedFiles.length > 0) {
+            selectedFilesInfo.classList.remove('hidden');
+            selectedCount.textContent = selectedFiles.length;
+        } else {
+            selectedFilesInfo.classList.add('hidden');
+        }
+        
+        // Update remaining slots info
+        const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
+        const remainingSlots = 6 - currentImageCount - selectedFiles.length;
+        const remainingSlotsElement = document.getElementById('remainingSlots');
+        if (remainingSlotsElement) {
+            remainingSlotsElement.textContent = remainingSlots;
+            
+                         // Change color based on remaining slots
+            const remainingSlotsInfo = document.getElementById('remainingSlotsInfo');
+            if (remainingSlots <= 0) {
+                remainingSlotsInfo.className = 'text-red-600 font-medium';
+                // Disable drop area
+                dropArea.classList.add('opacity-50', 'pointer-events-none');
+                browseBtn.disabled = true;
+                browseBtn.textContent = 'Maksimal Gambar Tercapai';
+            } else if (remainingSlots <= 2) {
+                remainingSlotsInfo.className = 'text-yellow-600 font-medium';
+                // Enable drop area
+                dropArea.classList.remove('opacity-50', 'pointer-events-none');
+                browseBtn.disabled = false;
+                browseBtn.innerHTML = '<i class="fas fa-folder-open mr-2"></i>Pilih Gambar';
+            } else {
+                remainingSlotsInfo.className = 'text-blue-800';
+                // Enable drop area
+                dropArea.classList.remove('opacity-50', 'pointer-events-none');
+                browseBtn.disabled = false;
+                browseBtn.innerHTML = '<i class="fas fa-folder-open mr-2"></i>Pilih Gambar';
+            }
+        }
+    }
+    
+    function updatePreview() {
         preview.innerHTML = '';
         
-        if (files.length > 0) {
-            preview.classList.remove('hidden');
-            
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const div = document.createElement('div');
-                        div.className = 'relative group';
-                        div.innerHTML = `
-                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
-                                 class="w-full h-32 object-cover rounded-lg border border-gray-200">
-                            <div class="absolute top-2 right-2">
-                                <span class="bg-green-600 text-white text-xs px-2 py-1 rounded">Baru</span>
-                            </div>
-                            <div class="absolute bottom-2 left-2">
-                                <span class="bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-                                    ${file.name}
-                                </span>
-                            </div>
-                        `;
-                        preview.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        } else {
-            preview.classList.add('hidden');
-        }
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'upload-preview relative group bg-white rounded-lg shadow-md overflow-hidden';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}" 
+                         class="w-full h-32 object-cover">
+                    <div class="absolute top-2 right-2">
+                        <span class="bg-green-600 text-white text-xs px-2 py-1 rounded-full shadow">
+                            <i class="fas fa-plus mr-1"></i>Baru
+                        </span>
+                    </div>
+                    <div class="absolute top-2 left-2 file-remove-btn">
+                        <button type="button" onclick="removeFile(${index})" 
+                                class="bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-700 shadow-lg transition-colors">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-3">
+                        <p class="text-xs truncate font-medium">${file.name}</p>
+                        <p class="text-xs text-gray-300">${formatFileSize(file.size)}</p>
+                    </div>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileInput();
+        updateSelectedInfo();
+        updatePreview();
+        showAlert('Gambar berhasil dihapus', 'info');
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Make removeFile function global
+    window.removeFile = removeFile;
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSelectedInfo(); // Update initial state
     });
 
     function confirmDeleteImage(imageId) {
         confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
+            // Update current image count
+            const currentCount = document.getElementById('currentImageCount');
+            if (currentCount) {
+                const newCount = parseInt(currentCount.textContent) - 1;
+                currentCount.textContent = newCount;
+                
+                // Update remaining slots
+                updateSelectedInfo();
+            }
+            
             // Create a form dynamically to submit
             const form = document.createElement('form');
             form.method = 'POST';

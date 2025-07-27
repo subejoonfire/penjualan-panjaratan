@@ -214,8 +214,17 @@ class DashboardController extends Controller
             'productstock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
             'is_active' => 'boolean',
+            'images' => 'array|max:5', // Maksimal 5 gambar baru
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        // Validasi total gambar tidak lebih dari 6
+        $currentImageCount = $product->images()->count();
+        $newImageCount = $request->hasFile('images') ? count($request->file('images')) : 0;
+        
+        if ($currentImageCount + $newImageCount > 6) {
+            return back()->withErrors(['images' => 'Total gambar tidak boleh lebih dari 6. Saat ini: ' . $currentImageCount . ', akan ditambah: ' . $newImageCount]);
+        }
 
         $product->update([
             'productname' => $request->productname,
