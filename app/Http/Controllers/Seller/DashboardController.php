@@ -86,6 +86,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Statistik view produk (top 10)
+        $topViewedProducts = $user->products()
+            ->orderBy('view_count', 'desc')
+            ->limit(10)
+            ->get(['productname', 'view_count']);
+
         return view('seller.dashboard', compact(
             'totalProducts',
             'activeProducts',
@@ -95,7 +101,8 @@ class DashboardController extends Controller
             'recentOrders',
             'topProducts',
             'monthlyRevenue',
-            'lowStockProducts'
+            'lowStockProducts',
+            'topViewedProducts'
         ));
     }
 
@@ -364,7 +371,15 @@ class DashboardController extends Controller
             'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
         ]);
 
+        $previousStatus = $order->status;
         $order->update(['status' => $request->status]);
+
+        // Increment sold_count jika status berubah ke delivered dan sebelumnya bukan delivered
+        if ($request->status === 'delivered' && $previousStatus !== 'delivered') {
+            foreach ($order->cart->cartDetails as $cartDetail) {
+                $cartDetail->product->incrementSoldCount($cartDetail->quantity);
+            }
+        }
 
         return back()->with('success', 'Order status updated successfully');
     }

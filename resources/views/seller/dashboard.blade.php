@@ -187,6 +187,16 @@
             </div>
         </div>
 
+        <!-- Statistik View Produk -->
+        <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-900">Statistik Dilihat Produk</h3>
+            </div>
+            <div class="p-6">
+                <canvas id="productViewsChart" height="120"></canvas>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Recent Orders -->
             <div class="bg-white shadow rounded-lg">
@@ -483,4 +493,51 @@
         });
     });
 </script>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('productViewsChart').getContext('2d');
+    const productViewsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($topViewedProducts->pluck('productname')) !!},
+            datasets: [{
+                label: 'Jumlah Dilihat',
+                data: {!! json_encode($topViewedProducts->pluck('view_count')) !!},
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+                maxBarThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Dilihat: ' + context.parsed.y + ' kali';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: false },
+                    ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Jumlah Dilihat' }
+                }
+            }
+        }
+    });
+</script>
+@endpush
 @endsection
