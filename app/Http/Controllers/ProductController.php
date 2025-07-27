@@ -15,53 +15,78 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'images', 'seller'])
-            ->where('is_active', true)
-            ->where('productstock', '>', 0);
+        // Cache key based on request parameters
+        $cacheKey = 'products_index_' . md5(json_encode($request->all()));
+        
+        // Try to get from cache first (cache for 5 minutes)
+        $result = cache()->remember($cacheKey, 300, function () use ($request) {
+            $query = Product::with(['category:id,categoryname', 'images:id,idproduct,imagepath', 'seller:id,username'])
+                ->select(['id', 'productname', 'productprice', 'productstock', 'idcategories', 'iduserseller', 'created_at'])
+                ->where('is_active', true)
+                ->where('productstock', '>', 0);
 
-        // Search by product name
-        if ($request->filled('search')) {
-            $query->where('productname', 'like', '%' . $request->search . '%');
-        }
+            // Search by product name
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('productname', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
+                });
+            }
 
-        // Filter by category
-        if ($request->filled('category')) {
-            $query->where('idcategories', $request->category);
-        }
-        // Filter by price range
-        if ($request->filled('min_price')) {
-            $query->where('productprice', '>=', $request->min_price);
-        }
-        if ($request->filled('max_price')) {
-            $query->where('productprice', '<=', $request->max_price);
-        }
-        // Sort products
+            // Filter by category
+            if ($request->filled('category')) {
+                $query->where('idcategories', $request->category);
+            }
+            
+            // Filter by price range
+            if ($request->filled('min_price')) {
+                $query->where('productprice', '>=', $request->min_price);
+            }
+            if ($request->filled('max_price')) {
+                $query->where('productprice', '<=', $request->max_price);
+            }
+            
+            // Sort products
+            $sortBy = $request->get('sort', 'latest');
+            switch ($sortBy) {
+                case 'price_low':
+                    $query->orderBy('productprice', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('productprice', 'desc');
+                    break;
+                case 'name':
+                    $query->orderBy('productname', 'asc');
+                    break;
+                case 'popular':
+                    $query->withSoldCount()->orderBy('sold_count', 'desc');
+                    break;
+                default: // latest
+                    $query->orderBy('created_at', 'desc');
+            }
+
+            return $query->paginate(12);
+        });
+
+        // Cache categories separately
+        $categories = cache()->remember('categories_with_product_count', 3600, function () {
+            return Category::withCount(['products' => function ($query) {
+                $query->where('is_active', true)->where('productstock', '>', 0);
+            }])->get(['id', 'categoryname']);
+        });
+
+        // Cache price range
+        $priceRange = cache()->remember('products_price_range', 3600, function () {
+            return Product::where('is_active', true)
+                ->where('productstock', '>', 0)
+                ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
+                ->first();
+        });
+
+        $products = $result;
         $sortBy = $request->get('sort', 'latest');
-        switch ($sortBy) {
-            case 'price_low':
-                $query->orderBy('productprice', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('productprice', 'desc');
-                break;
-            case 'name':
-                $query->orderBy('productname', 'asc');
-                break;
-            case 'popular':
-                $query->withSoldCount()->orderBy('sold_count', 'desc');
-                break;
-            default: // latest
-                $query->orderBy('created_at', 'desc');
-        }
-
-        $products = $query->paginate(12);
-        $categories = Category::withCount('products')->get();
-
-        // Get price range for filters
-        $priceRange = Product::where('is_active', true)
-            ->where('productstock', '>', 0)
-            ->selectRaw('MIN(productprice) as min_price, MAX(productprice) as max_price')
-            ->first();
+        
         return view('products.index', compact(
             'products',
             'categories',
@@ -80,67 +105,94 @@ class ProductController extends Controller
             abort(404, 'Product not found');
         }
 
-        $product->load([
-            'category',
-            'seller',
-            'images',
-            'reviews.user'
-        ]);
+        // Cache product details for 30 minutes
+        $cacheKey = "product_details_{$product->id}";
+        $productData = cache()->remember($cacheKey, 1800, function () use ($product) {
+            $product->load([
+                'category:id,categoryname',
+                'seller:id,username,nickname',
+                'images:id,idproduct,imagepath',
+                'reviews' => function ($query) {
+                    $query->with('user:id,username,nickname')->latest();
+                }
+            ]);
 
-        // Increment view count
-        $product->incrementViewCount();
+            // Calculate review statistics in one query
+            $reviewStats = $product->reviews()
+                ->selectRaw('
+                    COUNT(*) as total_reviews,
+                    AVG(rating) as average_rating,
+                    SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as rating_5,
+                    SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as rating_4,
+                    SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as rating_3,
+                    SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as rating_2,
+                    SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as rating_1
+                ')
+                ->first();
 
-        // Get related products from same category
-        $relatedProducts = Product::where('idcategories', $product->idcategories)
-            ->where('id', '!=', $product->id)
-            ->where('is_active', true)
-            ->where('productstock', '>', 0)
-            ->with(['images'])
-            ->limit(4)
-            ->get();
+            $totalReviews = $reviewStats->total_reviews ?? 0;
+            $averageRating = $reviewStats->average_rating ?? 0;
 
-        // Calculate average rating
-        $averageRating = $product->reviews()->avg('rating') ?? 0;
-        $totalReviews = $product->reviews()->count();
+            // Build rating distribution
+            $ratingDistribution = [];
+            for ($i = 5; $i >= 1; $i--) {
+                $count = $reviewStats->{'rating_' . $i} ?? 0;
+                $percentage = $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
+                $ratingDistribution[$i] = [
+                    'count' => $count,
+                    'percentage' => $percentage
+                ];
+            }
 
-        // Get rating distribution
-        $ratingDistribution = [];
-        for ($i = 5; $i >= 1; $i--) {
-            $count = $product->reviews()->where('rating', $i)->count();
-            $percentage = $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
-            $ratingDistribution[$i] = [
-                'count' => $count,
-                'percentage' => $percentage
+            return [
+                'product' => $product,
+                'averageRating' => round($averageRating, 1),
+                'totalReviews' => $totalReviews,
+                'ratingDistribution' => $ratingDistribution
             ];
-        }
+        });
 
-        // Check if user can review this product
+        // Increment view count asynchronously (don't block page load)
+        dispatch(function () use ($product) {
+            $product->incrementViewCount();
+        })->afterResponse();
+
+        // Cache related products
+        $relatedProducts = cache()->remember("related_products_{$product->idcategories}_{$product->id}", 3600, function () use ($product) {
+            return Product::where('idcategories', $product->idcategories)
+                ->where('id', '!=', $product->id)
+                ->where('is_active', true)
+                ->where('productstock', '>', 0)
+                ->with(['images:id,idproduct,imagepath'])
+                ->select(['id', 'productname', 'productprice', 'productstock'])
+                ->limit(4)
+                ->get();
+        });
+
+        // Check if user can review this product (only if logged in)
         $canReview = false;
         if (auth()->check() && auth()->user()->isCustomer()) {
-            $hasPurchased = auth()->user()->carts()
-                ->whereHas('order', function ($query) {
-                    $query->where('status', 'delivered');
-                })
-                ->whereHas('cartDetails', function ($query) use ($product) {
-                    $query->where('idproduct', $product->id);
-                })
-                ->exists();
+            $cacheKey = "can_review_{$product->id}_" . auth()->id();
+            $canReview = cache()->remember($cacheKey, 300, function () use ($product) {
+                $hasPurchased = auth()->user()->orders()
+                    ->where('status', 'delivered')
+                    ->whereHas('cart.cartDetails', function ($query) use ($product) {
+                        $query->where('idproduct', $product->id);
+                    })
+                    ->exists();
 
-            $hasReviewed = $product->reviews()
-                ->where('iduser', auth()->id())
-                ->exists();
+                $hasReviewed = $product->reviews()
+                    ->where('iduser', auth()->id())
+                    ->exists();
 
-            $canReview = $hasPurchased && !$hasReviewed;
+                return $hasPurchased && !$hasReviewed;
+            });
         }
 
-        return view('products.show', compact(
-            'product',
-            'relatedProducts',
-            'averageRating',
-            'totalReviews',
-            'ratingDistribution',
-            'canReview'
-        ));
+        return view('products.show', array_merge($productData, [
+            'relatedProducts' => $relatedProducts,
+            'canReview' => $canReview
+        ]));
     }
 
     /**

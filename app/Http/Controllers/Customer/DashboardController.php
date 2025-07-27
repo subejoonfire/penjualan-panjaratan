@@ -25,59 +25,78 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Get user's cart details for cart summary
-        $cart = $user->cart;
-        $cartItems = [];
-        $cartTotal = 0;
-        $cartItemsCount = 0;
-        
-        if ($cart) {
-            $cartItems = $cart->cartDetails()->with('product.images')->get();
-            $cartTotal = $cartItems->sum(function ($item) {
-                return $item->quantity * $item->product->productprice;
-            });
-            $cartItemsCount = $cartItems->sum('quantity'); // Total quantity of all items
-        }
-        
-        // Get orders statistics
-        $userOrders = $user->orders();
-        $totalOrders = $userOrders->count();
-        $pendingOrders = $userOrders->where('status', 'pending')->count();
-        $totalSpent = $userOrders->sum('grandtotal');
-        
-        // Get recent orders
-        $recentOrders = $user->orders()
-            ->with(['cart.cartDetails.product.images', 'transaction'])
-            ->latest()
-            ->limit(5)
-            ->get();
+        // Cache dashboard data for 5 minutes to improve performance
+        $cacheKey = "customer_dashboard_{$user->id}";
+        $dashboardData = cache()->remember($cacheKey, 300, function () use ($user) {
             
-        // Get favorite products (products that user has reviewed)
-        $favoriteProducts = \App\Models\Product::whereHas('reviews', function($query) use ($user) {
-            $query->where('iduser', $user->id);
-        })
-        ->with(['images', 'reviews'])
-        ->limit(6)
-        ->get();
+            // Get user's cart details for cart summary (optimized)
+            $cart = $user->activeCart;
+            $cartItems = collect();
+            $cartTotal = 0;
+            $cartItemsCount = 0;
             
-        // Get wishlist count
-        $wishlistCount = $user->wishlists()->count();
+            if ($cart) {
+                $cartItems = $cart->cartDetails()
+                    ->with(['product:id,productname,productprice', 'product.images:id,idproduct,imagepath'])
+                    ->get();
+                $cartTotal = $cartItems->sum(function ($item) {
+                    return $item->quantity * $item->productprice; // Use cached price from cart
+                });
+                $cartItemsCount = $cartItems->sum('quantity');
+            }
+            
+            // Get orders statistics using single query
+            $orderStats = $user->orders()
+                ->selectRaw('
+                    COUNT(*) as total_orders,
+                    SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending_orders,
+                    SUM(grandtotal) as total_spent
+                ')
+                ->first();
+            
+            // Get recent orders (optimized relations)
+            $recentOrders = $user->orders()
+                ->with([
+                    'cart.cartDetails:id,idcart,idproduct,quantity,productprice',
+                    'cart.cartDetails.product:id,productname',
+                    'cart.cartDetails.product.images:id,idproduct,imagepath',
+                    'transaction:id,idorder,transactionstatus'
+                ])
+                ->latest()
+                ->limit(5)
+                ->get();
+                
+            // Get favorite products (optimized)
+            $favoriteProducts = Product::whereHas('reviews', function($query) use ($user) {
+                    $query->where('iduser', $user->id);
+                })
+                ->with(['images:id,idproduct,imagepath'])
+                ->select(['id', 'productname', 'productprice'])
+                ->limit(6)
+                ->get();
+                
+            // Get wishlist count
+            $wishlistCount = $user->wishlists()->count();
+            
+            return [
+                'cartItems' => $cartItems,
+                'cartTotal' => $cartTotal,
+                'cartItemsCount' => $cartItemsCount,
+                'totalOrders' => $orderStats->total_orders ?? 0,
+                'pendingOrders' => $orderStats->pending_orders ?? 0,
+                'totalSpent' => $orderStats->total_spent ?? 0,
+                'recentOrders' => $recentOrders,
+                'favoriteProducts' => $favoriteProducts,
+                'wishlistCount' => $wishlistCount,
+            ];
+        });
         
-        // Get notification data for dashboard
+        // Get real-time notification count (not cached)
         $unreadNotifications = $user->unread_notification_count;
         
-        return view('customer.dashboard', compact(
-            'cartItems', 
-            'cartTotal', 
-            'cartItemsCount',
-            'totalOrders',
-            'totalSpent', 
-            'pendingOrders',
-            'recentOrders', 
-            'favoriteProducts',
-            'wishlistCount',
-            'unreadNotifications'
-        ));
+        return view('customer.dashboard', array_merge($dashboardData, [
+            'unreadNotifications' => $unreadNotifications
+        ]));
     }
     
     /**

@@ -55,51 +55,83 @@ class CartController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->productstock
+            'quantity' => 'required|integer|min:1|max:' . max(1, $product->productstock)
+        ], [
+            'quantity.required' => 'Jumlah produk harus diisi',
+            'quantity.integer' => 'Jumlah produk harus berupa angka',
+            'quantity.min' => 'Jumlah produk minimal 1',
+            'quantity.max' => 'Jumlah produk melebihi stok yang tersedia'
         ]);
 
-        // Check if product is active
-        if (!$product->is_active) {
-            return back()->with('error', 'Produk tidak tersedia');
+        // Check if product is active and in stock
+        if (!$product->is_active || $product->productstock <= 0) {
+            return back()->with('error', 'Produk tidak tersedia atau stok habis');
         }
 
-        // Check stock
-        if ($product->productstock < $request->quantity) {
-            return back()->with('error', 'Stok tidak mencukupi');
+        // Rate limiting for cart additions (prevent spam)
+        $rateLimitKey = 'cart_add:' . $user->id;
+        if (cache()->get($rateLimitKey, 0) >= 10) {
+            return back()->with('error', 'Terlalu banyak percobaan menambah produk. Coba lagi dalam 1 menit.');
         }
 
-        // Get or create active cart
-        $cart = $user->activeCart;
-        if (!$cart) {
-            $cart = Cart::create([
-                'iduser' => $user->id,
-                'checkoutstatus' => 'active'
-            ]);
-        }
-
-        // Check if product already in cart
-        $existingDetail = $cart->cartDetails()
-            ->where('idproduct', $product->id)
-            ->first();
-
-        if ($existingDetail) {
-            $newQuantity = $existingDetail->quantity + $request->quantity;
-
-            if ($newQuantity > $product->productstock) {
-                return back()->with('error', 'Stok tidak mencukupi');
+        DB::beginTransaction();
+        try {
+            // Lock product for stock checking
+            $product = Product::lockForUpdate()->find($product->id);
+            
+            // Recheck stock after lock
+            if ($product->productstock < $request->quantity) {
+                throw new \Exception('Stok tidak mencukupi');
             }
 
-            $existingDetail->update(['quantity' => $newQuantity]);
-        } else {
-            CartDetail::create([
-                'idcart' => $cart->id,
-                'idproduct' => $product->id,
-                'quantity' => $request->quantity,
-                'productprice' => $product->productprice
-            ]);
-        }
+            // Get or create active cart
+            $cart = $user->activeCart;
+            if (!$cart) {
+                $cart = Cart::create([
+                    'iduser' => $user->id,
+                    'checkoutstatus' => 'active'
+                ]);
+            }
 
-        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
+            // Check if product already in cart
+            $existingDetail = $cart->cartDetails()
+                ->where('idproduct', $product->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($existingDetail) {
+                $newQuantity = $existingDetail->quantity + $request->quantity;
+
+                if ($newQuantity > $product->productstock) {
+                    throw new \Exception('Total jumlah di keranjang melebihi stok yang tersedia');
+                }
+
+                $existingDetail->update(['quantity' => $newQuantity]);
+            } else {
+                CartDetail::create([
+                    'idcart' => $cart->id,
+                    'idproduct' => $product->id,
+                    'quantity' => $request->quantity,
+                    'productprice' => $product->productprice
+                ]);
+            }
+
+            DB::commit();
+            
+            // Clear cache for cart count
+            cache()->forget("cart_count_{$user->id}");
+            
+            return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            // Increment rate limiting on error
+            $attempts = cache()->get($rateLimitKey, 0) + 1;
+            cache()->put($rateLimitKey, $attempts, 60);
+            
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -305,14 +337,18 @@ class CartController extends Controller
     public function getCartCount()
     {
         $user = Auth::user();
-        $cart = $user->activeCart;
+        
+        // Cache cart count for 2 minutes to reduce database queries
+        $cacheKey = "cart_count_{$user->id}";
+        $count = cache()->remember($cacheKey, 120, function () use ($user) {
+            $cart = $user->activeCart;
+            return $cart ? $cart->cartDetails()->count() : 0;
+        });
 
-        $count = 0;
-        if ($cart) {
-            $count = $cart->cartDetails()->count(); // Count unique products, not quantities
-        }
-
-        return response()->json(['count' => $count]);
+        return response()->json([
+            'count' => $count,
+            'cache_time' => now()->toISOString()
+        ]);
     }
 
     /**

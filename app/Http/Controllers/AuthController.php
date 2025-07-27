@@ -27,9 +27,17 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // Rate limiting - 5 attempts per minute
+        $key = 'login_attempts:' . $request->ip();
+        if (cache()->get($key, 0) >= 5) {
+            return back()->withErrors([
+                'login' => 'Terlalu banyak percobaan login. Coba lagi dalam 1 menit.',
+            ])->withInput();
+        }
+
         $validator = Validator::make($request->all(), [
-            'login' => 'required|string',
-            'password' => 'required|min:6',
+            'login' => 'required|string|max:255',
+            'password' => 'required|min:6|max:255',
         ], [
             'login.required' => 'Username atau Email wajib diisi.',
             'password.required' => 'Password wajib diisi.',
@@ -51,8 +59,15 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
             
+            // Clear rate limiting on successful login
+            cache()->forget($key);
+            
             return $this->redirectToDashboard();
         }
+
+        // Increment failed login attempts
+        $attempts = cache()->get($key, 0) + 1;
+        cache()->put($key, $attempts, 60); // 1 minute expiry
 
         return back()->withErrors([
             'login' => 'Username/Email atau password salah.',
@@ -76,43 +91,71 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        // Rate limiting for registration - 3 attempts per 5 minutes
+        $key = 'register_attempts:' . $request->ip();
+        if (cache()->get($key, 0) >= 3) {
+            return back()->withErrors([
+                'general' => 'Terlalu banyak percobaan registrasi. Coba lagi dalam 5 menit.',
+            ])->withInput();
+        }
+
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:50|unique:users,username',
+            'username' => 'required|string|min:3|max:50|unique:users,username|regex:/^[a-zA-Z0-9_]+$/',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\-\+\(\)\s]+$/',
             'nickname' => 'nullable|string|max:100',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|max:255|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/',
             'role' => 'required|in:customer,seller',
         ], [
             'username.required' => 'Username wajib diisi.',
+            'username.min' => 'Username minimal 3 karakter.',
+            'username.regex' => 'Username hanya boleh mengandung huruf, angka, dan underscore.',
             'username.unique' => 'Username sudah digunakan.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
+            'phone.regex' => 'Format nomor telepon tidak valid.',
             'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 6 karakter.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, dan angka.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'role.required' => 'Role wajib dipilih.',
             'role.in' => 'Role tidak valid.',
         ]);
 
         if ($validator->fails()) {
+            // Increment registration attempts on validation failure
+            $attempts = cache()->get($key, 0) + 1;
+            cache()->put($key, $attempts, 300); // 5 minutes expiry
+            
             return back()->withErrors($validator)->withInput();
         }
 
-        $user = User::create([
-            'username' => $request->username,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'nickname' => $request->nickname,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+        try {
+            $user = User::create([
+                'username' => strtolower(trim($request->username)),
+                'email' => strtolower(trim($request->email)),
+                'phone' => $request->phone ? trim($request->phone) : null,
+                'nickname' => $request->nickname ? trim($request->nickname) : null,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ]);
 
-        // Auto login setelah registrasi
-        Auth::login($user);
+            // Clear rate limiting on successful registration
+            cache()->forget($key);
 
-        return $this->redirectToDashboard();
+            // Auto login setelah registrasi
+            Auth::login($user);
+
+            return $this->redirectToDashboard();
+        } catch (\Exception $e) {
+            // Log error for debugging
+            \Log::error('Registration failed: ' . $e->getMessage());
+            
+            return back()->withErrors([
+                'general' => 'Terjadi kesalahan saat registrasi. Silakan coba lagi.',
+            ])->withInput();
+        }
     }
 
     /**
