@@ -242,7 +242,7 @@
                                 <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
                                 <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
                                     @php
-                                        $desc = strip_tags($product->productdesc);
+                                        $desc = strip_tags($product->productdescription);
                                         $words = explode(' ', $desc);
                                         if(count($words) > 15) {
                                             $desc = implode(' ', array_slice($words, 0, 15)) . '...';
