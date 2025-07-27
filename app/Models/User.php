@@ -113,22 +113,81 @@ class User extends Authenticatable
     }
 
     /**
-     * Get unread notification count efficiently
+     * Get unread notification count efficiently with caching
      */
     public function getUnreadNotificationCountAttribute()
     {
-        return $this->unreadNotifications()->count();
+        return cache()->remember("user_notifications_count_{$this->id}", 300, function () {
+            return $this->unreadNotifications()->count();
+        });
     }
 
     /**
-     * Get recent notifications for navbar/dropdown
+     * Get recent notifications for navbar/dropdown with caching
      */
     public function getRecentNotifications($limit = 5)
     {
-        return $this->notifications()
-            ->latest()
-            ->limit($limit)
-            ->get(['id', 'title', 'notification', 'type', 'readstatus', 'created_at']);
+        return cache()->remember("user_recent_notifications_{$this->id}", 180, function () use ($limit) {
+            return $this->notifications()
+                ->select(['id', 'title', 'notification', 'type', 'readstatus', 'created_at'])
+                ->latest()
+                ->limit($limit)
+                ->get();
+        });
+    }
+
+    /**
+     * Clear notification cache when updated
+     */
+    public function clearNotificationCache()
+    {
+        cache()->forget("user_notifications_count_{$this->id}");
+        cache()->forget("user_recent_notifications_{$this->id}");
+    }
+
+    /**
+     * Get user statistics efficiently
+     */
+    public function getStatsAttribute()
+    {
+        return cache()->remember("user_stats_{$this->id}", 600, function () {
+            $stats = [];
+            
+            if ($this->isCustomer()) {
+                $orderStats = $this->orders()
+                    ->selectRaw('
+                        COUNT(*) as total_orders,
+                        SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending_orders,
+                        SUM(CASE WHEN status = "delivered" THEN 1 ELSE 0 END) as completed_orders,
+                        SUM(grandtotal) as total_spent
+                    ')
+                    ->first();
+                
+                $stats = [
+                    'total_orders' => $orderStats->total_orders ?? 0,
+                    'pending_orders' => $orderStats->pending_orders ?? 0,
+                    'completed_orders' => $orderStats->completed_orders ?? 0,
+                    'total_spent' => $orderStats->total_spent ?? 0,
+                    'wishlist_count' => $this->wishlists()->count(),
+                ];
+            } elseif ($this->isSeller()) {
+                $productStats = $this->products()
+                    ->selectRaw('
+                        COUNT(*) as total_products,
+                        SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_products,
+                        SUM(productstock) as total_stock
+                    ')
+                    ->first();
+                
+                $stats = [
+                    'total_products' => $productStats->total_products ?? 0,
+                    'active_products' => $productStats->active_products ?? 0,
+                    'total_stock' => $productStats->total_stock ?? 0,
+                ];
+            }
+            
+            return $stats;
+        });
     }
 
     // Relasi ke Wishlist (One to Many)

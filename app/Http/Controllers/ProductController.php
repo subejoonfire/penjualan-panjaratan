@@ -15,58 +15,75 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Cache key based on request parameters
-        $cacheKey = 'products_index_' . md5(json_encode($request->all()));
+        // Optimized cache key with better performance
+        $cacheKey = 'products:' . md5(serialize([
+            'search' => $request->get('search'),
+            'category' => $request->get('category'),
+            'min_price' => $request->get('min_price'),
+            'max_price' => $request->get('max_price'),
+            'sort' => $request->get('sort', 'latest'),
+            'page' => $request->get('page', 1)
+        ]));
         
-        // Try to get from cache first (cache for 5 minutes)
         $result = cache()->remember($cacheKey, 300, function () use ($request) {
-            $query = Product::with(['category:id,categoryname', 'images:id,idproduct,imagepath', 'seller:id,username'])
+            $baseQuery = Product::query()
                 ->select(['id', 'productname', 'productprice', 'productstock', 'idcategories', 'iduserseller', 'created_at'])
                 ->where('is_active', true)
                 ->where('productstock', '>', 0);
 
-            // Search by product name
-            if ($request->filled('search')) {
-                $searchTerm = $request->search;
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('productname', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
+            // Apply filters first for better performance
+            if ($request->filled('category')) {
+                $baseQuery->where('idcategories', $request->category);
+            }
+            
+            if ($request->filled('min_price') || $request->filled('max_price')) {
+                $baseQuery->when($request->filled('min_price'), function ($q) use ($request) {
+                    return $q->where('productprice', '>=', $request->min_price);
+                })->when($request->filled('max_price'), function ($q) use ($request) {
+                    return $q->where('productprice', '<=', $request->max_price);
                 });
             }
 
-            // Filter by category
-            if ($request->filled('category')) {
-                $query->where('idcategories', $request->category);
+            // Search optimization
+            if ($request->filled('search')) {
+                $searchTerm = trim($request->search);
+                if (strlen($searchTerm) >= 2) {
+                    $baseQuery->where(function ($q) use ($searchTerm) {
+                        $q->where('productname', 'like', '%' . $searchTerm . '%');
+                        if (strlen($searchTerm) >= 3) {
+                            $q->orWhere('productdescription', 'like', '%' . $searchTerm . '%');
+                        }
+                    });
+                }
             }
             
-            // Filter by price range
-            if ($request->filled('min_price')) {
-                $query->where('productprice', '>=', $request->min_price);
-            }
-            if ($request->filled('max_price')) {
-                $query->where('productprice', '<=', $request->max_price);
-            }
-            
-            // Sort products
+            // Apply sorting
             $sortBy = $request->get('sort', 'latest');
             switch ($sortBy) {
                 case 'price_low':
-                    $query->orderBy('productprice', 'asc');
+                    $baseQuery->orderBy('productprice');
                     break;
                 case 'price_high':
-                    $query->orderBy('productprice', 'desc');
+                    $baseQuery->orderByDesc('productprice');
                     break;
                 case 'name':
-                    $query->orderBy('productname', 'asc');
+                    $baseQuery->orderBy('productname');
                     break;
                 case 'popular':
-                    $query->withSoldCount()->orderBy('sold_count', 'desc');
+                    $baseQuery->withSoldCount()->orderByDesc('sold_count');
                     break;
-                default: // latest
-                    $query->orderBy('created_at', 'desc');
+                default:
+                    $baseQuery->orderByDesc('created_at');
             }
 
-            return $query->paginate(12);
+            // Load relationships efficiently
+            return $baseQuery->with([
+                'category:id,categoryname',
+                'images:id,idproduct,imagepath' => function ($query) {
+                    $query->take(1); // Only first image for listing
+                },
+                'seller:id,username'
+            ])->paginate(12);
         });
 
         // Cache categories separately

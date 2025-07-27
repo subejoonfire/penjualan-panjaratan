@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -142,23 +143,79 @@ class Product extends Model
         $this->increment('view_count');
     }
 
-    // Helper method untuk mendapatkan jumlah terjual (dari orders yang delivered)
+    // Helper method untuk mendapatkan jumlah terjual (cached)
     public function getSoldCountAttribute()
     {
-        return $this->cartDetails()
-            ->whereHas('cart.order', function ($query) {
-                $query->where('status', 'delivered');
-            })
-            ->sum('quantity');
+        return cache()->remember("product_sold_count_{$this->id}", 1800, function () {
+            return $this->cartDetails()
+                ->whereHas('cart.order', function ($query) {
+                    $query->where('status', 'delivered');
+                })
+                ->sum('quantity');
+        });
     }
 
-    // Helper method untuk scope sold count
+    // Optimized scope untuk sold count dengan subquery
     public function scopeWithSoldCount($query)
     {
-        return $query->withSum(['cartDetails as sold_count' => function($q) {
-            $q->whereHas('cart.order', function($query) {
-                $query->where('status', 'delivered');
-            });
-        }], 'quantity');
+        return $query->addSelect([
+            'sold_count' => DB::table('cart_details')
+                ->select(DB::raw('COALESCE(SUM(quantity), 0)'))
+                ->join('carts', 'cart_details.idcart', '=', 'carts.id')
+                ->join('orders', 'carts.id', '=', 'orders.idcart')
+                ->whereColumn('cart_details.idproduct', 'products.id')
+                ->where('orders.status', 'delivered')
+        ]);
+    }
+
+    // Clear sold count cache
+    public function clearSoldCountCache()
+    {
+        cache()->forget("product_sold_count_{$this->id}");
+    }
+
+    // Optimized method untuk product dengan review stats
+    public function scopeWithReviewStats($query)
+    {
+        return $query->addSelect([
+            'avg_rating' => DB::table('product_reviews')
+                ->select(DB::raw('ROUND(AVG(rating), 1)'))
+                ->whereColumn('idproduct', 'products.id'),
+            'review_count' => DB::table('product_reviews')
+                ->select(DB::raw('COUNT(*)'))
+                ->whereColumn('idproduct', 'products.id')
+        ]);
+    }
+
+    // Helper untuk mendapatkan product stats efficiently
+    public function getStatsAttribute()
+    {
+        return cache()->remember("product_stats_{$this->id}", 3600, function () {
+            $stats = DB::table('product_reviews')
+                ->where('idproduct', $this->id)
+                ->selectRaw('
+                    COUNT(*) as review_count,
+                    ROUND(AVG(rating), 1) as avg_rating,
+                    SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as rating_5,
+                    SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as rating_4,
+                    SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as rating_3,
+                    SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as rating_2,
+                    SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as rating_1
+                ')
+                ->first();
+
+            return [
+                'sold_count' => $this->sold_count,
+                'review_count' => $stats->review_count ?? 0,
+                'avg_rating' => $stats->avg_rating ?? 0,
+                'rating_distribution' => [
+                    5 => $stats->rating_5 ?? 0,
+                    4 => $stats->rating_4 ?? 0,
+                    3 => $stats->rating_3 ?? 0,
+                    2 => $stats->rating_2 ?? 0,
+                    1 => $stats->rating_1 ?? 0,
+                ]
+            ];
+        });
     }
 }

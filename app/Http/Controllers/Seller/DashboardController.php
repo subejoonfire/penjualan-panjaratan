@@ -26,34 +26,63 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Seller statistics
-        $totalProducts = $user->products()->count();
-        $activeProducts = $user->products()->where('is_active', true)->count();
+        // Cache dashboard stats for 5 minutes
+        $cacheKey = "seller_dashboard_stats_{$user->id}";
+        $stats = cache()->remember($cacheKey, 300, function () use ($user) {
+            
+            // Get product statistics in one query
+            $productStats = $user->products()
+                ->selectRaw('
+                    COUNT(*) as total_products,
+                    SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_products,
+                    SUM(productstock) as total_stock,
+                    SUM(CASE WHEN productstock = 0 THEN 1 ELSE 0 END) as out_of_stock
+                ')
+                ->first();
 
-        $totalOrders = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
-            $query->where('iduserseller', $user->id);
-        })->count();
+            // Get order statistics efficiently with subquery
+            $orderStats = DB::table('orders')
+                ->join('carts', 'orders.idcart', '=', 'carts.id')
+                ->join('cart_details', 'carts.id', '=', 'cart_details.idcart')
+                ->join('products', 'cart_details.idproduct', '=', 'products.id')
+                ->where('products.iduserseller', $user->id)
+                ->selectRaw('
+                    COUNT(DISTINCT orders.id) as total_orders,
+                    SUM(CASE WHEN orders.status = "pending" THEN 1 ELSE 0 END) as pending_orders,
+                    SUM(CASE WHEN orders.status = "delivered" THEN 1 ELSE 0 END) as delivered_orders
+                ')
+                ->first();
 
-        // Calculate total revenue from delivered orders with paid transactions
-        $totalRevenue = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
-            $query->where('iduserseller', $user->id);
-        })
-        ->whereHas('transaction', function ($query) {
-            $query->where('transactionstatus', 'paid');
-        })
-        ->where('status', 'delivered')
-        ->get()
-        ->sum(function ($order) use ($user) {
-            return $order->cart->cartDetails
-                ->where('product.iduserseller', $user->id)
-                ->sum(function ($item) {
-                    return $item->quantity * $item->productprice;
-                });
+            // Calculate revenue efficiently
+            $revenueQuery = DB::table('orders')
+                ->join('carts', 'orders.idcart', '=', 'carts.id')
+                ->join('cart_details', 'carts.id', '=', 'cart_details.idcart')
+                ->join('products', 'cart_details.idproduct', '=', 'products.id')
+                ->leftJoin('transactions', 'orders.id', '=', 'transactions.idorder')
+                ->where('products.iduserseller', $user->id)
+                ->where('orders.status', 'delivered')
+                ->where('transactions.transactionstatus', 'paid')
+                ->selectRaw('SUM(cart_details.quantity * cart_details.productprice) as total_revenue')
+                ->first();
+
+            return [
+                'total_products' => $productStats->total_products ?? 0,
+                'active_products' => $productStats->active_products ?? 0,
+                'total_stock' => $productStats->total_stock ?? 0,
+                'out_of_stock' => $productStats->out_of_stock ?? 0,
+                'total_orders' => $orderStats->total_orders ?? 0,
+                'pending_orders' => $orderStats->pending_orders ?? 0,
+                'delivered_orders' => $orderStats->delivered_orders ?? 0,
+                'total_revenue' => $revenueQuery->total_revenue ?? 0,
+            ];
         });
 
-        $pendingOrders = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
-            $query->where('iduserseller', $user->id);
-        })->where('status', 'pending')->count();
+        // Extract individual variables for backward compatibility
+        $totalProducts = $stats['total_products'];
+        $activeProducts = $stats['active_products'];
+        $totalOrders = $stats['total_orders'];
+        $totalRevenue = $stats['total_revenue'];
+        $pendingOrders = $stats['pending_orders'];
 
         // Recent orders for seller's products
         $recentOrders = Order::with(['cart.user', 'cart.cartDetails.product', 'transaction'])
