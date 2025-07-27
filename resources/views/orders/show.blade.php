@@ -3,7 +3,8 @@
 @section('title', 'Detail Pesanan #' . $order->order_number . ' - Penjualan Panjaratan')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -204,6 +205,7 @@
                 @endif
             </div>
         </div>
+    </div>
     </div>
 </div>
 @endsection

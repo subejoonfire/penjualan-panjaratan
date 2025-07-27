@@ -3,8 +3,8 @@
 @section('title', 'Laporan Penjualan - Penjualan Panjaratan')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <div class="w-full px-4 sm:px-6 lg:px-8">
+<div class="py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-center">
