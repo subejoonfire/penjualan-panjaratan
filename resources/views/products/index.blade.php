@@ -208,7 +208,7 @@
                 @if($products->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     @foreach($products as $product)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group flex flex-col h-full">
                         <!-- Product Image -->
                         <div class="aspect-w-1 aspect-h-1 relative">
                             <a href="{{ route('products.show', $product) }}">
@@ -222,83 +222,52 @@
                                 </div>
                                 @endif
                             </a>
-
-                            <!-- Quick Actions -->
-                            @auth
-                            @if(auth()->user()->isCustomer())
-                            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <form action="{{ route('customer.cart.add', $product) }}" method="POST"
-                                    class="inline-block">
-                                    @csrf
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit"
-                                        class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        title="Tambah ke Keranjang">
-                                        <i class="fas fa-shopping-cart text-sm"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            @endif
-                            @endauth
                         </div>
-
-                        <!-- Product Details -->
-                        <div class="p-4">
-                            <h3 class="text-lg font-medium text-gray-900 mb-2 truncate">
-                                <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
-                                    {{ $product->productname }}
-                                </a>
-                            </h3>
-
-                            <p class="text-sm text-gray-600 mb-2">{{ $product->category->category }}</p>
-                            <p class="text-sm text-gray-500 mb-3">oleh {{ $product->seller->nickname ?? $product->seller->username }}</p>
-
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-lg font-bold text-blue-600">Rp {{
-                                    number_format($product->productprice)
-                                    }}</span>
-                                <span class="text-sm text-gray-500">Stok: {{ $product->productstock }}</span>
+                        <!-- Product Details & Actions -->
+                        <div class="flex flex-col flex-1 justify-between p-4">
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-900 mb-1 truncate">
+                                    <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
+                                        {{ $product->productname }}
+                                    </a>
+                                </h3>
+                                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
+                                <p class="text-xs text-gray-500 mb-3">
+                                    @php
+                                        $desc = strip_tags($product->productdesc);
+                                        $words = str_word_count($desc, 2);
+                                        $wordKeys = array_keys($words);
+                                        if(count($words) > 30) {
+                                            $desc = substr($desc, 0, $wordKeys[30]) . '...';
+                                        }
+                                    @endphp
+                                    {{ $desc }}
+                                </p>
                             </div>
-
-                            <!-- Rating & Reviews -->
-                            @if($product->reviews->count() > 0)
-                            @php
-                            $avgRating = $product->reviews->avg('rating');
-                            @endphp
-                            <div class="flex items-center mb-3">
-                                <div class="flex items-center">
-                                    @for($i = 1; $i <= 5; $i++) <i
-                                        class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}">
-                                        </i>
-                                        @endfor
+                            <div class="flex flex-col gap-2 mt-2">
+                                <div class="flex gap-2 w-full">
+                                    <a href="{{ route('products.show', $product) }}"
+                                        class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-xs font-medium hover:bg-gray-200 text-center">
+                                        Detail
+                                    </a>
+                                    @auth
+                                    @if(auth()->user()->isCustomer() && $product->productstock > 0)
+                                    <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1">
+                                        @csrf
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit"
+                                            class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                    @else
+                                    <a href="{{ route('login') }}"
+                                        class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 text-center">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </a>
+                                    @endauth
                                 </div>
-                                <span class="ml-2 text-sm text-gray-600">({{ $product->reviews->count() }})</span>
-                            </div>
-                            @endif
-
-                            <!-- Actions -->
-                            <div class="flex space-x-2">
-                                <a href="{{ route('products.show', $product) }}"
-                                    class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200 text-center">
-                                    Lihat Detail
-                                </a>
-                                @auth
-                                @if(auth()->user()->isCustomer() && $product->productstock > 0)
-                                <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit"
-                                        class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-                                        Tambah ke Keranjang
-                                    </button>
-                                </form>
-                                @endif
-                                @else
-                                <a href="{{ route('login') }}"
-                                    class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center">
-                                    Masuk untuk Beli
-                                </a>
-                                @endauth
                             </div>
                         </div>
                     </div>
