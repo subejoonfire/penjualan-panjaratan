@@ -218,23 +218,20 @@
                             <img src="{{ url('storage/' . $image->image) }}" alt="Gambar Produk"
                                 class="w-full h-32 object-cover rounded-lg border border-gray-200">
                             @if($image->is_primary)
-                            <span
-                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded z-10 image-overlay-button">Utama</span>
+                            <button type="button" disabled
+                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded z-10 image-overlay-button cursor-default">
+                                Utama
+                            </button>
                             @else
                             <button type="button" onclick="setPrimaryImage({{ $image->id }})"
                                 class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 Jadikan Utama
                             </button>
                             @endif
-                            <form action="{{ route('seller.products.images.delete', $image) }}" method="POST" 
-                                style="display: inline;" id="deleteImageForm{{ $image->id }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" onclick="confirmDeleteImage({{ $image->id }})" 
-                                    class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    Hapus
-                                </button>
-                            </form>
+                            <button type="button" onclick="confirmDeleteImage({{ $image->id }})" 
+                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-red-500">
+                                Hapus
+                            </button>
                         </div>
                         @endforeach
                     </div>
@@ -332,7 +329,35 @@
 
     function confirmDeleteImage(imageId) {
         confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
-            document.getElementById('deleteImageForm' + imageId).submit();
+            // Create a form dynamically to submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/seller/products/images/${imageId}`;
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            // Add method field for DELETE
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+            
+            console.log('Deleting image with form action:', form.action);
+            console.log('Delete form method:', form.method);
+            
+            // Submit the form
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Show loading indicator
+            showAlert('Menghapus gambar...', 'info');
         });
     }
 
@@ -367,56 +392,58 @@
         });
     }
 
-    // Debug form submission
+    // Form submission handling
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form[action*="products"][action*="update"]');
-        console.log('Form found:', form);
+        console.log('Main form found:', form);
         
         if (form) {
+            console.log('Form action:', form.action);
+            console.log('Form method:', form.method);
+            
             form.addEventListener('submit', function(e) {
-                console.log('Form is being submitted');
+                console.log('Main form is being submitted');
+                console.log('Form action at submit:', this.action);
+                console.log('Form method at submit:', this.method);
+                
+                // Check for method override
+                const methodInput = this.querySelector('input[name="_method"]');
+                console.log('Method override:', methodInput ? methodInput.value : 'none');
                 
                 // Basic validation
-                const productName = document.getElementById('productname').value.trim();
-                const productPrice = document.getElementById('productprice').value;
-                const productStock = document.getElementById('productstock').value;
-                const category = document.getElementById('idcategories').value;
+                const productName = document.getElementById('productname');
+                const productPrice = document.getElementById('productprice');
+                const productStock = document.getElementById('productstock');
+                const category = document.getElementById('idcategories');
                 
-                console.log('Validation data:', {
-                    productName, 
-                    productPrice, 
-                    productStock, 
-                    category
-                });
-                
-                if (!productName) {
+                if (!productName || !productName.value.trim()) {
                     e.preventDefault();
                     showAlert('Nama produk harus diisi', 'error');
                     return false;
                 }
                 
-                if (!productPrice || parseFloat(productPrice) <= 0) {
+                if (!productPrice || !productPrice.value || parseFloat(productPrice.value) <= 0) {
                     e.preventDefault();
                     showAlert('Harga produk harus diisi dan lebih dari 0', 'error');
                     return false;
                 }
                 
-                if (productStock === '' || parseInt(productStock) < 0) {
+                if (!productStock || productStock.value === '' || parseInt(productStock.value) < 0) {
                     e.preventDefault();
                     showAlert('Stok produk harus diisi dan tidak boleh negatif', 'error');
                     return false;
                 }
                 
-                if (!category) {
+                if (!category || !category.value) {
                     e.preventDefault();
                     showAlert('Kategori harus dipilih', 'error');
                     return false;
                 }
                 
-                console.log('Form validation passed, submitting...');
+                console.log('Form validation passed, allowing submission...');
                 
                 // Show loading state
-                const submitBtn = form.querySelector('button[type="submit"]');
+                const submitBtn = this.querySelector('button[type="submit"]');
                 if (submitBtn) {
                     const originalText = submitBtn.innerHTML;
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
@@ -434,6 +461,9 @@
                 return true; // Allow form submission
             });
         }
+        
+        // Log info about dynamic forms
+        console.log('Using dynamic forms for image operations to prevent conflicts');
     });
 </script>
 @endsection
