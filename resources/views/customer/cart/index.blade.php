@@ -7,7 +7,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Keranjang Belanja</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Keranjang Belanja</h1>
             <p class="mt-2 text-gray-600">Tinjau item Anda sebelum checkout</p>
         </div>
 
@@ -35,16 +35,89 @@
 
                     <div class="divide-y divide-gray-200">
                         @foreach($cartDetails as $detail)
-                        <div class="px-2 py-4 sm:px-4 sm:py-6">
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                        <div class="p-4">
+                            <!-- Mobile Layout -->
+                            <div class="block sm:hidden">
+                                <div class="flex items-start space-x-3">
+                                    <!-- Product Image -->
+                                    <div class="flex-shrink-0">
+                                        @if($detail->product->images->count() > 0)
+                                        <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}"
+                                            alt="{{ $detail->product->productname }}"
+                                            class="w-16 h-16 rounded-lg object-cover">
+                                        @else
+                                        <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-image text-gray-400 text-lg"></i>
+                                        </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Product Details -->
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-sm font-medium text-gray-900 mb-1">
+                                            <a href="{{ route('products.show', $detail->product) }}"
+                                                class="hover:text-blue-600">
+                                                {{ Str::limit($detail->product->productname, 40) }}
+                                            </a>
+                                        </h4>
+                                        <p class="text-xs text-gray-600">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
+                                        <p class="text-xs text-gray-500">{{ $detail->product->category->category }}</p>
+                                        
+                                        <div class="mt-2 flex items-center justify-between">
+                                            <span class="text-sm font-bold text-blue-600">
+                                                Rp {{ number_format($detail->productprice) }}
+                                            </span>
+                                            @if($detail->product->productstock < $detail->quantity)
+                                                <span class="text-xs text-red-600 font-medium">
+                                                    Stok habis
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Quantity & Actions -->
+                                        <div class="mt-3 flex items-center justify-between">
+                                            <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
+                                                class="flex items-center space-x-2">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="button" onclick="decreaseQuantity(this)"
+                                                    class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
+                                                    <i class="fas fa-minus text-xs"></i>
+                                                </button>
+                                                <input type="number" name="quantity" value="{{ $detail->quantity }}" min="1"
+                                                    max="{{ $detail->product->productstock }}"
+                                                    class="w-12 text-center border-gray-300 rounded text-sm"
+                                                    onchange="this.form.submit()">
+                                                <button type="button" onclick="increaseQuantity(this)"
+                                                    class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
+                                                    <i class="fas fa-plus text-xs"></i>
+                                                </button>
+                                            </form>
+                                            
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-sm font-medium text-gray-900">
+                                                    Rp {{ number_format($detail->quantity * $detail->productprice) }}
+                                                </span>
+                                                <button type="button" class="text-red-600 hover:text-red-700 p-1"
+                                                    onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Desktop Layout -->
+                            <div class="hidden sm:flex sm:items-center gap-4">
                                 <!-- Product Image -->
-                                <div class="flex-shrink-0 mx-auto sm:mx-0">
+                                <div class="flex-shrink-0">
                                     @if($detail->product->images->count() > 0)
                                     <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}"
                                         alt="{{ $detail->product->productname }}"
-                                        class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover">
+                                        class="w-24 h-24 rounded-lg object-cover">
                                     @else
-                                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-image text-gray-400 text-xl"></i>
                                     </div>
                                     @endif
@@ -52,21 +125,21 @@
 
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="text-sm sm:text-lg font-medium text-gray-900 truncate">
+                                    <h4 class="text-lg font-medium text-gray-900 truncate">
                                         <a href="{{ route('products.show', $detail->product) }}"
                                             class="hover:text-blue-600">
                                             {{ $detail->product->productname }}
                                         </a>
                                     </h4>
-                                    <p class="text-xs sm:text-sm text-gray-600 truncate">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
-                                    <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $detail->product->category->category }}</p>
+                                    <p class="text-sm text-gray-600 truncate">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
+                                    <p class="text-sm text-gray-500 truncate">{{ $detail->product->category->category }}</p>
 
-                                    <div class="mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
-                                        <span class="text-base sm:text-lg font-bold text-blue-600">
+                                    <div class="mt-2 flex flex-row items-center gap-4">
+                                        <span class="text-lg font-bold text-blue-600">
                                             Rp {{ number_format($detail->productprice) }}
                                         </span>
                                         @if($detail->product->productstock < $detail->quantity)
-                                            <span class="text-xs sm:text-sm text-red-600 font-medium">
+                                            <span class="text-sm text-red-600 font-medium">
                                                 Stok tidak mencukupi (Tersedia: {{ $detail->product->productstock }})
                                             </span>
                                         @endif
@@ -74,43 +147,44 @@
                                 </div>
 
                                 <!-- Quantity Controls & Subtotal -->
-                                <div class="flex flex-row sm:flex-col items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
+                                <div class="flex flex-col items-center gap-3">
                                     <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
-                                        class="flex items-center gap-1 sm:gap-2">
+                                        class="flex items-center gap-2">
                                         @csrf
                                         @method('PUT')
                                         <button type="button" onclick="decreaseQuantity(this)"
-                                            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 text-lg">
+                                            class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                             <i class="fas fa-minus"></i>
                                         </button>
                                         <input type="number" name="quantity" value="{{ $detail->quantity }}" min="1"
                                             max="{{ $detail->product->productstock }}"
-                                            class="w-10 sm:w-14 text-center border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-base"
+                                            class="w-14 text-center border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500"
                                             onchange="this.form.submit()">
                                         <button type="button" onclick="increaseQuantity(this)"
-                                            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 text-lg">
+                                            class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                             <i class="fas fa-plus"></i>
                                         </button>
                                     </form>
                                     <div class="text-right min-w-[80px]">
-                                        <p class="text-xs sm:text-lg font-medium text-gray-900">
+                                        <p class="text-lg font-medium text-gray-900">
                                             Rp {{ number_format($detail->quantity * $detail->productprice) }}
                                         </p>
                                     </div>
                                 </div>
 
                                 <!-- Remove Button -->
-                                <div class="flex justify-end sm:block mt-2 sm:mt-0">
+                                <div class="flex justify-end">
                                     <button type="button" class="text-red-600 hover:text-red-700 p-2"
                                         onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <form id="removeItemForm{{ $detail->id }}" action="{{ route('customer.cart.remove', $detail) }}" method="POST" class="hidden">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
                                 </div>
                             </div>
+
+                            <form id="removeItemForm{{ $detail->id }}" action="{{ route('customer.cart.remove', $detail) }}" method="POST" class="hidden">
+                                @csrf
+                                @method('DELETE')
+                            </form>
                         </div>
                         @endforeach
                     </div>

@@ -75,32 +75,24 @@
                     </div>
                 </div>
 
-                <!-- Role Selection -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        Saya ingin mendaftar sebagai
-                    </label>
-                    <div class="mt-2 space-y-2">
-                        <div class="flex items-center">
-                            <input id="role_customer" name="role" type="radio" value="customer" 
-                                   {{ old('role', 'customer') === 'customer' ? 'checked' : '' }}
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <label for="role_customer" class="ml-3 block text-sm font-medium text-gray-700">
-                                Pembeli - Membeli produk dari penjual
-                            </label>
+                <!-- Hidden Role Field (Customer Only) -->
+                <input type="hidden" name="role" value="customer">
+
+                <!-- Role Information -->
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
                         </div>
-                        <div class="flex items-center">
-                            <input id="role_seller" name="role" type="radio" value="seller"
-                                   {{ old('role') === 'seller' ? 'checked' : '' }}
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <label for="role_seller" class="ml-3 block text-sm font-medium text-gray-700">
-                                Penjual - Menjual produk kepada pembeli
-                            </label>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">
+                                Pendaftaran Pembeli
+                            </h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <p>Anda akan mendaftar sebagai pembeli. Jika ingin menjadi penjual, silakan hubungi administrator setelah registrasi.</p>
+                            </div>
                         </div>
                     </div>
-                    @error('role')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
                 </div>
 
                 <!-- Phone (Optional) -->
@@ -155,7 +147,7 @@
 
                 <div class="mt-6">
                     <a href="{{ route('login') }}"
-                       class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                       class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Masuk ke akun Anda
                     </a>
                 </div>

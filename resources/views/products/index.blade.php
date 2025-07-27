@@ -206,24 +206,34 @@
 
                 <!-- Products Grid -->
                 @if($products->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
                     @foreach($products as $product)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group flex flex-col h-full">
+                    <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
                         <!-- Product Image -->
-                        <div class="aspect-w-1 aspect-h-1 relative">
+                        <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
                             <a href="{{ route('products.show', $product) }}">
                                 @if($product->images->count() > 0)
                                 <img src="{{ asset('storage/' . $product->images->first()->image) }}"
                                     alt="{{ $product->productname }}"
-                                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                                    class="w-full h-48 object-cover">
                                 @else
-                                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                                    <i class="fas fa-image text-gray-400 text-3xl"></i>
+                                <div class="w-full h-48 flex items-center justify-center">
+                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
                                 </div>
                                 @endif
                             </a>
+                            <!-- Stock Status -->
+                            @if($product->productstock <= 0)
+                            <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                                Habis
+                            </div>
+                            @elseif($product->productstock <= 10)
+                            <div class="absolute top-2 left-2 bg-yellow-600 text-white text-xs px-2 py-1 rounded">
+                                Stok Terbatas
+                            </div>
+                            @endif
                         </div>
-                        <!-- Product Details & Actions -->
+                        <!-- Product Info & Actions -->
                         <div class="flex flex-col flex-1 justify-between p-4">
                             <div>
                                 <h3 class="text-base font-semibold text-gray-900 mb-1 truncate">
@@ -243,6 +253,11 @@
                                     @endphp
                                     {{ $desc }}
                                 </p>
+                                <div class="mb-3">
+                                    <span class="text-lg font-bold text-blue-600">
+                                        Rp {{ number_format($product->productprice) }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="flex flex-col gap-2 mt-2">
                                 <div class="flex gap-2 w-full">
@@ -252,7 +267,7 @@
                                     </a>
                                     @auth
                                     @if(auth()->user()->isCustomer() && $product->productstock > 0)
-                                    <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1">
+                                    <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1 add-to-cart-form">
                                         @csrf
                                         <input type="hidden" name="quantity" value="1">
                                         <button type="submit"
@@ -260,10 +275,15 @@
                                             <i class="fas fa-shopping-cart"></i>
                                         </button>
                                     </form>
+                                    @else
+                                    <button disabled 
+                                        class="w-full bg-gray-400 text-white px-3 py-2 rounded-md cursor-not-allowed text-xs flex items-center justify-center">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
                                     @endif
                                     @else
                                     <a href="{{ route('login') }}"
-                                        class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 text-center">
+                                        class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 text-center flex items-center justify-center">
                                         <i class="fas fa-shopping-cart"></i>
                                     </a>
                                     @endauth
@@ -324,6 +344,52 @@
         if (filterButton) {
             // Filter functionality is handled by Alpine.js x-data="{ filterOpen: true }"
         }
+    });
+
+    // Handle add to cart forms
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const button = this.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    button.classList.add('bg-green-600');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-600');
+                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Terjadi kesalahan', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        });
     });
 </script>
 @endsection
