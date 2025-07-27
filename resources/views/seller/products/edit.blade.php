@@ -477,7 +477,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         // Show errors if any
         if (errors.length > 0) {
-            showAlert(errors, 'error');
+            const uniqueErrors = [...new Set(errors)];
+            showAlert(uniqueErrors, 'error');
             return;
         }
         // Add valid files
