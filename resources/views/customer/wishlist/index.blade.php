@@ -16,7 +16,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
             @foreach($wishlists as $wishlist)
             @php $product = $wishlist->product; @endphp
-            <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
                 <!-- Product Image -->
                 <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
                     @if($product->images->count() > 0)
@@ -27,13 +27,11 @@
                         <i class="fas fa-image text-gray-400 text-2xl"></i>
                     </div>
                     @endif
-                    
                     <!-- Remove from Wishlist Button -->
                     <button onclick="removeFromWishlist({{ $product->id }})" 
                         class="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
                         <i class="fas fa-heart text-sm"></i>
                     </button>
-                    
                     <!-- Stock Status -->
                     @if($product->productstock <= 0)
                     <div class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
@@ -45,50 +43,50 @@
                     </div>
                     @endif
                 </div>
-                
-                <!-- Product Info -->
-                <div class="p-4">
-                    <h3 class="text-sm font-medium text-gray-900 truncate mb-2">
-                        <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
-                            {{ $product->productname }}
-                        </a>
-                    </h3>
-                    
-                    <p class="text-lg font-bold text-blue-600 mb-2">
-                        Rp {{ number_format($product->productprice) }}
-                    </p>
-                    
-                    <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
-                        <span>{{ $product->seller->nickname ?? $product->seller->username }}</span>
-                        <span>{{ $product->category->category }}</span>
+                <!-- Product Info & Actions -->
+                <div class="flex flex-col flex-1 justify-between p-4">
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-900 mb-1 truncate">
+                            <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
+                                {{ $product->productname }}
+                            </a>
+                        </h3>
+                        <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
+                        <p class="text-xs text-gray-500 mb-3">
+                            @php
+                                $desc = strip_tags($product->productdesc);
+                                $words = str_word_count($desc, 2);
+                                $wordKeys = array_keys($words);
+                                if(count($words) > 30) {
+                                    $desc = substr($desc, 0, $wordKeys[30]) . '...';
+                                }
+                            @endphp
+                            {{ $desc }}
+                        </p>
                     </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="space-y-2">
-                        @if($product->productstock > 0)
-                        <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="add-to-cart-form">
-                            @csrf
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" 
-                                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm">
-                                <i class="fas fa-shopping-cart mr-2"></i>
-                                Tambah ke Keranjang
+                    <div class="flex flex-col gap-2 mt-2">
+                        <div class="flex gap-2 w-full">
+                            <a href="{{ route('products.show', $product) }}" 
+                                class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-xs font-medium hover:bg-gray-200 text-center">
+                                Detail
+                            </a>
+                            @if($product->productstock > 0)
+                            <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1 add-to-cart-form">
+                                @csrf
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" 
+                                    class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </form>
+                            @else
+                            <button disabled 
+                                class="w-full bg-gray-400 text-white px-3 py-2 rounded-md cursor-not-allowed text-xs flex items-center justify-center">
+                                <i class="fas fa-shopping-cart"></i>
                             </button>
-                        </form>
-                        @else
-                        <button disabled 
-                            class="w-full bg-gray-400 text-white py-2 px-4 rounded-md cursor-not-allowed text-sm">
-                            Stok Habis
-                        </button>
-                        @endif
-                        
-                        <a href="{{ route('products.show', $product) }}" 
-                            class="block w-full text-center border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors text-sm">
-                            Lihat Detail
-                        </a>
+                            @endif
+                        </div>
                     </div>
-                    
-                    <!-- Added to Wishlist Date -->
                     <p class="text-xs text-gray-500 mt-3">
                         Ditambahkan {{ $wishlist->created_at->diffForHumans() }}
                     </p>
