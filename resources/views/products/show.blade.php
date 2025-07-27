@@ -243,11 +243,11 @@
             <div class="p-6">
                 <div class="grid grid-cols-3 gap-6">
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900">{{ $product->views ?? 0 }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ $product->view_count ?? 0 }}</div>
                         <div class="text-sm text-gray-500">Dilihat</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900">{{ $product->sold ?? 0 }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ $product->sold_count ?? 0 }}</div>
                         <div class="text-sm text-gray-500">Terjual</div>
                     </div>
                     <div class="text-center">
