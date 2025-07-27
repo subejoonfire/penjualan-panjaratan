@@ -137,9 +137,18 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
             ];
         });
         
+        // Get cart count for customer
+        $cart_count = 0;
+        if ($user->isCustomer()) {
+            $cart = $user->activeCart;
+            if ($cart) {
+                $cart_count = $cart->cartDetails()->count();
+            }
+        }
         return response()->json([
             'count' => $user->unread_notification_count,
-            'notifications' => $notifications
+            'notifications' => $notifications,
+            'cart_count' => $cart_count
         ]);
     })->name('notifications.unread');
     

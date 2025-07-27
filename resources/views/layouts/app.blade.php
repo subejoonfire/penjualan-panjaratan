@@ -377,10 +377,23 @@
                         const notificationCount = document.querySelector('.notification-count');
                         if (notificationCount) {
                             notificationCount.textContent = data.count;
-                            notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                            notificationCount.style.display = 'flex';
+                        }
+                        // Cart count update (if needed)
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount && data.cart_count !== undefined) {
+                            cartCount.textContent = data.cart_count;
+                            cartCount.style.display = 'flex';
                         }
                     })
-                    .catch(error => console.error('Error loading notification count:', error));
+                    .catch(error => {
+                        const notificationCount = document.querySelector('.notification-count');
+                        if (notificationCount) {
+                            notificationCount.textContent = '!';
+                            notificationCount.style.display = 'flex';
+                        }
+                        console.error('Error loading notification count:', error);
+                    });
             }
 
             // Load notifications when dropdown is opened
@@ -460,16 +473,16 @@
                                     `;
                                 }).join('');
                             } else {
-                                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
+                                notificationList.innerHTML = '<div class="px-4 py-6 text-center text-gray-500 text-sm">Tidak ada notifikasi</div>';
                             }
                         }
                     })
                     .catch(error => {
-                        console.error('Error loading notifications:', error);
                         const notificationList = document.getElementById('notificationList');
                         if (notificationList) {
-                            notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
+                            notificationList.innerHTML = '<div class="px-4 py-6 text-center text-red-500 text-sm">Gagal memuat notifikasi</div>';
                         }
+                        console.error('Error loading notifications:', error);
                     });
             }
 

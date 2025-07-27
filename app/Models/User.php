@@ -123,7 +123,7 @@ class User extends Authenticatable
     /**
      * Get recent notifications for navbar/dropdown
      */
-    public function getRecentNotifications($limit = 5)
+    public function getRecentNotifications($limit = 20)
     {
         return $this->notifications()
             ->latest()
