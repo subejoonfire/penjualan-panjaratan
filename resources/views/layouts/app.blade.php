@@ -26,9 +26,74 @@
 
 <body class="bg-gray-50 font-sans antialiased">
     <div class="min-h-screen flex flex-col">
-        <!-- Navigation -->
         @auth
-        <nav class="bg-white shadow-lg border-b border-gray-200">
+        <!-- Mobile Nav Bar -->
+        <nav class="mobile-nav-bar" style="display:none">
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                </a>
+                <a href="{{ route('admin.products.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i>
+                </a>
+                <a href="{{ route('admin.categories.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                    <i class="fas fa-list"></i>
+                </a>
+                <a href="{{ route('admin.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="{{ route('admin.transactions.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
+                    <i class="fas fa-credit-card"></i>
+                </a>
+            @elseif(auth()->user()->isSeller())
+                <a href="{{ route('seller.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <a href="{{ route('seller.products.index') }}" class="mobile-nav-item {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i>
+                </a>
+                <a href="{{ route('seller.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('seller.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="{{ route('seller.sales') }}" class="mobile-nav-item {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line"></i>
+                </a>
+                <a href="{{ route('seller.transactions.index') }}" class="mobile-nav-item {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}">
+                    <i class="fas fa-credit-card"></i>
+                </a>
+            @elseif(auth()->user()->isCustomer())
+                <a href="{{ route('customer.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <a href="{{ route('products.index') }}" class="mobile-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-bag"></i>
+                </a>
+                <a href="{{ route('customer.wishlist.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="{{ route('customer.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-list-alt"></i>
+                </a>
+            @endif
+            <!-- Notifikasi & Cart -->
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
+                <i class="fas fa-bell"></i>
+            </a>
+            @if(auth()->user()->isCustomer())
+            <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            @endif
+            <!-- Profile -->
+            <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+            </a>
+        </nav>
+        <!-- Desktop Nav -->
+        <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
             <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
                 <div class="flex justify-between h-16">
                     <!-- Logo & Brand -->
@@ -448,34 +513,67 @@
         .nav-link.active {
             @apply text-blue-600 bg-blue-50;
         }
-        /* Prevent horizontal scrolling */
         body {
             overflow-x: hidden;
         }
-        /* Hamburger menu for mobile */
-        .mobile-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 1rem 0;
-        }
+        /* Mobile nav bar */
         @media (max-width: 768px) {
-            .md\:flex {
+            .mobile-nav-bar {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 0.5rem;
+                background: #fff;
+                border-bottom: 1px solid #e5e7eb;
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+                box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+            }
+            .mobile-nav-bar::-webkit-scrollbar {
+                display: none;
+            }
+            .mobile-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-width: 48px;
+                min-height: 48px;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.5rem;
+                color: #64748b;
+                font-size: 1.25rem;
+                background: none;
+                border: none;
+            }
+            .mobile-nav-item.active {
+                background: #e0e7ff;
+                color: #2563eb;
+            }
+            .mobile-nav-label {
+                display: none;
+            }
+            .desktop-nav {
                 display: none !important;
             }
-            .mobile-nav-toggle {
-                display: block !important;
+            .mobile-nav-bar {
+                display: flex !important;
             }
-            .mobile-nav-menu {
-                display: block !important;
+            .text-3xl, .text-2xl, .text-xl, .text-lg {
+                font-size: 1rem !important;
+            }
+            .text-base, .text-md, .text-sm {
+                font-size: 0.9rem !important;
             }
         }
-        @media (min-width: 768px) {
-            .mobile-nav-toggle {
+        @media (min-width: 769px) {
+            .mobile-nav-bar {
                 display: none !important;
             }
-            .mobile-nav-menu {
-                display: none !important;
+            .desktop-nav {
+                display: flex !important;
             }
         }
     </style>
