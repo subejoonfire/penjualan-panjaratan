@@ -319,9 +319,8 @@
                         </label>
 
                         <!-- File Upload Area -->
-                        <div
-                            class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
-                            <div class="text-center">
+                        <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                            <div id="dropContent" class="text-center">
                                 <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
                                 <div class="flex text-sm text-gray-600 justify-center">
                                     <label for="images"
