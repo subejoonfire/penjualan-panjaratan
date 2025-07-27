@@ -60,7 +60,13 @@ function showModalNotification(options = {}) {
     
     // Set content
     title.textContent = config.title;
-    message.textContent = config.message;
+    // Support array or string, always use textContent (never innerHTML)
+    if (Array.isArray(config.message)) {
+        message.textContent = config.message.join('\n');
+    } else {
+        // Replace <br> and <br/> with newlines for plain text display
+        message.textContent = String(config.message).replace(/<br\s*\/?>/gi, '\n');
+    }
     confirmBtn.textContent = config.confirmText;
     cancelBtn.textContent = config.cancelText;
     
@@ -133,10 +139,15 @@ function confirmAction(message, onConfirm, onCancel = null) {
 }
 
 function showAlert(message, type = 'info') {
+    // If message is a string with <br>, convert to array for multi-line
+    let msg = message;
+    if (typeof message === 'string' && message.includes('<br')) {
+        msg = message.split(/<br\s*\/?>/gi);
+    }
     showModalNotification({
         type: type,
         title: type === 'success' ? 'Berhasil' : type === 'error' ? 'Error' : 'Informasi',
-        message: message,
+        message: msg,
         confirmText: 'OK',
         showCancel: false,
         onConfirm: () => hideModalNotification()
