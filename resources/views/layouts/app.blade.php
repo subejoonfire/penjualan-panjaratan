@@ -373,6 +373,7 @@
                 fetch('{{ route('api.notifications.unread') }}')
                     .then(response => response.json())
                     .then(data => {
+                        console.log('NotifCount API data:', data);
                         const notificationCount = document.querySelector('.notification-count');
                         if (notificationCount) {
                             notificationCount.textContent = data.count;
@@ -400,6 +401,7 @@
                 fetch('{{ route('api.notifications.unread') }}')
                     .then(response => response.json())
                     .then(data => {
+                        console.log('NotifDropdown API data:', data);
                         const notificationList = document.getElementById('notificationList');
                         if (notificationList) {
                             if (data.notifications && data.notifications.length > 0) {
@@ -745,6 +747,9 @@
             .desktop-nav {
                 display: flex !important;
             }
+        }
+        .notification-count {
+            display: flex !important;
         }
     </style>
 </body>
