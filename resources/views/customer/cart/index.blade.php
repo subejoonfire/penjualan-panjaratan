@@ -35,8 +35,8 @@
 
                     <div class="divide-y divide-gray-200">
                         @foreach($cartDetails as $detail)
-                        <div class="px-2 py-4 sm:px-4 sm:py-6 relative group">
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                        <div class="px-2 py-4 sm:px-6 sm:py-6 relative group">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0 mx-auto sm:mx-0">
                                     @if($detail->product->images->count() > 0)
@@ -71,7 +71,7 @@
                                     </div>
                                 </div>
                                 <!-- Quantity Controls & Subtotal -->
-                                <div class="flex flex-row sm:flex-col items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
+                                <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-2 sm:mt-0 min-w-[120px] sm:min-w-[180px]">
                                     <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
                                         class="flex items-center gap-1 sm:gap-2">
                                         @csrf
