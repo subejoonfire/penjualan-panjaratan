@@ -477,14 +477,25 @@
                     status: newStatus
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            .then(async response => {
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = null;
+                }
+                if (response.ok && data && data.success) {
                     closeStatusModal();
                     showAlert('Status pesanan berhasil diupdate', 'success');
                     setTimeout(() => location.reload(), 1200);
+                } else if (response.status === 422 && data && data.errors) {
+                    // Laravel validation error
+                    const errors = Object.values(data.errors).flat();
+                    showAlert(errors, 'error');
+                } else if (data && data.message) {
+                    showAlert(data.message, 'error');
                 } else {
-                    showAlert(data.message || 'Gagal mengupdate status pesanan', 'error');
+                    showAlert('Terjadi kesalahan saat mengupdate status', 'error');
                 }
             })
             .catch(error => {
