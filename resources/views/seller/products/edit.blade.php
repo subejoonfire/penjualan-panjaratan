@@ -71,8 +71,8 @@
 
 <!-- Session Messages -->
 @if(session('success'))
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
+<div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 mt-3 sm:mt-4">
+    <div class="bg-green-100 border border-green-400 text-green-700 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm sm:text-base" role="alert">
         <strong class="font-bold">Berhasil!</strong>
         <span class="block sm:inline">{{ session('success') }}</span>
     </div>
@@ -80,57 +80,58 @@
 @endif
 
 @if(session('error'))
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
+<div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 mt-3 sm:mt-4">
+    <div class="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm sm:text-base" role="alert">
         <strong class="font-bold">Error!</strong>
         <span class="block sm:inline">{{ session('error') }}</span>
     </div>
 </div>
 @endif
 
-<div class="py-6">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="py-3 sm:py-6">
+    <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
-        <div class="mb-8">
+        <div class="mb-4 sm:mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Edit Produk</h1>
-                    <p class="mt-2 text-gray-600">Perbarui informasi produk Anda</p>
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Edit Produk</h1>
+                    <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Perbarui informasi produk Anda</p>
                 </div>
                 <a href="{{ route('seller.products.index') }}"
-                    class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Kembali ke Produk
+                    class="bg-gray-600 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-md hover:bg-gray-700 text-xs sm:text-sm">
+                    <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>
+                    <span class="hidden sm:inline">Kembali ke Produk</span>
+                    <span class="sm:hidden">Kembali</span>
                 </a>
             </div>
         </div>
 
         <!-- Current Product Info -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 h-16 w-16">
+                <div class="flex-shrink-0 h-12 w-12 sm:h-16 sm:w-16">
                     @if($product->images->count() > 0)
                     <img src="{{ url('storage/' . $product->images->where('is_primary', true)->first()?->image ?? $product->images->first()?->image) }}"
-                        alt="{{ $product->productname }}" class="h-16 w-16 rounded-lg object-cover">
+                        alt="{{ $product->productname }}" class="h-12 w-12 sm:h-16 sm:w-16 rounded-lg object-cover">
                     @else
-                    <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
-                        <i class="fas fa-image text-gray-400 text-xl"></i>
+                    <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-image text-gray-400 text-base sm:text-xl"></i>
                     </div>
                     @endif
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-blue-900">{{ $product->productname }}</h3>
-                    <p class="text-sm text-blue-700">
+                <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+                    <h3 class="text-sm sm:text-base md:text-lg font-medium text-blue-900 truncate">{{ $product->productname }}</h3>
+                    <p class="text-xs sm:text-sm text-blue-700">
                         {{ $product->category->category }} •
                         Dibuat {{ $product->created_at->format('d M Y') }} •
                         {{ $product->images->count() }} gambar
                     </p>
                     <div class="mt-1 flex items-center space-x-2">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                        <span class="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium
                             {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
                         </span>
-                        <span class="text-sm text-blue-600 font-medium">Rp {{ number_format($product->productprice)
+                        <span class="text-xs sm:text-sm text-blue-600 font-medium">Rp {{ number_format($product->productprice)
                             }}</span>
                     </div>
                 </div>
@@ -138,35 +139,35 @@
         </div>
 
         <form action="{{ route('seller.products.update', $product) }}" method="POST" enctype="multipart/form-data"
-            class="space-y-8">
+            class="space-y-4 sm:space-y-8">
             @csrf
             @method('PUT')
 
             <!-- Basic Information -->
             <div class="bg-white shadow rounded-lg">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Informasi Dasar</h3>
+                <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900">Informasi Dasar</h3>
                 </div>
-                <div class="px-6 py-6 space-y-6">
+                <div class="px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
                     <!-- Product Name -->
                     <div>
-                        <label for="productname" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="productname" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Nama Produk <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="productname" id="productname"
-                            value="{{ old('productname', $product->productname) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                            value="{{ old('productname', $product->productname) }}" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                       @error('productname') border-red-300 @enderror">
                         @error('productname')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Category -->
                     <div>
-                        <label for="idcategories" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="idcategories" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Kategori <span class="text-red-500">*</span>
                         </label>
-                        <select name="idcategories" id="idcategories" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                        <select name="idcategories" id="idcategories" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                        @error('idcategories') border-red-300 @enderror">
                             <option value="">Pilih Kategori</option>
                             @foreach($categories as $category)
@@ -177,20 +178,20 @@
                             @endforeach
                         </select>
                         @error('idcategories')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Description -->
                     <div>
-                        <label for="productdescription" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="productdescription" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Deskripsi Produk <span class="text-red-500">*</span>
                         </label>
-                        <textarea name="productdescription" id="productdescription" rows="4" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                        <textarea name="productdescription" id="productdescription" rows="4" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                          @error('productdescription') border-red-300 @enderror"
                             placeholder="Deskripsikan produk Anda...">{{ old('productdescription', $product->productdescription) }}</textarea>
                         @error('productdescription')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -198,54 +199,54 @@
 
             <!-- Pricing & Inventory -->
             <div class="bg-white shadow rounded-lg">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Harga & Stok</h3>
+                <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900">Harga & Stok</h3>
                 </div>
-                <div class="px-6 py-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <!-- Price -->
                         <div>
-                            <label for="productprice" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="productprice" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Harga (Rp) <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="productprice" id="productprice" min="0" step="any"
-                                value="{{ old('productprice', $product->productprice) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                value="{{ old('productprice', $product->productprice) }}" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                           @error('productprice') border-red-300 @enderror" placeholder="0">
                             @error('productprice')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Stock -->
                         <div>
-                            <label for="productstock" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="productstock" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Jumlah Stok <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="productstock" id="productstock" min="0"
-                                value="{{ old('productstock', $product->productstock) }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
+                                value="{{ old('productstock', $product->productstock) }}" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
                                           @error('productstock') border-red-300 @enderror" placeholder="0">
                             @error('productstock')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
                     <!-- Status -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Status Produk</label>
-                        <div class="flex items-center space-x-6">
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Status Produk</label>
+                        <div class="flex items-center space-x-4 sm:space-x-6">
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="is_active" value="1" {{ (old('is_active', $product->is_active ? '1' : '0') == '1') ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="ml-2 text-sm text-gray-700">Aktif</span>
+                                <span class="ml-2 text-xs sm:text-sm text-gray-700">Aktif</span>
                             </label>
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="is_active" value="0" {{ (old('is_active', $product->is_active ? '1' : '0') == '0') ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="ml-2 text-sm text-gray-700">Tidak Aktif</span>
+                                <span class="ml-2 text-xs sm:text-sm text-gray-700">Tidak Aktif</span>
                             </label>
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-xs sm:text-sm text-gray-500">
                             Produk tidak aktif tidak akan terlihat oleh pelanggan
                         </p>
                     </div>
@@ -255,30 +256,32 @@
             <!-- Current Images -->
             @if($product->images->count() > 0)
             <div class="bg-white shadow rounded-lg">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Gambar Saat Ini</h3>
-                    <p class="text-sm text-gray-600">{{ $product->images->count() }} gambar telah diunggah</p>
+                <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900">Gambar Saat Ini</h3>
+                    <p class="text-xs sm:text-sm text-gray-600">{{ $product->images->count() }} gambar telah diunggah</p>
                 </div>
-                <div class="px-6 py-6">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="px-3 sm:px-6 py-4 sm:py-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                         @foreach($product->images as $image)
                         <div class="relative group">
                             <img src="{{ url('storage/' . $image->image) }}" alt="Gambar Produk"
-                                class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                                class="w-full h-24 sm:h-32 object-cover rounded-lg border border-gray-200">
                             @if($image->is_primary)
                             <button type="button" disabled
-                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded z-10 image-overlay-button cursor-default">
+                                class="absolute top-1 sm:top-2 left-1 sm:left-2 bg-blue-600 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded z-10 image-overlay-button cursor-default">
                                 Utama
                             </button>
                             @else
                             <button type="button" onclick="setPrimaryImage({{ $image->id }})"
-                                class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                Jadikan Utama
+                                class="absolute top-1 sm:top-2 left-1 sm:left-2 bg-gray-600 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded hover:bg-blue-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span class="hidden sm:inline">Jadikan Utama</span>
+                                <span class="sm:hidden">Utama</span>
                             </button>
                             @endif
                             <button type="button" onclick="deleteImage({{ $image->id }})"
-                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">
-                                Hapus
+                                class="absolute top-1 sm:top-2 right-1 sm:right-2 bg-red-600 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded hover:bg-red-700">
+                                <span class="hidden sm:inline">Hapus</span>
+                                <i class="sm:hidden fas fa-trash"></i>
                             </button>
                         </div>
                         @endforeach
@@ -289,16 +292,16 @@
 
             <!-- Add New Images -->
             <div class="bg-white shadow rounded-lg">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Tambah Gambar Baru</h3>
-                    <p class="text-sm text-gray-600">Unggah gambar produk tambahan (opsional)</p>
+                <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900">Tambah Gambar Baru</h3>
+                    <p class="text-xs sm:text-sm text-gray-600">Unggah gambar produk tambahan (opsional)</p>
                 </div>
-                <div class="px-6 py-6">
+                <div class="px-3 sm:px-6 py-4 sm:py-6">
                     <!-- Upload Info -->
-                    <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                            <div class="text-sm text-blue-800">
+                    <div class="mb-3 sm:mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-600 mr-2 mt-0.5 text-sm sm:text-base"></i>
+                            <div class="text-xs sm:text-sm text-blue-800">
                                 <p class="font-medium">Info Upload Gambar:</p>
                                 <ul class="mt-1 space-y-1">
                                     <li>• Maksimal 5 gambar baru (total maksimal 6 dengan gambar utama)</li>
@@ -314,15 +317,15 @@
                     </div>
 
                     <div>
-                        <label for="images" class="block text-sm font-medium text-gray-700 mb-3">
+                        <label for="images" class="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                             Upload Gambar Tambahan
                         </label>
 
                         <!-- File Upload Area -->
-                        <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                        <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 hover:border-blue-400 transition-colors">
                             <div id="dropContent" class="text-center">
-                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
-                                <div class="flex text-sm text-gray-600 justify-center">
+                                <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
+                                <div class="flex text-xs sm:text-sm text-gray-600 justify-center">
                                     <label for="images"
                                         class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                         <span>Pilih file</span>
@@ -336,34 +339,34 @@
                         </div>
 
                         @error('images')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-2 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         @error('images.*')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Image Preview -->
-                    <div id="imagePreview" class="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+                    <div id="imagePreview" class="mt-4 sm:mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"></div>
                 </div>
             </div>
 
             <!-- Form Actions -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('products.show', $product) }}" class="text-blue-600 hover:text-blue-800 text-sm">
+            <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+                <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+                    <a href="{{ route('products.show', $product) }}" class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm text-center">
                         <i class="fas fa-eye mr-1"></i>
                         Pratinjau Produk
                     </a>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <a href="{{ route('seller.products.index') }}"
-                        class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        class="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 text-center text-sm">
                         Batal
                     </a>
                     <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fas fa-save mr-2"></i>
+                        class="w-full sm:w-auto bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <i class="fas fa-save mr-1 sm:mr-2"></i>
                         Perbarui Produk
                     </button>
                 </div>
