@@ -684,8 +684,9 @@
             .mobile-nav-bar {
                 display: flex;
                 flex-direction: row;
-                justify-content: center;
+                justify-content: flex-start;
                 overflow-x: auto;
+                overflow-y: hidden;
                 gap: 0.25rem;
                 background: #fff;
                 border-bottom: 1px solid #e5e7eb;
@@ -694,6 +695,7 @@
                 z-index: 50;
                 padding: 0.5rem 0.75rem;
                 box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+                white-space: nowrap;
             }
             .mobile-nav-bar::-webkit-scrollbar {
                 display: none;
@@ -711,6 +713,10 @@
                 font-size: 1.125rem;
                 background: none;
                 border: none;
+                max-width: 60px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .mobile-nav-item.active {
                 background: #e0e7ff;
