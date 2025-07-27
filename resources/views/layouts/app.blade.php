@@ -413,11 +413,11 @@
             }
 
             // Load notifications when dropdown is opened
-            function loadNotifications() {
+            function loadNotificationsDesktop() {
                 fetch('{{ route('api.notifications.unread') }}')
                     .then(response => response.json())
                     .then(data => {
-                        console.log('NotifDropdown API data:', data);
+                        console.log('NotifDropdown Desktop API data:', data);
                         const notificationList = document.getElementById('notificationList');
                         if (notificationList) {
                             if (data.notifications && data.notifications.length > 0) {
@@ -425,49 +425,25 @@
                                     // Get notification icon based on type
                                     let icon = 'fas fa-bell';
                                     let iconColor = 'text-blue-500';
-                                    
                                     switch(notification.type) {
-                                        case 'order':
-                                            icon = 'fas fa-shopping-cart';
-                                            iconColor = 'text-green-500';
-                                            break;
-                                        case 'payment':
-                                            icon = 'fas fa-credit-card';
-                                            iconColor = 'text-yellow-500';
-                                            break;
-                                        case 'product':
-                                            icon = 'fas fa-box';
-                                            iconColor = 'text-purple-500';
-                                            break;
-                                        case 'promotion':
-                                            icon = 'fas fa-percentage';
-                                            iconColor = 'text-red-500';
-                                            break;
-                                        case 'system':
-                                            icon = 'fas fa-cog';
-                                            iconColor = 'text-gray-500';
-                                            break;
-                                        case 'review':
-                                            icon = 'fas fa-star';
-                                            iconColor = 'text-orange-500';
-                                            break;
-                                        default:
-                                            icon = 'fas fa-bell';
-                                            iconColor = 'text-blue-500';
+                                        case 'order': icon = 'fas fa-shopping-cart'; iconColor = 'text-green-500'; break;
+                                        case 'payment': icon = 'fas fa-credit-card'; iconColor = 'text-yellow-500'; break;
+                                        case 'product': icon = 'fas fa-box'; iconColor = 'text-purple-500'; break;
+                                        case 'promotion': icon = 'fas fa-percentage'; iconColor = 'text-red-500'; break;
+                                        case 'system': icon = 'fas fa-cog'; iconColor = 'text-gray-500'; break;
+                                        case 'review': icon = 'fas fa-star'; iconColor = 'text-orange-500'; break;
+                                        default: icon = 'fas fa-bell'; iconColor = 'text-blue-500';
                                     }
-                                    
                                     // Truncate notification text
                                     const maxLength = 60;
                                     let displayText = notification.notification;
                                     let showMore = '';
-                                    
                                     if (displayText.length > maxLength) {
                                         displayText = displayText.substring(0, maxLength) + '...';
                                         showMore = '<span class="text-blue-600 hover:text-blue-800 text-xs cursor-pointer ml-1">lihat</span>';
                                     }
-                                    
                                     return `
-                                        <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.readstatus ? '' : 'bg-blue-50'}" onclick="viewNotificationDetail(${notification.id})">
+                                        <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.readstatus ? '' : 'bg-blue-50'}">
                                             <div class="flex items-start space-x-3">
                                                 <div class="flex-shrink-0">
                                                     <i class="${icon} ${iconColor} text-sm"></i>
@@ -537,7 +513,7 @@
                 .then(data => {
                     if (data.success) {
                         loadNotificationCount(); // Refresh count
-                        loadNotifications(); // Refresh list
+                        loadNotificationsDesktop(); // Refresh list
                     }
                 })
                 .catch(error => console.error('Error marking notification as read:', error));
@@ -551,7 +527,7 @@
                 const notificationButton = document.querySelector('.notification-count').closest('button');
                 if (notificationButton) {
                     notificationButton.addEventListener('click', function() {
-                        setTimeout(loadNotifications, 100); // Small delay to ensure dropdown is open
+                        setTimeout(loadNotificationsDesktop, 100); // Small delay to ensure dropdown is open
                     });
                 }
             });
