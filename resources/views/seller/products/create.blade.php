@@ -228,112 +228,144 @@
         });
         
         // Drag and drop functionality
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, unhighlight, false);
-        });
-        
-        dropArea.addEventListener('drop', handleDrop, false);
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        function setupDragAndDrop() {
+            // Prevent default drag behaviors on document level
+            ['dragenter', 'dragover'].forEach(eventName => {
+                document.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['drop'].forEach(eventName => {
+                document.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            // Drop area specific events
+            dropArea.addEventListener('dragenter', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                highlight();
+            });
+
+            dropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                highlight();
+            });
+
+            dropArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Only unhighlight if we're leaving the drop area itself
+                if (!dropArea.contains(e.relatedTarget)) {
+                    unhighlight();
+                }
+            });
+
+            dropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Drop event triggered');
+                unhighlight();
+                
+                const files = e.dataTransfer.files;
+                console.log('Files dropped:', files ? files.length : 0);
+                if (files && files.length > 0) {
+                    handleFiles(files);
+                } else {
+                    console.log('No files in drop event or files is null');
+                }
+            });
         }
         
         function highlight() {
             dropArea.classList.add('border-blue-500', 'bg-blue-50');
-            dropArea.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-cloud-upload-alt text-blue-500 text-4xl mb-4 animate-bounce"></i>
-                    <div class="flex text-sm text-blue-600">
-                        <span class="font-medium">Lepaskan file di sini</span>
-                    </div>
-                    <p class="text-xs text-blue-500 mt-1">PNG, JPG, GIF maksimal 2MB per gambar (maksimal 5 gambar)</p>
-                </div>
-            `;
+            const icon = dropArea.querySelector('.fa-cloud-upload-alt');
+            if (icon) {
+                icon.classList.add('text-blue-500', 'animate-bounce');
+                icon.classList.remove('text-gray-400');
+            }
         }
         
         function unhighlight() {
             dropArea.classList.remove('border-blue-500', 'bg-blue-50');
-            // Restore original content
-            dropArea.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
-                    <div class="flex text-sm text-gray-600">
-                        <label for="images"
-                            class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                            <span>Unggah gambar</span>
-                            <input id="images" name="images[]" type="file" class="sr-only" multiple accept="image/*" required>
-                        </label>
-                        <p class="pl-1">atau seret dan lepas</p>
-                    </div>
-                    <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar (maksimal 5 gambar)</p>
-                    <p id="imageCount" class="text-xs text-blue-600 mt-1 ${currentFiles.length === 0 ? 'hidden' : ''}">${currentFiles.length}/5 gambar dipilih</p>
-                </div>
-            `;
-            
-            // Re-attach event listener to the new file input
-            const newImageInput = document.getElementById('images');
-            if (newImageInput) {
-                newImageInput.addEventListener('change', function(e) {
-                    handleFiles(e.target.files);
-                });
+            const icon = dropArea.querySelector('.fa-cloud-upload-alt');
+            if (icon) {
+                icon.classList.remove('text-blue-500', 'animate-bounce');
+                icon.classList.add('text-gray-400');
             }
         }
         
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
+        // Setup drag and drop
+        setupDragAndDrop();
+        
+        // Manual file input listener
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                console.log('File input changed:', e.target.files.length, 'files selected');
+                if (e.target.files.length > 0) {
+                    handleFiles(e.target.files);
+                }
+            });
         }
         
-        imageInput.addEventListener('change', function(e) {
-            handleFiles(e.target.files);
-        });
-        
-                 function handleFiles(files) {
-             const newFiles = Array.from(files).filter(file => {
-                 // Check file type
-                 if (!file.type.startsWith('image/')) {
-                     showAlert(`File ${file.name} bukan file gambar yang valid.`, 'error');
-                     return false;
-                 }
-                 
-                 // Check file size
-                 if (file.size > maxFileSize) {
-                     showAlert(`File ${file.name} terlalu besar. Maksimal 2MB per gambar.`, 'error');
-                     return false;
-                 }
-                 
-                 return true;
-             });
-             
-             // Check total files limit
-             if (currentFiles.length + newFiles.length > maxFiles) {
-                 const remainingSlots = maxFiles - currentFiles.length;
-                 if (remainingSlots > 0) {
-                     showAlert(`Maksimal ${maxFiles} gambar. Hanya ${remainingSlots} gambar yang dapat ditambahkan.`, 'warning');
-                     currentFiles = currentFiles.concat(newFiles.slice(0, remainingSlots));
-                 } else {
-                     showAlert(`Maksimal ${maxFiles} gambar sudah tercapai.`, 'warning');
-                     return; // Don't add any files if limit reached
-                 }
-             } else {
-                 currentFiles = currentFiles.concat(newFiles);
-             }
-             
-             updateFileInput();
-             updateImagePreview();
-             updateImageCount();
-         }
+        function handleFiles(files) {
+            console.log('handleFiles called with', files.length, 'files');
+            
+            if (!files || files.length === 0) {
+                console.log('No files provided to handleFiles');
+                return;
+            }
+            
+            const newFiles = Array.from(files).filter(file => {
+                console.log('Processing file:', file.name, 'Type:', file.type, 'Size:', file.size);
+                
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    showAlert(`File ${file.name} bukan file gambar yang valid.`, 'error');
+                    return false;
+                }
+                
+                // Check file size
+                if (file.size > maxFileSize) {
+                    showAlert(`File ${file.name} terlalu besar. Maksimal 2MB per gambar.`, 'error');
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            console.log('Valid files after filtering:', newFiles.length);
+            
+            if (newFiles.length === 0) {
+                console.log('No valid files to add');
+                return;
+            }
+            
+            // Check total files limit
+            if (currentFiles.length + newFiles.length > maxFiles) {
+                const remainingSlots = maxFiles - currentFiles.length;
+                if (remainingSlots > 0) {
+                    showAlert(`Maksimal ${maxFiles} gambar. Hanya ${remainingSlots} gambar yang dapat ditambahkan.`, 'warning');
+                    currentFiles = currentFiles.concat(newFiles.slice(0, remainingSlots));
+                } else {
+                    showAlert(`Maksimal ${maxFiles} gambar sudah tercapai.`, 'warning');
+                    return; // Don't add any files if limit reached
+                }
+            } else {
+                currentFiles = currentFiles.concat(newFiles);
+            }
+            
+            console.log('Total files after adding:', currentFiles.length);
+            
+            updateFileInput();
+            updateImagePreview();
+            updateImageCount();
+        }
         
         function updateFileInput() {
             const dt = new DataTransfer();

@@ -190,11 +190,10 @@
                                 class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">Jadikan
                                 Utama</a>
                             @endif
-                            <a href="{{ route('seller.products.images.delete', $image) }}"
-                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
-                                onclick="return confirm('Hapus gambar ini?')">
+                            <button type="button" onclick="deleteImage({{ $image->id }})"
+                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">
                                 Hapus
-                            </a>
+                            </button>
                         </div>
                         @endforeach
                     </div>
@@ -210,17 +209,31 @@
                 </div>
                 <div class="px-6 py-6">
                     <div>
-                        <label for="images" class="block text-sm font-medium text-gray-700 mb-2">
-                            Gambar Produk
+                        <label for="images" class="block text-sm font-medium text-gray-700 mb-3">
+                            Upload Gambar Tambahan
                         </label>
-                        <input type="file" name="images[]" id="images" multiple accept="image/*" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
-                                      @error('images') border-red-300 @enderror">
+                        
+                        <!-- File Upload Area -->
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                            <div class="text-center">
+                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
+                                <div class="flex text-sm text-gray-600 justify-center">
+                                    <label for="images" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        <span>Pilih file</span>
+                                        <input type="file" name="images[]" id="images" multiple accept="image/*" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">atau seret dan lepas</p>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF maksimal 2MB per gambar</p>
+                            </div>
+                        </div>
+                        
                         @error('images')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @error('images.*')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                        <p class="mt-1 text-sm text-gray-500">
-                            Pilih beberapa gambar (JPG, PNG, maksimal 2MB per gambar)
-                        </p>
                     </div>
 
                     <!-- Image Preview -->
@@ -286,8 +299,7 @@
 });
 
 function deleteImage(imageId) {
-                    confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
-        // In a real application, you would make an AJAX call here
+    confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
         fetch(`/seller/products/images/${imageId}`, {
             method: 'DELETE',
             headers: {
@@ -297,16 +309,19 @@ function deleteImage(imageId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                showAlert('Gambar berhasil dihapus', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             } else {
-                alert('Gagal menghapus gambar');
+                showAlert('Gagal menghapus gambar', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Gagal menghapus gambar');
+            showAlert('Terjadi kesalahan saat menghapus gambar', 'error');
         });
-    }
+    });
 }
 </script>
 @endsection
