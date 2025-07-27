@@ -201,7 +201,8 @@
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-900 truncate">{{ $product->productname }}
                                     </p>
-                                    <p class="text-sm text-gray-500">{{ $product->seller->nickname ?? $product->seller->username ?? 'N/A' }}</p>
+                                    <p class="text-sm text-gray-500">{{ $product->seller->nickname ??
+                                        $product->seller->username ?? 'N/A' }}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">{{ $product->sold_quantity }} terjual
@@ -243,37 +244,6 @@
                         <p class="text-sm text-gray-500">{{ $category->products_count }} produk</p>
                     </div>
                     @endforeach
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Aksi Cepat</h3>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-                    <a href="{{ route('admin.users.index') }}"
-                        class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                        <i class="fas fa-users text-blue-600 text-xl mr-3"></i>
-                        <span class="font-medium text-blue-900">Kelola Pengguna</span>
-                    </a>
-                    <a href="{{ route('admin.products.index') }}"
-                        class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                        <i class="fas fa-box text-green-600 text-xl mr-3"></i>
-                        <span class="font-medium text-green-900">Kelola Produk</span>
-                    </a>
-                    <a href="{{ route('admin.orders.index') }}"
-                        class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
-                        <i class="fas fa-shopping-cart text-yellow-600 text-xl mr-3"></i>
-                        <span class="font-medium text-yellow-900">Kelola Pesanan</span>
-                    </a>
-                    <a href="{{ route('admin.transactions.index') }}"
-                        class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                        <i class="fas fa-credit-card text-purple-600 text-xl mr-3"></i>
-                        <span class="font-medium text-purple-900">Lihat Transaksi</span>
-                    </a>
                 </div>
             </div>
         </div>

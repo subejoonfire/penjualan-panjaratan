@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
@@ -13,7 +13,8 @@
                     <p class="mt-2 text-gray-600">Kelola semua transaksi pembayaran dalam sistem</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <button onclick="exportTransactions()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <button onclick="exportTransactions()"
+                        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
                         <i class="fas fa-download mr-2"></i>Export
                     </button>
                 </div>
@@ -45,7 +46,8 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500">Dibayar</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $transactions->where('transactionstatus', 'paid')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $transactions->where('transactionstatus',
+                            'paid')->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -59,7 +61,8 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500">Pending</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $transactions->where('transactionstatus', 'pending')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $transactions->where('transactionstatus',
+                            'pending')->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -73,7 +76,8 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500">Dibatalkan</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $transactions->where('transactionstatus', 'cancelled')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $transactions->where('transactionstatus',
+                            'cancelled')->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -82,15 +86,15 @@
         <!-- Filters and Search -->
         <div class="bg-white shadow rounded-lg mb-6">
             <div class="px-6 py-4 border-b border-gray-200">
-                <form method="GET" action="{{ route('admin.transactions.index') }}" class="flex flex-wrap items-center gap-4">
+                <form method="GET" action="{{ route('admin.transactions.index') }}"
+                    class="flex flex-wrap items-center gap-4">
                     <div class="flex-1 min-w-0">
                         <label for="search" class="sr-only">Cari Transaksi</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
-                            <input type="text" name="search" id="search" 
-                                value="{{ request('search') }}"
+                            <input type="text" name="search" id="search" value="{{ request('search') }}"
                                 class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Cari nomor transaksi...">
                         </div>
@@ -98,25 +102,29 @@
 
                     <div>
                         <label for="status" class="sr-only">Status</label>
-                        <select name="status" id="status" 
+                        <select name="status" id="status"
                             class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md">
                             <option value="">Semua Status</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Dibayar</option>
-                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
-                            <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>Gagal</option>
+                            <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Pending
+                            </option>
+                            <option value="paid" {{ request('status')==='paid' ? 'selected' : '' }}>Dibayar</option>
+                            <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Dibatalkan
+                            </option>
+                            <option value="failed" {{ request('status')==='failed' ? 'selected' : '' }}>Gagal</option>
                         </select>
                     </div>
 
                     <div>
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-filter mr-2"></i>Filter
                         </button>
                     </div>
 
                     @if(request('search') || request('status'))
                     <div>
-                        <a href="{{ route('admin.transactions.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <a href="{{ route('admin.transactions.index') }}"
+                            class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             <i class="fas fa-times mr-2"></i>Reset
                         </a>
                     </div>
@@ -160,7 +168,8 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <div
+                                            class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                                             <i class="fas fa-credit-card text-blue-600"></i>
                                         </div>
                                     </div>
@@ -189,25 +198,25 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     @switch($transaction->payment_method)
-                                        @case('bank_transfer')
-                                            <i class="fas fa-university text-blue-600 mr-2"></i>
-                                            <span class="text-sm text-gray-900">Transfer Bank</span>
-                                            @break
-                                        @case('credit_card')
-                                            <i class="fas fa-credit-card text-green-600 mr-2"></i>
-                                            <span class="text-sm text-gray-900">Kartu Kredit</span>
-                                            @break
-                                        @case('e_wallet')
-                                            <i class="fas fa-wallet text-purple-600 mr-2"></i>
-                                            <span class="text-sm text-gray-900">E-Wallet</span>
-                                            @break
-                                        @case('cod')
-                                            <i class="fas fa-money-bill text-orange-600 mr-2"></i>
-                                            <span class="text-sm text-gray-900">Bayar di Tempat</span>
-                                            @break
-                                        @default
-                                            <i class="fas fa-question text-gray-600 mr-2"></i>
-                                            <span class="text-sm text-gray-900">{{ $transaction->payment_method }}</span>
+                                    @case('bank_transfer')
+                                    <i class="fas fa-university text-blue-600 mr-2"></i>
+                                    <span class="text-sm text-gray-900">Transfer Bank</span>
+                                    @break
+                                    @case('credit_card')
+                                    <i class="fas fa-credit-card text-green-600 mr-2"></i>
+                                    <span class="text-sm text-gray-900">Kartu Kredit</span>
+                                    @break
+                                    @case('e_wallet')
+                                    <i class="fas fa-wallet text-purple-600 mr-2"></i>
+                                    <span class="text-sm text-gray-900">E-Wallet</span>
+                                    @break
+                                    @case('cod')
+                                    <i class="fas fa-money-bill text-orange-600 mr-2"></i>
+                                    <span class="text-sm text-gray-900">Bayar di Tempat</span>
+                                    @break
+                                    @default
+                                    <i class="fas fa-question text-gray-600 mr-2"></i>
+                                    <span class="text-sm text-gray-900">{{ $transaction->payment_method }}</span>
                                     @endswitch
                                 </div>
                             </td>
@@ -218,30 +227,35 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @switch($transaction->transactionstatus)
-                                    @case('pending')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            <i class="fas fa-clock mr-1"></i>Pending
-                                        </span>
-                                        @break
-                                    @case('paid')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            <i class="fas fa-check mr-1"></i>Dibayar
-                                        </span>
-                                        @break
-                                    @case('cancelled')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            <i class="fas fa-times mr-1"></i>Dibatalkan
-                                        </span>
-                                        @break
-                                    @case('failed')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            <i class="fas fa-exclamation-triangle mr-1"></i>Gagal
-                                        </span>
-                                        @break
-                                    @default
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                            {{ $transaction->transactionstatus }}
-                                        </span>
+                                @case('pending')
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i class="fas fa-clock mr-1"></i>Pending
+                                </span>
+                                @break
+                                @case('paid')
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check mr-1"></i>Dibayar
+                                </span>
+                                @break
+                                @case('cancelled')
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times mr-1"></i>Dibatalkan
+                                </span>
+                                @break
+                                @case('failed')
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>Gagal
+                                </span>
+                                @break
+                                @default
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    {{ $transaction->transactionstatus }}
+                                </span>
                                 @endswitch
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -249,21 +263,22 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex items-center space-x-2">
-                                    <button onclick="viewTransactionDetails({{ $transaction->id }})" 
+                                    <button onclick="viewTransactionDetails({{ $transaction->id }})"
                                         class="text-blue-600 hover:text-blue-900">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @if($transaction->transactionstatus === 'pending')
-                                    <button onclick="updateTransactionStatus({{ $transaction->id }}, 'paid')" 
+                                    <button onclick="updateTransactionStatus({{ $transaction->id }}, 'paid')"
                                         class="text-green-600 hover:text-green-900">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button onclick="updateTransactionStatus({{ $transaction->id }}, 'cancelled')" 
+                                    <button onclick="updateTransactionStatus({{ $transaction->id }}, 'cancelled')"
                                         class="text-red-600 hover:text-red-900">
                                         <i class="fas fa-times"></i>
                                     </button>
                                     @endif
-                                    <button onclick="confirmAction('Apakah Anda yakin ingin menghapus transaksi ini?', function() { deleteTransaction({{ $transaction->id }}); })" 
+                                    <button
+                                        onclick="confirmAction('Apakah Anda yakin ingin menghapus transaksi ini?', function() { deleteTransaction({{ $transaction->id }}); })"
                                         class="text-red-600 hover:text-red-900">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -320,7 +335,7 @@
 
 @push('scripts')
 <script>
-function viewTransactionDetails(transactionId) {
+    function viewTransactionDetails(transactionId) {
     fetch(`/admin/transactions/${transactionId}/details`)
         .then(response => response.json())
         .then(data => {

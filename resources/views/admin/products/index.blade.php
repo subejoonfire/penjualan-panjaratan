@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
@@ -279,7 +279,8 @@
                 <!-- Modal content will be loaded here -->
             </div>
             <div class="flex justify-end space-x-3">
-                <button onclick="closeModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition-colors">
+                <button onclick="closeModal()"
+                    class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition-colors">
                     Batal
                 </button>
                 <button id="confirmBtn" onclick="confirmAction()"
@@ -293,7 +294,7 @@
 </div>
 
 <script>
-let currentAction = null;
+    let currentAction = null;
 let currentProductId = null;
 
 // CSRF Token Setup
