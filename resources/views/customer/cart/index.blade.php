@@ -35,68 +35,68 @@
 
                     <div class="divide-y divide-gray-200">
                         @foreach($cartDetails as $detail)
-                        <div class="px-1 py-2 sm:px-4 sm:py-4">
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-h-0">
+                        <div class="px-2 py-4 sm:px-4 sm:py-6 relative group">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0 mx-auto sm:mx-0">
                                     @if($detail->product->images->count() > 0)
                                     <img src="{{ asset('storage/' . $detail->product->images->first()->image) }}"
                                         alt="{{ $detail->product->productname }}"
-                                        class="w-14 h-14 sm:w-20 sm:h-20 rounded-lg object-cover">
+                                        class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover">
                                     @else
-                                    <div class="w-14 h-14 sm:w-20 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-image text-gray-400 text-xl"></i>
                                     </div>
                                     @endif
                                 </div>
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="text-xs sm:text-lg font-medium text-gray-900 truncate">
+                                    <h4 class="text-sm sm:text-lg font-medium text-gray-900 truncate">
                                         <a href="{{ route('products.show', $detail->product) }}"
                                             class="hover:text-blue-600">
                                             {{ $detail->product->productname }}
                                         </a>
                                     </h4>
-                                    <p class="text-[11px] sm:text-sm text-gray-600 truncate">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
-                                    <p class="text-[11px] sm:text-sm text-gray-500 truncate">{{ $detail->product->category->category }}</p>
-                                    <div class="mt-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
-                                        <span class="text-sm sm:text-lg font-bold text-blue-600">
+                                    <p class="text-xs sm:text-sm text-gray-600 truncate">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
+                                    <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $detail->product->category->category }}</p>
+                                    <div class="mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                                        <span class="text-base sm:text-lg font-bold text-blue-600">
                                             Rp {{ number_format($detail->productprice) }}
                                         </span>
                                         @if($detail->product->productstock < $detail->quantity)
-                                            <span class="text-[11px] sm:text-sm text-red-600 font-medium">
+                                            <span class="text-xs sm:text-sm text-red-600 font-medium">
                                                 Stok tidak mencukupi (Tersedia: {{ $detail->product->productstock }})
                                             </span>
                                         @endif
                                     </div>
                                 </div>
                                 <!-- Quantity Controls & Subtotal -->
-                                <div class="flex flex-row sm:flex-col items-center gap-1 sm:gap-3 mt-1 sm:mt-0">
+                                <div class="flex flex-row sm:flex-col items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                                     <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
                                         class="flex items-center gap-1 sm:gap-2">
                                         @csrf
                                         @method('PUT')
                                         <button type="button" onclick="decreaseQuantity(this)"
-                                            class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 text-base">
+                                            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 text-lg">
                                             <i class="fas fa-minus"></i>
                                         </button>
                                         <input type="number" name="quantity" value="{{ $detail->quantity }}" min="1"
                                             max="{{ $detail->product->productstock }}"
-                                            class="w-8 sm:w-14 text-center border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-base"
+                                            class="w-10 sm:w-14 text-center border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-base"
                                             onchange="this.form.submit()">
                                         <button type="button" onclick="increaseQuantity(this)"
-                                            class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 text-base">
+                                            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 text-lg">
                                             <i class="fas fa-plus"></i>
                                         </button>
                                     </form>
-                                    <div class="text-right min-w-[60px] sm:min-w-[80px]">
+                                    <div class="text-right min-w-[80px]">
                                         <p class="text-xs sm:text-lg font-medium text-gray-900">
                                             Rp {{ number_format($detail->quantity * $detail->productprice) }}
                                         </p>
                                     </div>
                                 </div>
                                 <!-- Remove Button -->
-                                <div class="flex justify-end sm:block mt-1 sm:mt-0">
+                                <div class="hidden sm:block">
                                     <button type="button" class="text-red-600 hover:text-red-700 p-2"
                                         onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
                                         <i class="fas fa-trash"></i>
@@ -106,6 +106,11 @@
                                         @method('DELETE')
                                     </form>
                                 </div>
+                                <!-- Tombol hapus absolute di mobile -->
+                                <button type="button" class="block sm:hidden absolute top-2 right-2 z-10 text-red-600 hover:text-red-700 p-2 bg-white bg-opacity-80 rounded-full shadow"
+                                    onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                         @endforeach
