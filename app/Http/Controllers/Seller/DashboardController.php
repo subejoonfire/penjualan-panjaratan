@@ -381,7 +381,10 @@ class DashboardController extends Controller
             }
         }
 
-        return back()->with('success', 'Order status updated successfully');
+        return response()->json([
+            'success' => true,
+            'message' => 'Status pesanan berhasil diupdate'
+        ]);
     }
 
     /**
