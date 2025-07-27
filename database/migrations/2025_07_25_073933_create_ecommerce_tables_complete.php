@@ -38,6 +38,8 @@ return new class extends Migration
             $table->foreignId('idcategories')->constrained('categories')->onDelete('cascade'); // Relasi ke categories
             $table->foreignId('iduserseller')->constrained('users')->onDelete('cascade'); // Relasi ke users (seller)
             $table->boolean('is_active')->default(true); // Status aktif produk
+            $table->integer('view_count')->default(0); // Jumlah dilihat
+            $table->integer('sold_count')->default(0); // Jumlah terjual
             $table->timestamps();
         });
 
