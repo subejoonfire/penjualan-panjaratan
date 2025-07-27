@@ -28,7 +28,7 @@
     <div class="min-h-screen flex flex-col">
         @auth
         <!-- Mobile Nav Bar -->
-        <nav class="mobile-nav-bar" style="display:none">
+        <nav class="mobile-nav-bar" style="display:none" x-data="{ mobileProfileOpen: false }">
             @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
@@ -88,32 +88,39 @@
             </a>
             @endif
             <!-- Profile with Dropdown -->
-            <div class="relative mobile-profile-dropdown">
-                <button onclick="toggleMobileProfileDropdown()" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+            <div class="relative">
+                <button @click="mobileProfileOpen = !mobileProfileOpen" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i>
                 </button>
                 
                 <!-- Mobile Profile Dropdown -->
-                <div id="mobileProfileDropdown" class="mobile-dropdown-menu hidden">
-                    <a href="{{ route('profile') }}" class="mobile-dropdown-item">
+                <div x-show="mobileProfileOpen" @click.away="mobileProfileOpen = false" x-transition
+                    x-cloak
+                    class="absolute top-12 right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                    <a href="{{ route('profile') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-user mr-2"></i>Profil
                     </a>
                     @if(auth()->user()->isAdmin())
-                    <a href="{{ route('admin.notifications.index') }}" class="mobile-dropdown-item">
+                    <a href="{{ route('admin.notifications.index') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-bell mr-2"></i>Notifikasi
                     </a>
                     @elseif(auth()->user()->isSeller())
-                    <a href="{{ route('seller.notifications.index') }}" class="mobile-dropdown-item">
+                    <a href="{{ route('seller.notifications.index') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-bell mr-2"></i>Notifikasi
                     </a>
                     @else
-                    <a href="{{ route('customer.notifications.index') }}" class="mobile-dropdown-item">
+                    <a href="{{ route('customer.notifications.index') }}"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-bell mr-2"></i>Notifikasi
                     </a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}" class="block">
                         @csrf
-                        <button type="submit" class="mobile-dropdown-item w-full text-left">
+                        <button type="submit"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-sign-out-alt mr-2"></i>Keluar
                         </button>
                     </form>
@@ -589,38 +596,6 @@
             .mobile-nav-bar {
                 display: flex !important;
             }
-            
-            /* Mobile Profile Dropdown */
-            .mobile-profile-dropdown {
-                position: relative;
-            }
-            .mobile-dropdown-menu {
-                position: absolute;
-                bottom: 60px;
-                right: 0;
-                width: 200px;
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-                border: 1px solid #e5e7eb;
-                z-index: 9999;
-                overflow: hidden;
-            }
-            .mobile-dropdown-item {
-                display: block;
-                padding: 12px 16px;
-                font-size: 14px;
-                color: #374151;
-                text-decoration: none;
-                border-bottom: 1px solid #f3f4f6;
-                transition: background-color 0.2s;
-            }
-            .mobile-dropdown-item:hover {
-                background-color: #f9fafb;
-            }
-            .mobile-dropdown-item:last-child {
-                border-bottom: none;
-            }
         }
         @media (min-width: 769px) {
             .mobile-nav-bar {
@@ -631,33 +606,6 @@
             }
         }
     </style>
-
-    <!-- Mobile Profile Dropdown JavaScript -->
-    <script>
-        function toggleMobileProfileDropdown() {
-            const dropdown = document.getElementById('mobileProfileDropdown');
-            if (dropdown.classList.contains('hidden')) {
-                dropdown.classList.remove('hidden');
-                // Close dropdown when clicking outside
-                setTimeout(() => {
-                    document.addEventListener('click', closeMobileDropdown);
-                }, 100);
-            } else {
-                dropdown.classList.add('hidden');
-                document.removeEventListener('click', closeMobileDropdown);
-            }
-        }
-
-        function closeMobileDropdown(event) {
-            const dropdown = document.getElementById('mobileProfileDropdown');
-            const profileButton = event.target.closest('.mobile-profile-dropdown');
-            
-            if (!profileButton) {
-                dropdown.classList.add('hidden');
-                document.removeEventListener('click', closeMobileDropdown);
-            }
-        }
-    </script>
 </body>
 
 </html>
