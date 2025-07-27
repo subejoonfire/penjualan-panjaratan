@@ -160,7 +160,7 @@
                             </h3>
 
                             <p class="text-sm text-gray-600 mb-2">{{ $product->category->category }}</p>
-                            <p class="text-sm text-gray-500 mb-3">oleh {{ $product->seller->username }}</p>
+                            <p class="text-sm text-gray-500 mb-3">oleh {{ $product->seller->nickname ?? $product->seller->username }}</p>
 
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-lg font-bold text-blue-600">Rp {{

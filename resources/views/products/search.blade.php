@@ -77,6 +77,42 @@
                             @endif
                         </div>
 
+                        <!-- Rating Filter -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Minimum Rating</label>
+                            <div class="space-y-2">
+                                @for($i = 5; $i >= 1; $i--)
+                                <label class="flex items-center">
+                                    <input type="radio" name="rating" value="{{ $i }}" 
+                                        {{ request('rating') == $i ? 'checked' : '' }}
+                                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                    <span class="ml-2 flex items-center">
+                                        @for($j = 1; $j <= 5; $j++)
+                                        <i class="fas fa-star text-sm {{ $j <= $i ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                        @endfor
+                                        <span class="ml-1 text-sm text-gray-600">& up</span>
+                                    </span>
+                                </label>
+                                @endfor
+                                <label class="flex items-center">
+                                    <input type="radio" name="rating" value="" 
+                                        {{ !request('rating') ? 'checked' : '' }}
+                                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                    <span class="ml-2 text-sm text-gray-600">All ratings</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Stock Filter -->
+                        <div class="mb-6">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="in_stock" value="1" 
+                                    {{ request('in_stock') ? 'checked' : '' }}
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-gray-700">In stock only</span>
+                            </label>
+                        </div>
+
                         <!-- Sort -->
                         <div class="mb-6">
                             <label for="sort" class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
@@ -95,7 +131,7 @@
                     </form>
 
                     <!-- Applied Filters -->
-                    @if(request()->hasAny(['category', 'min_price', 'max_price', 'sort']))
+                    @if(request()->hasAny(['category', 'min_price', 'max_price', 'rating', 'in_stock', 'sort']))
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <h3 class="text-sm font-medium text-gray-700 mb-3">Applied Filters</h3>
                         <div class="space-y-2">
@@ -121,7 +157,32 @@
                                 <a href="{{ request()->fullUrlWithQuery(['min_price' => null, 'max_price' => null]) }}" class="text-red-600 hover:text-red-500">×</a>
                             </div>
                             @endif
+
+                            @if(request('rating'))
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="flex items-center">
+                                    Rating: 
+                                    @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star text-xs {{ $i <= request('rating') ? 'text-yellow-400' : 'text-gray-300' }} ml-1"></i>
+                                    @endfor
+                                    <span class="ml-1">& up</span>
+                                </span>
+                                <a href="{{ request()->fullUrlWithQuery(['rating' => null]) }}" class="text-red-600 hover:text-red-500">×</a>
+                            </div>
+                            @endif
+
+                            @if(request('in_stock'))
+                            <div class="flex items-center justify-between text-sm">
+                                <span>In stock only</span>
+                                <a href="{{ request()->fullUrlWithQuery(['in_stock' => null]) }}" class="text-red-600 hover:text-red-500">×</a>
+                            </div>
+                            @endif
                         </div>
+
+                        <a href="{{ route('products.search', ['q' => $searchTerm]) }}" 
+                           class="inline-block mt-3 text-sm text-blue-600 hover:text-blue-500">
+                            Clear all filters
+                        </a>
                     </div>
                     @endif
                 </div>
@@ -167,7 +228,7 @@
                             </p>
 
                             <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
-                                <span>{{ $product->seller->username }}</span>
+                                <span>{{ $product->seller->nickname ?? $product->seller->username }}</span>
                                 <span>{{ $product->category->category }}</span>
                             </div>
 

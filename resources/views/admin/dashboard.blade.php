@@ -118,45 +118,28 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
             <!-- Order Status Chart -->
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Pesanan</h3>
-                <div class="space-y-3">
-                    @foreach(['pending' => 'Menunggu', 'processing' => 'Diproses', 'shipped' => 'Dikirim', 'delivered' => 'Diterima', 'cancelled' => 'Dibatalkan'] as $status => $label)
-                    @php $count = $orderStats[$status] ?? 0; @endphp
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-600">{{ $label }}</span>
-                        <div class="flex items-center">
-                            <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                                <div class="bg-blue-500 h-2 rounded-full"
-                                    style="width: {{ $totalOrders > 0 ? ($count / $totalOrders) * 100 : 0 }}%"></div>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
-                        </div>
-                    </div>
-                    @endforeach
+                <div class="relative h-64">
+                    <canvas id="orderStatusChart"></canvas>
                 </div>
             </div>
 
             <!-- Transaction Status Chart -->
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Transaksi</h3>
-                <div class="space-y-3">
-                    @foreach(['pending' => 'Menunggu', 'paid' => 'Dibayar', 'failed' => 'Gagal', 'refunded' => 'Dikembalikan'] as $status => $label)
-                    @php $count = $transactionStats[$status] ?? 0; @endphp
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-600">{{ $label }}</span>
-                        <div class="flex items-center">
-                            <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                                <div class="bg-green-500 h-2 rounded-full"
-                                    style="width: {{ array_sum($transactionStats) > 0 ? ($count / array_sum($transactionStats)) * 100 : 0 }}%">
-                                </div>
-                            </div>
-                            <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
-                        </div>
-                    </div>
-                    @endforeach
+                <div class="relative h-64">
+                    <canvas id="transactionStatusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Revenue Trend -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Tren Pendapatan Bulanan</h3>
+                <div class="relative h-64">
+                    <canvas id="revenueChart"></canvas>
                 </div>
             </div>
         </div>
@@ -218,7 +201,7 @@
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-900 truncate">{{ $product->productname }}
                                     </p>
-                                    <p class="text-sm text-gray-500">{{ $product->seller->username ?? 'N/A' }}</p>
+                                    <p class="text-sm text-gray-500">{{ $product->seller->nickname ?? $product->seller->username ?? 'N/A' }}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-medium text-gray-900">{{ $product->sold_quantity }} terjual
@@ -299,7 +282,149 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Order Status Chart
+        const orderCtx = document.getElementById('orderStatusChart').getContext('2d');
+        const orderData = @json($orderStats);
+        
+        new Chart(orderCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Menunggu', 'Diproses', 'Dikirim', 'Diterima', 'Dibatalkan'],
+                datasets: [{
+                    data: [
+                        orderData.pending || 0,
+                        orderData.processing || 0,
+                        orderData.shipped || 0,
+                        orderData.delivered || 0,
+                        orderData.cancelled || 0
+                    ],
+                    backgroundColor: [
+                        '#FCD34D', // yellow
+                        '#60A5FA', // blue
+                        '#A78BFA', // purple
+                        '#34D399', // green
+                        '#F87171'  // red
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+
+        // Transaction Status Chart
+        const transactionCtx = document.getElementById('transactionStatusChart').getContext('2d');
+        const transactionData = @json($transactionStats);
+        
+        new Chart(transactionCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Menunggu', 'Dibayar', 'Gagal', 'Dikembalikan'],
+                datasets: [{
+                    data: [
+                        transactionData.pending || 0,
+                        transactionData.paid || 0,
+                        transactionData.failed || 0,
+                        transactionData.refunded || 0
+                    ],
+                    backgroundColor: [
+                        '#FCD34D', // yellow
+                        '#34D399', // green
+                        '#F87171', // red
+                        '#9CA3AF'  // gray
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+
+        // Revenue Chart (need to get monthly data from controller)
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        
+        // Get last 6 months data (you'll need to pass this from controller)
+        const months = [];
+        const revenues = [];
+        
+        // For now, create dummy data - replace with actual data from controller
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            months.push(date.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' }));
+            revenues.push(Math.random() * 10000000); // Replace with real data
+        }
+        
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Pendapatan (Rp)',
+                    data: revenues,
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Pendapatan: Rp ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
     // Refresh dashboard data every 30 seconds
     setInterval(function() {
         // You can add AJAX calls here to refresh specific sections

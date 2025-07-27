@@ -21,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register model observers
+        \App\Models\Order::observe(\App\Observers\OrderObserver::class);
+        
         // Share notification data dengan semua view
         View::composer('*', function ($view) {
             if (auth()->check()) {

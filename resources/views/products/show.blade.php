@@ -98,7 +98,7 @@
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-900">Seller</dt>
-                            <dd class="mt-1 text-gray-700">{{ $product->seller->username }}</dd>
+                            <dd class="mt-1 text-gray-700">{{ $product->seller->nickname ?? $product->seller->username }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-900">Stock</dt>
@@ -127,6 +127,20 @@
 
                 <!-- Add to Cart Section -->
                 @auth
+                @if(auth()->user()->role === 'customer')
+                <!-- Wishlist Button -->
+                <div class="border-t border-gray-200 pt-6">
+                    @php
+                    $isInWishlist = auth()->user() && \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists();
+                    @endphp
+                    <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
+                        class="w-full mb-4 {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-heart mr-2"></i>
+                        <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist' }}</span>
+                    </button>
+                </div>
+                @endif
+                
                 @if(auth()->user()->role === 'customer' && $product->is_active && $product->productstock > 0)
                 <div class="border-t border-gray-200 pt-6">
                     <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
@@ -288,7 +302,7 @@
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-medium text-gray-900">{{ $review->user->username }}</h4>
+                                    <h4 class="text-sm font-medium text-gray-900">{{ $review->user->nickname ?? $review->user->username }}</h4>
                                     <div class="flex items-center">
                                         @for($i = 1; $i <= 5; $i++)
                                         <i class="fas fa-star text-sm {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
@@ -399,7 +413,7 @@
                         <p class="text-lg font-bold text-blue-600 mt-1">Rp {{
                             number_format($relatedProduct->productprice) }}</p>
                         <div class="mt-2 flex items-center justify-between">
-                            <span class="text-xs text-gray-500">{{ $relatedProduct->seller->username }}</span>
+                            <span class="text-xs text-gray-500">{{ $relatedProduct->seller->nickname ?? $relatedProduct->seller->username }}</span>
                             <a href="{{ route('products.show', $relatedProduct) }}"
                                 class="text-blue-600 hover:text-blue-500 text-sm">
                                 View
@@ -458,5 +472,72 @@
             setRating(5);
         }
     });
+
+    // Wishlist functionality
+    function toggleWishlist(productId) {
+        const btn = document.getElementById('wishlistBtn');
+        const text = document.getElementById('wishlistText');
+        const originalText = text.textContent;
+        
+        btn.disabled = true;
+        text.textContent = 'Memproses...';
+        
+        fetch(`/customer/wishlist/toggle/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.action === 'added') {
+                    btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                    text.textContent = 'Hapus dari Wishlist';
+                } else {
+                    btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    text.textContent = 'Tambah ke Wishlist';
+                }
+                
+                // Show toast notification
+                showToast(data.message);
+            } else {
+                text.textContent = originalText;
+                alert(data.message || 'Terjadi kesalahan');
+            }
+            btn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            text.textContent = originalText;
+            btn.disabled = false;
+            alert('Terjadi kesalahan');
+        });
+    }
+    
+    function showToast(message) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
 </script>
 @endsection

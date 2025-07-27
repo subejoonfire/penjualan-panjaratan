@@ -160,6 +160,33 @@
             </div>
         </div>
 
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            <!-- Monthly Sales Chart -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Penjualan Bulanan</h3>
+                <div class="relative h-48">
+                    <canvas id="monthlySalesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Product Performance Chart -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Performa Produk</h3>
+                <div class="relative h-48">
+                    <canvas id="productPerformanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Order Status Distribution -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Status Pesanan</h3>
+                <div class="relative h-48">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Recent Orders -->
             <div class="bg-white shadow rounded-lg">
@@ -309,42 +336,151 @@
 <!-- Chart Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Revenue Chart
-const monthlyData = @json($monthlyRevenue);
-const ctx = document.getElementById('revenueChart');
-
-if (ctx && monthlyData.length > 0) {
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: monthlyData.map(item => `${item.month}/${item.year}`),
-            datasets: [{
-                label: 'Pendapatan',
-                data: monthlyData.map(item => item.total),
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Monthly Sales Chart
+        const monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
+        const monthlyData = @json($monthlyRevenue);
+        
+        const months = [];
+        const sales = [];
+        
+        // Prepare last 6 months data
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            months.push(date.toLocaleDateString('id-ID', { month: 'short' }));
+            
+            // Find data for this month
+            const monthData = monthlyData.find(item => 
+                item.month == (date.getMonth() + 1) && item.year == date.getFullYear()
+            );
+            sales.push(monthData ? monthData.total : 0);
+        }
+        
+        new Chart(monthlySalesCtx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Penjualan',
+                    data: sales,
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Rp ' + value.toLocaleString();
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Penjualan: Rp ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                            }
                         }
                     }
                 }
             }
-        }
+        });
+
+        // Product Performance Chart (Top 5 products)
+        const productCtx = document.getElementById('productPerformanceChart').getContext('2d');
+        const topProducts = @json($topProducts);
+        
+        const productNames = topProducts.map(product => product.productname.substring(0, 15) + '...');
+        const productSales = topProducts.map(product => product.sold_quantity || 0);
+        
+        new Chart(productCtx, {
+            type: 'bar',
+            data: {
+                labels: productNames,
+                datasets: [{
+                    label: 'Terjual',
+                    data: productSales,
+                    backgroundColor: [
+                        '#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6'
+                    ],
+                    borderColor: [
+                        '#DC2626', '#EA580C', '#CA8A04', '#16A34A', '#2563EB'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart
+        const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        
+        // Calculate order status distribution
+        const orderStatuses = {
+            pending: {{ $pendingOrders }},
+            processing: 0, // Add from controller if needed
+            shipped: 0,    // Add from controller if needed
+            delivered: 0,  // Add from controller if needed
+            completed: {{ $totalOrders - $pendingOrders }}
+        };
+        
+        new Chart(orderStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Menunggu', 'Selesai'],
+                datasets: [{
+                    data: [orderStatuses.pending, orderStatuses.completed],
+                    backgroundColor: [
+                        '#FCD34D', // yellow
+                        '#34D399'  // green
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
     });
-}
 </script>
 @endsection

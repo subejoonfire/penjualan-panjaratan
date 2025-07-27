@@ -61,7 +61,7 @@
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-medium text-gray-900">{{ $detail->product->productname }}</h3>
-                                <p class="text-sm text-gray-600">oleh {{ $detail->product->seller->username }}</p>
+                                                                    <p class="text-sm text-gray-600">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
                                 <div class="flex items-center justify-between mt-2">
                                     <span class="text-sm text-gray-600">Jumlah: {{ $detail->quantity }}</span>
                                     <span class="font-medium text-gray-900">
