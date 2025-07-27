@@ -3,6 +3,27 @@
 @section('title', 'Edit Produk - Dashboard Penjual')
 
 @section('content')
+@include('components.modal-notification')
+
+<!-- Session Messages -->
+@if(session('success'))
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
+            <strong class="font-bold">Berhasil!</strong>
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    </div>
+@endif
+
 <div class="py-6">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
@@ -196,10 +217,10 @@
                             </form>
                             @endif
                             <form action="{{ route('seller.products.images.delete', $image) }}" method="POST" 
-                                style="display: inline;" onsubmit="return confirm('Hapus gambar ini?')">
+                                style="display: inline;" id="deleteImageForm{{ $image->id }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" 
+                                <button type="button" onclick="confirmDeleteImage({{ $image->id }})" 
                                     class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">
                                     Hapus
                                 </button>
@@ -263,59 +284,46 @@
 
 <script>
     document.getElementById('images').addEventListener('change', function(e) {
-    const preview = document.getElementById('imagePreview');
-    const files = e.target.files;
+        const preview = document.getElementById('imagePreview');
+        const files = e.target.files;
 
-    preview.innerHTML = '';
-    
-    if (files.length > 0) {
-        preview.classList.remove('hidden');
+        preview.innerHTML = '';
         
-        Array.from(files).forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'relative';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
-                             class="w-full h-32 object-cover rounded-lg border border-gray-200">
-                        <div class="absolute top-2 right-2">
-                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded">Baru</span>
-                        </div>
-                    `;
-                    preview.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    } else {
-        preview.classList.add('hidden');
-    }
-});
+        if (files.length > 0) {
+            preview.classList.remove('hidden');
+            
+            Array.from(files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative group';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
+                                 class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                            <div class="absolute top-2 right-2">
+                                <span class="bg-green-600 text-white text-xs px-2 py-1 rounded">Baru</span>
+                            </div>
+                            <div class="absolute bottom-2 left-2">
+                                <span class="bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                                    ${file.name}
+                                </span>
+                            </div>
+                        `;
+                        preview.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        } else {
+            preview.classList.add('hidden');
+        }
+    });
 
-function deleteImage(imageId) {
-                    confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
-        // In a real application, you would make an AJAX call here
-        fetch(`/seller/products/images/${imageId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Gagal menghapus gambar');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Gagal menghapus gambar');
+    function confirmDeleteImage(imageId) {
+        confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
+            document.getElementById('deleteImageForm' + imageId).submit();
         });
     }
-}
 </script>
 @endsection

@@ -190,10 +190,17 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const imageDiv = document.createElement('div');
-                        imageDiv.className = 'relative';
+                        imageDiv.className = 'relative group';
                         imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" class="w-full h-24 object-cover rounded-md border">
-                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : ''}
+                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                            <div class="absolute top-2 right-2">
+                                ${index === 0 ? '<span class="bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : '<span class="bg-green-600 text-white text-xs px-2 py-1 rounded">Tambahan</span>'}
+                            </div>
+                            <div class="absolute bottom-2 left-2">
+                                <span class="bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded truncate max-w-20">
+                                    ${file.name}
+                                </span>
+                            </div>
                         `;
                         imagePreview.appendChild(imageDiv);
                     };

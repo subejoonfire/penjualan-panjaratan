@@ -233,7 +233,7 @@ class DashboardController extends Controller
                 ProductImage::create([
                     'idproduct' => $product->id,
                     'image' => $path,
-                    'is_primary' => $product->images()->count() === 0
+                    'is_primary' => false // New images won't be primary by default
                 ]);
             }
         }
