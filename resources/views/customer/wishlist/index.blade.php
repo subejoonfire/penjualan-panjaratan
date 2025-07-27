@@ -21,9 +21,9 @@
                 <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
                     @if($product->images->count() > 0)
                     <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                        alt="{{ $product->productname }}" class="w-full h-48 object-cover">
+                        alt="{{ $product->productname }}" class="w-full h-36 object-cover">
                     @else
-                    <div class="w-full h-48 flex items-center justify-center">
+                    <div class="w-full h-36 flex items-center justify-center">
                         <i class="fas fa-image text-gray-400 text-2xl"></i>
                     </div>
                     @endif
@@ -44,30 +44,44 @@
                     @endif
                 </div>
                 <!-- Product Info & Actions -->
-                <div class="flex flex-col flex-1 justify-between p-4">
+                <div class="flex flex-col flex-1 justify-between p-3">
                     <div>
-                        <h3 class="text-base font-semibold text-gray-900 mb-1 truncate">
+                        <h3 class="text-sm font-semibold text-gray-900 mb-1 truncate">
                             <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
                                 {{ $product->productname }}
                             </a>
                         </h3>
                         <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                        <p class="text-xs text-gray-500 mb-3">
+                        <p class="text-xs text-gray-500 mb-2">
                             @php
                                 $desc = strip_tags($product->productdesc);
                                 $words = str_word_count($desc, 2);
                                 $wordKeys = array_keys($words);
-                                if(count($words) > 30) {
-                                    $desc = substr($desc, 0, $wordKeys[30]) . '...';
+                                if(count($words) > 15) {
+                                    $desc = substr($desc, 0, $wordKeys[15]) . '...';
                                 }
                             @endphp
                             {{ $desc }}
                         </p>
+                        <div class="flex items-center gap-2 mb-2">
+                            @php $avgRating = $product->reviews->count() > 0 ? $product->reviews->avg('rating') : 0; @endphp
+                            <div class="flex items-center">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star text-[10px] {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
+                                @endfor
+                            </div>
+                            <span class="text-[11px] text-gray-500">({{ $product->reviews->count() }})</span>
+                            <span class="text-[11px] text-gray-500 ml-2">Terjual: {{ $product->sold_count ?? 0 }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-bold text-blue-600">Rp {{ number_format($product->productprice) }}</span>
+                            <span class="text-[11px] text-gray-500">Stok: {{ $product->productstock }}</span>
+                        </div>
                     </div>
                     <div class="flex flex-col gap-2 mt-2">
                         <div class="flex gap-2 w-full">
                             <a href="{{ route('products.show', $product) }}" 
-                                class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-xs font-medium hover:bg-gray-200 text-center">
+                                class="flex-1 bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs font-medium hover:bg-gray-200 text-center">
                                 Detail
                             </a>
                             @if($product->productstock > 0)
@@ -75,19 +89,19 @@
                                 @csrf
                                 <input type="hidden" name="quantity" value="1">
                                 <button type="submit" 
-                                    class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
+                                    class="w-full bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
                                     <i class="fas fa-shopping-cart"></i>
                                 </button>
                             </form>
                             @else
                             <button disabled 
-                                class="w-full bg-gray-400 text-white px-3 py-2 rounded-md cursor-not-allowed text-xs flex items-center justify-center">
+                                class="w-full bg-gray-400 text-white px-2 py-1 rounded-md cursor-not-allowed text-xs flex items-center justify-center">
                                 <i class="fas fa-shopping-cart"></i>
                             </button>
                             @endif
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-3">
+                    <p class="text-[11px] text-gray-500 mt-2">
                         Ditambahkan {{ $wishlist->created_at->diffForHumans() }}
                     </p>
                 </div>

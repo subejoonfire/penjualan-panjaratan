@@ -44,18 +44,18 @@
         </div>
 
         <!-- Orders List -->
-        <div class="space-y-6">
+        <div class="space-y-4 sm:space-y-6">
             @forelse($orders as $order)
             <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
+                <div class="px-3 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-900">Pesanan #{{ $order->order_number }}</h3>
-                            <p class="text-sm text-gray-600">Dipesan pada {{ $order->created_at->format('d M Y, H:i') }}
+                            <h3 class="text-base sm:text-lg font-medium text-gray-900">Pesanan #{{ $order->order_number }}</h3>
+                            <p class="text-xs sm:text-sm text-gray-600">Dipesan pada {{ $order->created_at->format('d M Y, H:i') }}
                             </p>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                        <div class="flex items-center space-x-2 sm:space-x-4">
+                            <span class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium
                                     @if($order->status === 'pending') bg-yellow-100 text-yellow-800
                                     @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
                                     @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
@@ -63,78 +63,63 @@
                                     @elseif($order->status === 'cancelled') bg-red-100 text-red-800
                                     @endif">
                                 @switch($order->status)
-                                @case('pending')
-                                Menunggu
-                                @break
-                                @case('confirmed')
-                                Dikonfirmasi
-                                @break
-                                @case('shipped')
-                                Dikirim
-                                @break
-                                @case('delivered')
-                                Diterima
-                                @break
-                                @case('cancelled')
-                                Dibatalkan
-                                @break
-                                @default
-                                {{ ucfirst($order->status) }}
-                                @endswitch
+                                @case('pending') Menunggu @break
+                                @case('confirmed') Dikonfirmasi @break
+                                @case('shipped') Dikirim @break
+                                @case('delivered') Diterima @break
+                                @case('cancelled') Dibatalkan @break
+                                @default {{ ucfirst($order->status) }} @endswitch
                             </span>
                             <a href="{{ route('customer.orders.show', $order) }}"
-                                class="text-blue-600 hover:text-blue-700 font-medium">
+                                class="text-xs sm:text-blue-600 hover:text-blue-700 font-medium">
                                 Lihat Detail
                             </a>
                         </div>
                     </div>
                 </div>
-
-                <div class="px-6 py-4">
-                    <div class="flex items-center justify-between">
+                <div class="px-3 py-3 sm:px-6 sm:py-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div class="flex-1">
-                            <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2 sm:space-x-4">
                                 @if($order->cart && $order->cart->cartDetails->count() > 0)
                                 @php $firstDetail = $order->cart->cartDetails->first(); @endphp
                                 <div class="flex-shrink-0">
                                     @if($firstDetail->product->images->count() > 0)
                                     <img src="{{ asset('storage/' . $firstDetail->product->images->first()->image) }}"
                                         alt="{{ $firstDetail->product->productname }}"
-                                        class="w-12 h-12 rounded-lg object-cover">
+                                        class="w-8 h-8 sm:w-12 sm:h-12 rounded-lg object-cover">
                                     @else
-                                    <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-image text-gray-400"></i>
                                     </div>
                                     @endif
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">
+                                    <p class="text-xs sm:text-sm font-medium text-gray-900">
                                         {{ $firstDetail->product->productname }}
                                         @if($order->cart->cartDetails->count() > 1)
-                                        <span class="text-gray-500">dan {{ $order->cart->cartDetails->count() - 1 }}
-                                            item lainnya</span>
+                                        <span class="text-gray-500">dan {{ $order->cart->cartDetails->count() - 1 }} item lainnya</span>
                                         @endif
                                     </p>
-                                    <p class="text-sm text-gray-600">{{ $order->cart->cartDetails->sum('quantity') }}
-                                        item</p>
+                                    <p class="text-xs sm:text-sm text-gray-600">{{ $order->cart->cartDetails->sum('quantity') }} item</p>
                                 </div>
                                 @else
                                 <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-box text-gray-400"></i>
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">Detail pesanan tidak tersedia</p>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-900">Detail pesanan tidak tersedia</p>
                                 </div>
                                 @endif
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-lg font-bold text-gray-900">Rp {{ number_format($order->grandtotal) }}</p>
+                            <p class="text-sm sm:text-lg font-bold text-gray-900">Rp {{ number_format($order->grandtotal) }}</p>
                             @if($order->status === 'pending')
-                            <div class="mt-2 space-x-2">
-                                <button type="button" class="text-sm text-red-600 hover:text-red-700"
+                            <div class="mt-1 sm:mt-2 space-x-1 sm:space-x-2">
+                                <button type="button" class="text-xs sm:text-sm text-red-600 hover:text-red-700"
                                     onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm{{ $order->id }}').submit(); })">
                                     Batalkan Pesanan
                                 </button>
@@ -144,9 +129,9 @@
                                 </form>
                             </div>
                             @elseif($order->status === 'delivered')
-                            <div class="mt-2">
+                            <div class="mt-1 sm:mt-2">
                                 <a href="{{ route('customer.orders.show', $order) }}"
-                                    class="text-sm text-blue-600 hover:text-blue-700">
+                                    class="text-xs sm:text-blue-600 hover:text-blue-700">
                                     Lihat Detail
                                 </a>
                             </div>
