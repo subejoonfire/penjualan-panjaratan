@@ -717,13 +717,7 @@
                 color: #2563eb;
             }
             .mobile-nav-label {
-                display: block;
-                max-width: 60px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                font-size: 0.75rem;
-                margin-top: 2px;
+                display: none;
             }
             .desktop-nav {
                 display: none !important;
