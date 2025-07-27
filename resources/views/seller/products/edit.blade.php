@@ -235,14 +235,12 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status Produk</label>
                         <div class="flex items-center space-x-6">
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="is_active" value="1" {{ old('is_active', $product->is_active)
-                                == '1' || old('is_active', $product->is_active) === true ? 'checked' : '' }}
+                                <input type="radio" name="is_active" value="1" {{ (old('is_active', $product->is_active ? '1' : '0') == '1') ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Aktif</span>
                             </label>
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="is_active" value="0" {{ old('is_active', $product->is_active)
-                                == '0' || old('is_active', $product->is_active) === false ? 'checked' : '' }}
+                                <input type="radio" name="is_active" value="0" {{ (old('is_active', $product->is_active ? '1' : '0') == '0') ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Tidak Aktif</span>
                             </label>

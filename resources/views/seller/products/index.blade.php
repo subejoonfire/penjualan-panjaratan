@@ -2,6 +2,25 @@
 
 @section('title', 'Produk Saya - Dashboard Penjual')
 
+@push('styles')
+<style>
+    .product-inactive {
+        filter: grayscale(30%) brightness(90%);
+        transition: all 0.3s ease;
+    }
+    
+    .product-inactive:hover {
+        filter: grayscale(20%) brightness(95%);
+        transform: translateY(-2px);
+    }
+    
+    .product-active:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="py-6">
     <div class="w-full px-4 sm:px-6 lg:px-8">
@@ -73,16 +92,20 @@
         @if($products->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($products as $product)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 {{ !$product->is_active ? 'product-inactive opacity-75 bg-gray-50 border border-gray-200' : 'product-active hover:shadow-lg' }}">
                 <!-- Product Image -->
                 <div class="aspect-w-1 aspect-h-1 relative">
                     @if($product->primaryImage)
                     <img src="{{ url('storage/'.$product->primaryImage->image) }}" alt="{{ $product->productname }}"
                         class="w-full h-48 object-cover">
                     @else
-                    <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <div class="w-full h-48 bg-gray-200 flex items-center justify-center {{ !$product->is_active ? 'bg-gray-300' : '' }}">
                         <i class="fas fa-image text-gray-400 text-3xl"></i>
                     </div>
+                    @endif
+                    
+                    @if(!$product->is_active)
+                    <div class="absolute inset-0 bg-gray-900 bg-opacity-20"></div>
                     @endif
 
                     <!-- Status Badge -->
@@ -106,12 +129,17 @@
             </div>
 
             <!-- Product Details -->
-            <div class="p-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-2 truncate">{{ $product->productname }}</h3>
-                <p class="text-sm text-gray-600 mb-2">{{ $product->category->category }}</p>
-                <p class="text-lg font-bold text-blue-600 mb-2">Rp {{ number_format($product->productprice) }}</p>
+            <div class="p-4 {{ !$product->is_active ? 'bg-gray-50' : '' }}">
+                <h3 class="text-lg font-medium mb-2 truncate {{ !$product->is_active ? 'text-gray-600' : 'text-gray-900' }}">
+                    {{ $product->productname }}
+                    @if(!$product->is_active)
+                        <span class="text-xs text-gray-500 font-normal">(Tidak Aktif)</span>
+                    @endif
+                </h3>
+                <p class="text-sm mb-2 {{ !$product->is_active ? 'text-gray-500' : 'text-gray-600' }}">{{ $product->category->category }}</p>
+                <p class="text-lg font-bold mb-2 {{ !$product->is_active ? 'text-gray-500' : 'text-blue-600' }}">Rp {{ number_format($product->productprice) }}</p>
 
-                <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
+                <div class="flex items-center justify-between text-sm mb-4 {{ !$product->is_active ? 'text-gray-500' : 'text-gray-600' }}">
                     <span>Stok: {{ $product->productstock }}</span>
                     <span>{{ $product->images->count() }} gambar</span>
                 </div>
@@ -119,30 +147,30 @@
                 <!-- Actions -->
                 <div class="flex space-x-2">
                     <a href="{{ route('products.show', $product) }}"
-                        class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200 text-center">
+                        class="flex-1 px-3 py-2 rounded-md text-sm font-medium text-center {{ !$product->is_active ? 'bg-gray-200 text-gray-500 hover:bg-gray-300' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                         Lihat
                     </a>
                     <a href="{{ route('seller.products.edit', $product) }}"
-                        class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center">
+                        class="flex-1 px-3 py-2 rounded-md text-sm font-medium text-center {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }}">
                         Edit
                     </a>
                 </div>
             </div>
 
             <!-- Quick Stats -->
-            <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+            <div class="px-4 py-3 border-t {{ !$product->is_active ? 'bg-gray-100 border-gray-300' : 'bg-gray-50 border-gray-200' }}">
                 <div class="grid grid-cols-3 gap-4 text-center">
                     <div>
-                        <p class="text-xs text-gray-500">Dilihat</p>
-                        <p class="text-sm font-medium text-gray-900">{{ $product->view_count ?? 0 }}</p>
+                        <p class="text-xs {{ !$product->is_active ? 'text-gray-400' : 'text-gray-500' }}">Dilihat</p>
+                        <p class="text-sm font-medium {{ !$product->is_active ? 'text-gray-600' : 'text-gray-900' }}">{{ $product->view_count ?? 0 }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">Terjual</p>
-                        <p class="text-sm font-medium text-gray-900">{{ $product->sold_count ?? 0 }}</p>
+                        <p class="text-xs {{ !$product->is_active ? 'text-gray-400' : 'text-gray-500' }}">Terjual</p>
+                        <p class="text-sm font-medium {{ !$product->is_active ? 'text-gray-600' : 'text-gray-900' }}">{{ $product->sold_count ?? 0 }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">Rating</p>
-                        <p class="text-sm font-medium text-gray-900">
+                        <p class="text-xs {{ !$product->is_active ? 'text-gray-400' : 'text-gray-500' }}">Rating</p>
+                        <p class="text-sm font-medium {{ !$product->is_active ? 'text-gray-600' : 'text-gray-900' }}">
                             @if($product->reviews()->count() > 0)
                                 {{ number_format($product->reviews()->avg('rating'), 1) }}
                             @else

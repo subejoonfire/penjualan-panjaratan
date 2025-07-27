@@ -122,7 +122,7 @@ class DashboardController extends Controller
             $query->where('productname', 'like', '%' . $request->search . '%');
         }
 
-        $products = $query->orderBy('created_at', 'desc')->paginate(12);
+        $products = $query->orderBy('is_active', 'desc')->orderBy('created_at', 'desc')->paginate(12);
         $categories = Category::all();
 
         return view('seller.products.index', compact('products', 'categories'));
@@ -213,7 +213,7 @@ class DashboardController extends Controller
             'productprice' => 'required|numeric|min:0',
             'productstock' => 'required|integer|min:0',
             'idcategories' => 'required|exists:categories,id',
-            'is_active' => 'boolean',
+            'is_active' => 'required|in:0,1',
             'images' => 'array|max:5', // Maksimal 5 gambar baru
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
@@ -232,7 +232,7 @@ class DashboardController extends Controller
             'productprice' => $request->productprice,
             'productstock' => $request->productstock,
             'idcategories' => $request->idcategories,
-            'is_active' => $request->has('is_active')
+            'is_active' => $request->is_active == '1'
         ]);
 
         // Handle new image uploads
