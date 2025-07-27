@@ -81,12 +81,12 @@
             <!-- Notifikasi & Cart -->
             <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
                 <i class="fas fa-bell"></i>
-                <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                <span id="notification-count-mobile" class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
             </a>
             @if(auth()->user()->isCustomer())
             <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                <span id="cart-count-mobile" class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
             </a>
             @endif
             <!-- Profile Button -->
@@ -223,7 +223,7 @@
                             <button @click="open = !open"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
-                                <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                                <span id="notification-count-desktop" class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
                             </button>
 
                             <!-- Notification Dropdown -->
@@ -266,7 +266,7 @@
                             <a href="{{ route('customer.cart.index') }}"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none {{ request()->routeIs('customer.cart.*') ? 'text-blue-600' : '' }}">
                                 <i class="fas fa-shopping-cart text-lg"></i>
-                                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                                <span id="cart-count-desktop" class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
                             </a>
                         </div>
                         @endif
@@ -374,23 +374,39 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('NotifCount API data:', data);
-                        const notificationCount = document.querySelector('.notification-count');
-                        if (notificationCount) {
-                            notificationCount.textContent = data.count;
-                            notificationCount.style.display = 'flex';
+                        // Desktop
+                        const notifDesktop = document.getElementById('notification-count-desktop');
+                        if (notifDesktop) {
+                            notifDesktop.textContent = data.count;
+                            notifDesktop.style.display = 'flex';
                         }
-                        // Cart count update (if needed)
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount && data.cart_count !== undefined) {
-                            cartCount.textContent = data.cart_count;
-                            cartCount.style.display = 'flex';
+                        const cartDesktop = document.getElementById('cart-count-desktop');
+                        if (cartDesktop && data.cart_count !== undefined) {
+                            cartDesktop.textContent = data.cart_count;
+                            cartDesktop.style.display = 'flex';
+                        }
+                        // Mobile
+                        const notifMobile = document.getElementById('notification-count-mobile');
+                        if (notifMobile) {
+                            notifMobile.textContent = data.count;
+                            notifMobile.style.display = 'flex';
+                        }
+                        const cartMobile = document.getElementById('cart-count-mobile');
+                        if (cartMobile && data.cart_count !== undefined) {
+                            cartMobile.textContent = data.cart_count;
+                            cartMobile.style.display = 'flex';
                         }
                     })
                     .catch(error => {
-                        const notificationCount = document.querySelector('.notification-count');
-                        if (notificationCount) {
-                            notificationCount.textContent = '!';
-                            notificationCount.style.display = 'flex';
+                        const notifDesktop = document.getElementById('notification-count-desktop');
+                        if (notifDesktop) {
+                            notifDesktop.textContent = '!';
+                            notifDesktop.style.display = 'flex';
+                        }
+                        const notifMobile = document.getElementById('notification-count-mobile');
+                        if (notifMobile) {
+                            notifMobile.textContent = '!';
+                            notifMobile.style.display = 'flex';
                         }
                         console.error('Error loading notification count:', error);
                     });
