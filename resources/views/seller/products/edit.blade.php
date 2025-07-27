@@ -373,7 +373,17 @@
 </div>
 
 <script>
-    // Drag and Drop Upload Implementation
+// Drag and Drop Upload Implementation
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Prevent default drag behaviors on document level
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        document.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
+
     const dropArea = document.getElementById('dropArea');
     const dropContent = document.getElementById('dropContent');
     const uploadProgress = document.getElementById('uploadProgress');
@@ -387,115 +397,105 @@
     const maxFiles = 5;
     const maxFileSize = 2 * 1024 * 1024; // 2MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    
+
     // Browse button click
-    browseBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
+    if (browseBtn) {
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
     
     // File input change
     fileInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
     });
-    
-    // Drag and drop events
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
-    
-    function preventDefaults(e) {
+
+    // Drop area specific events
+    dropArea.addEventListener('dragenter', function(e) {
         e.preventDefault();
         e.stopPropagation();
-    }
-    
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, highlight, false);
+        highlight();
     });
-    
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, unhighlight, false);
+    dropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        highlight();
     });
-    
+    dropArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!dropArea.contains(e.relatedTarget)) {
+            unhighlight();
+        }
+    });
+    dropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        unhighlight();
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            handleFiles(files);
+        }
+    });
+
     function highlight() {
         dropArea.classList.add('border-blue-500', 'bg-blue-50', 'dragover');
         dropArea.classList.remove('border-gray-300');
     }
-    
     function unhighlight() {
         dropArea.classList.remove('border-blue-500', 'bg-blue-50', 'dragover');
         dropArea.classList.add('border-gray-300');
     }
-    
-    dropArea.addEventListener('drop', handleDrop, false);
-    
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFiles(files);
-    }
-    
+
     function handleFiles(files) {
         const fileArray = Array.from(files);
         const validFiles = [];
         const errors = [];
-        
         // Get current image count
         const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
         const totalAllowed = 6; // Maximum total images
         const remainingSlots = totalAllowed - currentImageCount - selectedFiles.length;
-        
         // Validate files
         fileArray.forEach((file, index) => {
             if (!allowedTypes.includes(file.type)) {
                 errors.push(`File "${file.name}" bukan format gambar yang valid`);
                 return;
             }
-            
             if (file.size > maxFileSize) {
                 errors.push(`File "${file.name}" terlalu besar (maksimal 2MB)`);
                 return;
             }
-            
             if (validFiles.length >= remainingSlots) {
                 errors.push(`Tidak bisa menambah lebih banyak gambar. Sisa slot: ${remainingSlots}`);
                 return;
             }
-            
             if (selectedFiles.length + validFiles.length >= maxFiles) {
                 errors.push(`Maksimal ${maxFiles} gambar baru yang bisa dipilih`);
                 return;
             }
-            
             validFiles.push(file);
         });
-        
         // Show errors if any
         if (errors.length > 0) {
             showAlert(errors.join('<br>'), 'error');
             return;
         }
-        
         // Add valid files
         selectedFiles = [...selectedFiles, ...validFiles];
-        
         // Update file input with selected files
         updateFileInput();
-        
         // Update UI
         updateSelectedInfo();
         updatePreview();
-        
         if (selectedFiles.length > 0) {
             showAlert(`${validFiles.length} gambar berhasil ditambahkan`, 'success');
         }
     }
-    
     function updateFileInput() {
         const dt = new DataTransfer();
         selectedFiles.forEach(file => dt.items.add(file));
         fileInput.files = dt.files;
     }
-    
     function updateSelectedInfo() {
         if (selectedFiles.length > 0) {
             selectedFilesInfo.classList.remove('hidden');
@@ -503,15 +503,13 @@
         } else {
             selectedFilesInfo.classList.add('hidden');
         }
-        
         // Update remaining slots info
         const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
         const remainingSlots = 6 - currentImageCount - selectedFiles.length;
         const remainingSlotsElement = document.getElementById('remainingSlots');
         if (remainingSlotsElement) {
             remainingSlotsElement.textContent = remainingSlots;
-            
-                         // Change color based on remaining slots
+            // Change color based on remaining slots
             const remainingSlotsInfo = document.getElementById('remainingSlotsInfo');
             if (remainingSlots <= 0) {
                 remainingSlotsInfo.className = 'text-red-600 font-medium';
@@ -534,10 +532,8 @@
             }
         }
     }
-    
     function updatePreview() {
         preview.innerHTML = '';
-        
         selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -567,7 +563,6 @@
             reader.readAsDataURL(file);
         });
     }
-    
     function removeFile(index) {
         selectedFiles.splice(index, 1);
         updateFileInput();
@@ -575,7 +570,6 @@
         updatePreview();
         showAlert('Gambar berhasil dihapus', 'info');
     }
-    
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -583,14 +577,11 @@
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-    
     // Make removeFile function global
     window.removeFile = removeFile;
-    
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        updateSelectedInfo(); // Update initial state
-    });
+    updateSelectedInfo(); // Update initial state
+});
 
 function setPrimaryImage(imageId) {
     confirmAction('Jadikan gambar ini sebagai gambar utama?', function() {
