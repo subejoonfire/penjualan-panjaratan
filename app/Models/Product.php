@@ -24,6 +24,8 @@ class Product extends Model
         'idcategories',
         'iduserseller',
         'is_active',
+        'view_count',
+        'sold_count',
     ];
 
     /**
@@ -132,5 +134,17 @@ class Product extends Model
     public function scopeBySeller($query, $sellerId)
     {
         return $query->where('iduserseller', $sellerId);
+    }
+
+    // Helper method untuk increment view count
+    public function incrementViewCount()
+    {
+        $this->increment('view_count');
+    }
+
+    // Helper method untuk increment sold count
+    public function incrementSoldCount($quantity = 1)
+    {
+        $this->increment('sold_count', $quantity);
     }
 }

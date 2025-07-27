@@ -134,15 +134,21 @@
                 <div class="grid grid-cols-3 gap-4 text-center">
                     <div>
                         <p class="text-xs text-gray-500">Dilihat</p>
-                        <p class="text-sm font-medium text-gray-900">0</p>
+                        <p class="text-sm font-medium text-gray-900">{{ $product->view_count ?? 0 }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Terjual</p>
-                        <p class="text-sm font-medium text-gray-900">0</p>
+                        <p class="text-sm font-medium text-gray-900">{{ $product->sold_count ?? 0 }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Rating</p>
-                        <p class="text-sm font-medium text-gray-900">-</p>
+                        <p class="text-sm font-medium text-gray-900">
+                            @if($product->reviews()->count() > 0)
+                                {{ number_format($product->reviews()->avg('rating'), 1) }}
+                            @else
+                                -
+                            @endif
+                        </p>
                     </div>
                 </div>
             </div>

@@ -186,15 +186,24 @@
                             <span
                                 class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>
                             @else
-                            <a href="{{ route('seller.products.images.primary', $image) }}"
-                                class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">Jadikan
-                                Utama</a>
+                            <form action="{{ route('seller.products.images.primary', $image) }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" 
+                                    class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">
+                                    Jadikan Utama
+                                </button>
+                            </form>
                             @endif
-                            <a href="{{ route('seller.products.images.delete', $image) }}"
-                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
-                                onclick="return confirm('Hapus gambar ini?')">
-                                Hapus
-                            </a>
+                            <form action="{{ route('seller.products.images.delete', $image) }}" method="POST" 
+                                style="display: inline;" onsubmit="return confirm('Hapus gambar ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                    class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">
+                                    Hapus
+                                </button>
+                            </form>
                         </div>
                         @endforeach
                     </div>

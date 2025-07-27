@@ -57,6 +57,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::get('/sales', [SellerDashboardController::class, 'sales'])->name('sales');
     Route::post('/products/{product}/images', [SellerDashboardController::class, 'uploadImage'])->name('products.images.upload');
     Route::delete('/products/images/{image}', [SellerDashboardController::class, 'deleteImage'])->name('products.images.delete');
+    Route::put('/products/images/{image}/primary', [SellerDashboardController::class, 'setPrimaryImage'])->name('products.images.primary');
 });
 
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {

@@ -96,6 +96,11 @@ class Transaction extends Model
             'transactionstatus' => 'paid',
             'paid_at' => now()
         ]);
+
+        // Increment sold count untuk setiap produk yang dibeli
+        foreach ($this->order->cart->cartDetails as $cartDetail) {
+            $cartDetail->product->incrementSoldCount($cartDetail->quantity);
+        }
     }
 
     // Helper method untuk mark sebagai failed

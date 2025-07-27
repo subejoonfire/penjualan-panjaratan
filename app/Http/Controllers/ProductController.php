@@ -91,6 +91,9 @@ class ProductController extends Controller
             'reviews.user'
         ]);
 
+        // Increment view count
+        $product->incrementViewCount();
+
         // Get related products from same category
         $relatedProducts = Product::where('idcategories', $product->idcategories)
             ->where('id', '!=', $product->id)
