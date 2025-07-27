@@ -96,6 +96,12 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class, 'iduser')->where('readstatus', false);
     }
 
+    // Relasi ke Wishlist (One to Many)
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     // Helper method untuk mengecek role
     public function isAdmin()
     {

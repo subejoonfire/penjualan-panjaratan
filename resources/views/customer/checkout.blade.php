@@ -40,7 +40,7 @@
                                 <div class="flex-1">
                                     <h4 class="text-sm font-medium text-gray-900">{{ $detail->product->productname }}
                                     </h4>
-                                    <p class="text-sm text-gray-600">Seller: {{ $detail->product->seller->username }}
+                                    <p class="text-sm text-gray-600">Seller: {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}
                                     </p>
                                     <p class="text-sm text-gray-600">Qty: {{ $detail->quantity }} × Rp {{
                                         number_format($detail->productprice) }}</p>

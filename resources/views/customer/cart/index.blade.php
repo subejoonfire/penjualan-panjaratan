@@ -56,7 +56,7 @@
                                             {{ $detail->product->productname }}
                                         </a>
                                     </h4>
-                                    <p class="text-sm text-gray-600">oleh {{ $detail->product->seller->username }}</p>
+                                    <p class="text-sm text-gray-600">oleh {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
                                     <p class="text-sm text-gray-500">{{ $detail->product->category->category }}</p>
 
                                     <div class="mt-2 flex items-center space-x-4">

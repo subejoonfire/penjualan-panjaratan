@@ -246,6 +246,19 @@ class ProductController extends Controller
             $query->where('productprice', '<=', $request->max_price);
         }
 
+        // Filter by rating
+        if ($request->filled('rating')) {
+            $query->whereHas('reviews', function($q) use ($request) {
+                $q->groupBy('idproduct')
+                  ->havingRaw('AVG(rating) >= ?', [$request->rating]);
+            });
+        }
+
+        // Filter by stock availability
+        if ($request->filled('in_stock')) {
+            $query->where('productstock', '>', 0);
+        }
+
         // Sort products
         $sortBy = $request->get('sort', 'relevance');
         switch ($sortBy) {

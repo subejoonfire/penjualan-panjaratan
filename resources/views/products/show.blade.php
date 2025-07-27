@@ -7,7 +7,7 @@
     <div class="w-full px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
         <nav class="flex mb-8" aria-label="Breadcrumb">
-                                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
                     <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-blue-600">
                         <i class="fas fa-home mr-2"></i>
@@ -98,8 +98,9 @@
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-900">Penjual</dt>
-                            <dd class="mt-1 text-gray-700">{{ $product->seller->username }}</dd>
+                            <dt class="text-sm font-medium text-gray-900">Seller</dt>
+                            <dd class="mt-1 text-gray-700">{{ $product->seller->nickname ?? $product->seller->username
+                                }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-900">Stok</dt>
@@ -128,6 +129,22 @@
 
                 <!-- Add to Cart Section -->
                 @auth
+                @if(auth()->user()->role === 'customer')
+                <!-- Wishlist Button -->
+                <div class="border-t border-gray-200 pt-6">
+                    @php
+                    $isInWishlist = auth()->user() && \App\Models\Wishlist::where('user_id',
+                    auth()->id())->where('product_id', $product->id)->exists();
+                    @endphp
+                    <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
+                        class="w-full mb-4 {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-2 px-4 rounded-md transition-colors">
+                        <i class="fas fa-heart mr-2"></i>
+                        <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'
+                            }}</span>
+                    </button>
+                </div>
+                @endif
+
                 @if(auth()->user()->role === 'customer' && $product->is_active && $product->productstock > 0)
                 <div class="border-t border-gray-200 pt-6">
                     <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
@@ -247,11 +264,13 @@
                         @if($totalReviews > 0)
                         <div class="flex items-center">
                             <div class="flex items-center mr-2">
-                                @for($i = 1; $i <= 5; $i++)
-                                <i class="fas fa-star text-lg {{ $i <= round($averageRating) ? 'text-yellow-400' : 'text-gray-300' }}"></i>
-                                @endfor
+                                @for($i = 1; $i <= 5; $i++) <i
+                                    class="fas fa-star text-lg {{ $i <= round($averageRating) ? 'text-yellow-400' : 'text-gray-300' }}">
+                                    </i>
+                                    @endfor
                             </div>
-                            <span class="text-lg font-semibold text-gray-900">{{ number_format($averageRating, 1) }}</span>
+                            <span class="text-lg font-semibold text-gray-900">{{ number_format($averageRating, 1)
+                                }}</span>
                             <span class="text-sm text-gray-500 ml-1">dari 5</span>
                         </div>
                         @endif
@@ -268,7 +287,8 @@
                             <i class="fas fa-star text-yellow-400 mx-1"></i>
                             <div class="flex-1 mx-3">
                                 <div class="bg-gray-200 rounded-full h-2">
-                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ $data['percentage'] }}%"></div>
+                                    <div class="bg-yellow-400 h-2 rounded-full"
+                                        style="width: {{ $data['percentage'] }}%"></div>
                                 </div>
                             </div>
                             <span class="w-8 text-right">{{ $data['count'] }}</span>
@@ -289,12 +309,15 @@
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-sm font-medium text-gray-900">{{ $review->user->username }}</h4>
+                                    <h4 class="text-sm font-medium text-gray-900">{{ $review->user->nickname ??
+                                        $review->user->username }}</h4>
                                     <div class="flex items-center">
-                                        @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star text-sm {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
-                                        @endfor
-                                        <span class="ml-2 text-sm text-gray-500">{{ $review->created_at->diffForHumans() }}</span>
+                                        @for($i = 1; $i <= 5; $i++) <i
+                                            class="fas fa-star text-sm {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}">
+                                            </i>
+                                            @endfor
+                                            <span class="ml-2 text-sm text-gray-500">{{
+                                                $review->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
                                 @if($review->productreviews)
@@ -316,7 +339,8 @@
                 @else
                 <div class="px-6 py-8 text-center">
                     <i class="fas fa-star text-gray-400 text-3xl mb-2"></i>
-                    <p class="text-gray-500">Belum ada ulasan. Jadilah yang pertama memberikan ulasan untuk produk ini!</p>
+                    <p class="text-gray-500">Belum ada ulasan. Jadilah yang pertama memberikan ulasan untuk produk ini!
+                    </p>
                 </div>
                 @endif
             </div>
@@ -336,12 +360,12 @@
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Penilaian</label>
                             <div class="flex items-center space-x-1">
-                                @for($i = 1; $i <= 5; $i++)
-                                <button type="button" onclick="setRating({{ $i }})" 
+                                @for($i = 1; $i <= 5; $i++) <button type="button" onclick="setRating({{ $i }})"
                                     class="rating-star focus:outline-none" data-rating="{{ $i }}">
-                                    <i class="fas fa-star text-2xl text-gray-300 hover:text-yellow-400 transition-colors"></i>
-                                </button>
-                                @endfor
+                                    <i
+                                        class="fas fa-star text-2xl text-gray-300 hover:text-yellow-400 transition-colors"></i>
+                                    </button>
+                                    @endfor
                             </div>
                             <input type="hidden" name="rating" id="rating" value="5" required>
                             @error('rating')
@@ -350,8 +374,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="productreviews" class="block text-sm font-medium text-gray-700 mb-2">Ulasan (Opsional)</label>
-                            <textarea name="productreviews" id="productreviews" rows="4" 
+                            <label for="productreviews" class="block text-sm font-medium text-gray-700 mb-2">Ulasan
+                                (Opsional)</label>
+                            <textarea name="productreviews" id="productreviews" rows="4"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="Bagikan pengalaman Anda dengan produk ini...">{{ old('productreviews') }}</textarea>
                             @error('productreviews')
@@ -360,7 +385,8 @@
                         </div>
 
                         <div class="flex justify-end">
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                            <button type="submit"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
                                 Kirim Ulasan
                             </button>
                         </div>
@@ -400,7 +426,8 @@
                         <p class="text-lg font-bold text-blue-600 mt-1">Rp {{
                             number_format($relatedProduct->productprice) }}</p>
                         <div class="mt-2 flex items-center justify-between">
-                            <span class="text-xs text-gray-500">{{ $relatedProduct->seller->username }}</span>
+                            <span class="text-xs text-gray-500">{{ $relatedProduct->seller->nickname ??
+                                $relatedProduct->seller->username }}</span>
                             <a href="{{ route('products.show', $relatedProduct) }}"
                                 class="text-blue-600 hover:text-blue-500 text-sm">
                                 Lihat
@@ -459,5 +486,72 @@
             setRating(5);
         }
     });
+
+    // Wishlist functionality
+    function toggleWishlist(productId) {
+        const btn = document.getElementById('wishlistBtn');
+        const text = document.getElementById('wishlistText');
+        const originalText = text.textContent;
+        
+        btn.disabled = true;
+        text.textContent = 'Memproses...';
+        
+        fetch(`/customer/wishlist/toggle/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.action === 'added') {
+                    btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                    text.textContent = 'Hapus dari Wishlist';
+                } else {
+                    btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    text.textContent = 'Tambah ke Wishlist';
+                }
+                
+                // Show toast notification
+                showToast(data.message);
+            } else {
+                text.textContent = originalText;
+                alert(data.message || 'Terjadi kesalahan');
+            }
+            btn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            text.textContent = originalText;
+            btn.disabled = false;
+            alert('Terjadi kesalahan');
+        });
+    }
+    
+    function showToast(message) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
 </script>
 @endsection

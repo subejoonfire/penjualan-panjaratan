@@ -132,7 +132,7 @@
                             </p>
 
                             <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
-                                <span>{{ $product->seller->username }}</span>
+                                <span>{{ $product->seller->nickname ?? $product->seller->username }}</span>
                                 <span>Stock: {{ $product->productstock }}</span>
                             </div>
 

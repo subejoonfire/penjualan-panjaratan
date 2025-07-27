@@ -10,7 +10,20 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (auth()->check()) {
+        $user = auth()->user();
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            case 'seller':
+                return redirect()->route('seller.dashboard');
+            case 'customer':
+                return redirect()->route('customer.dashboard');
+            default:
+                return redirect()->route('products.index');
+        }
+    }
+    return redirect()->route('products.index');
 });
 
 Route::middleware('guest')->group(function () {
@@ -75,6 +88,12 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/notifications', [CustomerDashboardController::class, 'notifications'])->name('notifications.index');
     Route::put('/notifications/{notification}/read', [CustomerDashboardController::class, 'markAsRead'])->name('notifications.read');
     Route::put('/notifications/mark-all-read', [CustomerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    
+    // Wishlist routes
+    Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add/{product}', [\App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{product}', [\App\Http\Controllers\WishlistController::class, 'remove'])->name('wishlist.remove');
+    Route::post('/wishlist/toggle/{product}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 Route::middleware('auth')->group(function () {

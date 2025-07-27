@@ -109,7 +109,8 @@
                             <label for="productstock" class="block text-sm font-medium text-gray-700 mb-2">
                                 Jumlah Stok <span class="text-red-500">*</span>
                             </label>
-                            <input type="number" name="productstock" id="productstock" value="{{ old('productstock') }}" required min="0"
+                            <input type="number" name="productstock" id="productstock" value="{{ old('productstock') }}"
+                                required min="0"
                                 class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="0">
                             @error('productstock')
@@ -124,28 +125,38 @@
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900">Gambar Produk</h3>
-                    <p class="mt-1 text-sm text-gray-600">Unggah gambar produk untuk menampilkan produk Anda. Gambar pertama
-                        akan menjadi gambar utama.</p>
+                    <p class="mt-1 text-sm text-gray-600">Unggah maksimal 5 gambar produk (2MB per gambar). Gambar
+                        pertama akan menjadi gambar utama.</p>
                 </div>
                 <div class="p-6">
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                    <!-- Upload Area -->
+                    <div id="dropArea"
+                        class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
                         <div class="text-center">
                             <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
                             <div class="flex text-sm text-gray-600">
                                 <label for="images"
                                     class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Unggah gambar</span>
-                                    <input id="images" name="images[]" type="file" class="sr-only" multiple accept="image/*" required>
+                                    <input id="images" name="images[]" type="file" class="sr-only" multiple
+                                        accept="image/*" required>
                                 </label>
                                 <p class="pl-1">atau seret dan lepas</p>
                             </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar</p>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar (maksimal 5 gambar)
+                            </p>
+                            <p id="imageCount" class="text-xs text-blue-600 mt-1 hidden">0/5 gambar dipilih</p>
                         </div>
                     </div>
 
-                    <!-- Image Preview -->
-                    <div id="imagePreview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 hidden">
-                        <!-- Images will be previewed here -->
+                    <!-- Image Preview with Drag and Drop Reordering -->
+                    <div id="imagePreview" class="mt-4 hidden">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar (Seret untuk mengurutkan)
+                        </h4>
+                        <div id="sortableImages" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Images will be previewed here -->
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Gambar pertama akan menjadi gambar utama produk</p>
                     </div>
 
                     @error('images')
@@ -173,58 +184,181 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const imageInput = document.getElementById('images');
-    const imagePreview = document.getElementById('imagePreview');
-    
-    imageInput.addEventListener('change', function(e) {
-        const files = Array.from(e.target.files);
-        imagePreview.innerHTML = '';
+        const imageInput = document.getElementById('images');
+        const imagePreview = document.getElementById('imagePreview');
+        const sortableImages = document.getElementById('sortableImages');
+        const dropArea = document.getElementById('dropArea');
+        const imageCount = document.getElementById('imageCount');
         
-        if (files.length > 0) {
-            imagePreview.classList.remove('hidden');
+        let currentFiles = [];
+        const maxFiles = 5;
+        const maxFileSize = 2 * 1024 * 1024; // 2MB
+        
+        // Initialize Sortable
+        const sortable = Sortable.create(sortableImages, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function (evt) {
+                // Reorder files array
+                const oldIndex = evt.oldIndex;
+                const newIndex = evt.newIndex;
+                const movedFile = currentFiles.splice(oldIndex, 1)[0];
+                currentFiles.splice(newIndex, 0, movedFile);
+                
+                // Update file input
+                updateFileInput();
+                // Update preview
+                updateImagePreview();
+            }
+        });
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function highlight() {
+            dropArea.classList.add('border-blue-500', 'bg-blue-50');
+        }
+        
+        function unhighlight() {
+            dropArea.classList.remove('border-blue-500', 'bg-blue-50');
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        imageInput.addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            const newFiles = Array.from(files).filter(file => {
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    alert(`File ${file.name} bukan file gambar yang valid.`);
+                    return false;
+                }
+                
+                // Check file size
+                if (file.size > maxFileSize) {
+                    alert(`File ${file.name} terlalu besar. Maksimal 2MB per gambar.`);
+                    return false;
+                }
+                
+                return true;
+            });
             
-            files.forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
+            // Check total files limit
+            if (currentFiles.length + newFiles.length > maxFiles) {
+                const remainingSlots = maxFiles - currentFiles.length;
+                if (remainingSlots > 0) {
+                    alert(`Maksimal ${maxFiles} gambar. Hanya ${remainingSlots} gambar yang dapat ditambahkan.`);
+                    currentFiles = currentFiles.concat(newFiles.slice(0, remainingSlots));
+                } else {
+                    alert(`Maksimal ${maxFiles} gambar sudah tercapai.`);
+                }
+            } else {
+                currentFiles = currentFiles.concat(newFiles);
+            }
+            
+            updateFileInput();
+            updateImagePreview();
+            updateImageCount();
+        }
+        
+        function updateFileInput() {
+            const dt = new DataTransfer();
+            currentFiles.forEach(file => dt.items.add(file));
+            imageInput.files = dt.files;
+        }
+        
+        function updateImagePreview() {
+            sortableImages.innerHTML = '';
+            
+            if (currentFiles.length > 0) {
+                imagePreview.classList.remove('hidden');
+                
+                currentFiles.forEach((file, index) => {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const imageDiv = document.createElement('div');
-                        imageDiv.className = 'relative group';
+                        imageDiv.className = 'relative group cursor-move';
                         imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" class="w-full h-32 object-cover rounded-lg border border-gray-200">
-                            <div class="absolute top-2 right-2">
-                                ${index === 0 ? '<span class="bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : '<span class="bg-green-600 text-white text-xs px-2 py-1 rounded">Tambahan</span>'}
-                            </div>
-                            <div class="absolute bottom-2 left-2">
-                                <span class="bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded truncate max-w-20">
-                                    ${file.name}
-                                </span>
+                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
+                                 class="w-full h-24 object-cover rounded-md border-2 ${index === 0 ? 'border-blue-500' : 'border-gray-200'}">
+                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : `<span class="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-1 rounded">${index + 1}</span>`}
+                            <button type="button" onclick="removeImage(${index})" 
+                                    class="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-md">
+                                <i class="fas fa-arrows-alt text-white text-lg"></i>
                             </div>
                         `;
-                        imagePreview.appendChild(imageDiv);
+                        sortableImages.appendChild(imageDiv);
                     };
                     reader.readAsDataURL(file);
-                }
-            });
-        } else {
-            imagePreview.classList.add('hidden');
+                });
+            } else {
+                imagePreview.classList.add('hidden');
+            }
         }
-    });
-
-    // Price formatting
-    const priceInput = document.getElementById('productprice');
-    priceInput.addEventListener('input', function(e) {
-        let value = e.target.value;
-        // Remove any non-numeric characters except decimal point
-        value = value.replace(/[^\d.]/g, '');
-        // Ensure only one decimal point
-        const parts = value.split('.');
-        if (parts.length > 2) {
-            value = parts[0] + '.' + parts.slice(1).join('');
+        
+        function updateImageCount() {
+            imageCount.textContent = `${currentFiles.length}/${maxFiles} gambar dipilih`;
+            imageCount.classList.toggle('hidden', currentFiles.length === 0);
         }
-        e.target.value = value;
+        
+        // Make removeImage function global
+        window.removeImage = function(index) {
+            currentFiles.splice(index, 1);
+            updateFileInput();
+            updateImagePreview();
+            updateImageCount();
+        };
+        
+        // Price formatting
+        const priceInput = document.getElementById('productprice');
+        priceInput.addEventListener('input', function(e) {
+            let value = e.target.value;
+            // Remove any non-numeric characters except decimal point
+            value = value.replace(/[^\d.]/g, '');
+            // Ensure only one decimal point
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            e.target.value = value;
+        });
     });
-});
 </script>
+
+<style>
+    .sortable-ghost {
+        opacity: 0.4;
+    }
+</style>
 @endsection
