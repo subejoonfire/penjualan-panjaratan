@@ -34,9 +34,22 @@ class DashboardController extends Controller
             $query->where('iduserseller', $user->id);
         })->count();
 
-        $totalRevenue = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
+        // Calculate total revenue from delivered orders with paid transactions
+        $totalRevenue = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
-        })->where('transactionstatus', 'paid')->sum('amount');
+        })
+        ->whereHas('transaction', function ($query) {
+            $query->where('transactionstatus', 'paid');
+        })
+        ->where('status', 'delivered')
+        ->get()
+        ->sum(function ($order) use ($user) {
+            return $order->cart->cartDetails
+                ->where('product.iduserseller', $user->id)
+                ->sum(function ($item) {
+                    return $item->quantity * $item->productprice;
+                });
+        });
 
         $pendingOrders = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
@@ -300,8 +313,11 @@ class DashboardController extends Controller
             'cancelled' => $allOrders->where('status', 'cancelled')->count(),
         ];
 
-        // Calculate total revenue from completed orders
+        // Calculate total revenue from delivered orders with paid transactions
         $totalRevenue = $allOrders->where('status', 'delivered')
+            ->filter(function ($order) {
+                return $order->transaction && $order->transaction->transactionstatus === 'paid';
+            })
             ->sum(function ($order) use ($user) {
                 return $order->cart->cartDetails
                     ->where('product.iduserseller', $user->id)

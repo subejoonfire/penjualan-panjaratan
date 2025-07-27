@@ -16,6 +16,11 @@
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Alpine.js cloak CSS -->
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+
     @stack('styles')
 </head>
 
@@ -110,11 +115,12 @@
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
                                 <span
-                                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center">0</span>
+                                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
                             </button>
 
                             <!-- Notification Dropdown -->
                             <div x-show="open" @click.away="open = false" x-transition
+                                x-cloak
                                 class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
                                 <div class="px-4 py-2 border-b">
                                     <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
@@ -152,7 +158,7 @@
                             <a href="{{ route('customer.cart.index') }}"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none {{ request()->routeIs('customer.cart.*') ? 'text-blue-600' : '' }}">
                                 <i class="fas fa-shopping-cart text-lg"></i>
-                                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center">0</span>
+                                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
                             </a>
                         </div>
                         @endif
@@ -169,6 +175,7 @@
                             </button>
 
                             <div x-show="open" @click.away="open = false" x-transition
+                                x-cloak
                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                                 <a href="{{ route('profile') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
