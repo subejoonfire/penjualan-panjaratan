@@ -29,13 +29,21 @@ class DashboardController extends Controller
         $cart = $user->cart;
         $cartItems = [];
         $cartTotal = 0;
+        $cartItemsCount = 0;
         
         if ($cart) {
             $cartItems = $cart->cartDetails()->with('product.images')->get();
             $cartTotal = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->product->productprice;
             });
+            $cartItemsCount = $cartItems->sum('quantity'); // Total quantity of all items
         }
+        
+        // Get orders statistics
+        $userOrders = $user->orders();
+        $totalOrders = $userOrders->count();
+        $pendingOrders = $userOrders->where('status', 'pending')->count();
+        $totalSpent = $userOrders->sum('grandtotal');
         
         // Get recent orders
         $recentOrders = $user->orders()
@@ -43,6 +51,14 @@ class DashboardController extends Controller
             ->latest()
             ->limit(5)
             ->get();
+            
+        // Get favorite products (products that user has reviewed)
+        $favoriteProducts = \App\Models\Product::whereHas('reviews', function($query) use ($user) {
+            $query->where('iduser', $user->id);
+        })
+        ->with(['images', 'reviews'])
+        ->limit(6)
+        ->get();
             
         // Get wishlist count
         $wishlistCount = $user->wishlists()->count();
@@ -53,7 +69,12 @@ class DashboardController extends Controller
         return view('customer.dashboard', compact(
             'cartItems', 
             'cartTotal', 
+            'cartItemsCount',
+            'totalOrders',
+            'totalSpent', 
+            'pendingOrders',
             'recentOrders', 
+            'favoriteProducts',
             'wishlistCount',
             'unreadNotifications'
         ));
