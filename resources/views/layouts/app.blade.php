@@ -28,7 +28,7 @@
     <div class="min-h-screen flex flex-col">
         @auth
         <!-- Mobile Nav Bar -->
-        <nav class="mobile-nav-bar" style="display:none" x-data="{ mobileProfileOpen: false }">
+        <nav class="mobile-nav-bar" style="display:none">
             @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
@@ -87,52 +87,53 @@
                 <i class="fas fa-shopping-cart"></i>
             </a>
             @endif
-            <!-- Profile with Dropdown -->
-            <div class="relative">
-                <button @click="mobileProfileOpen = !mobileProfileOpen" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
-                    <i class="fas fa-user"></i>
-                </button>
-                
-                <!-- Mobile Profile Dropdown -->
-                <div x-show="mobileProfileOpen" @click.away="mobileProfileOpen = false" x-transition
-                    x-cloak
-                    class="absolute top-12 right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border"
-                    style="background: white !important; border: 2px solid #ccc !important; min-height: 120px;">
-                    <a href="{{ route('profile') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        style="display: block !important; color: #374151 !important;">
-                        <i class="fas fa-user mr-2"></i>Profil
+            <!-- Profile Button -->
+            <button onclick="openMobileProfileModal()" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                <i class="fas fa-user"></i>
+            </button>
+        </nav>
+
+        <!-- Mobile Profile Modal -->
+        <div id="mobileProfileModal" class="mobile-modal hidden">
+            <div class="mobile-modal-overlay" onclick="closeMobileProfileModal()"></div>
+            <div class="mobile-modal-content">
+                <div class="mobile-modal-header">
+                    <h3 class="mobile-modal-title">Menu Profile</h3>
+                    <button onclick="closeMobileProfileModal()" class="mobile-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mobile-modal-body">
+                    <a href="{{ route('profile') }}" class="mobile-modal-item">
+                        <i class="fas fa-user"></i>
+                        <span>Profil</span>
                     </a>
                     @if(auth()->user()->isAdmin())
-                    <a href="{{ route('admin.notifications.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        style="display: block !important; color: #374151 !important;">
-                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                    <a href="{{ route('admin.notifications.index') }}" class="mobile-modal-item">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifikasi</span>
                     </a>
                     @elseif(auth()->user()->isSeller())
-                    <a href="{{ route('seller.notifications.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        style="display: block !important; color: #374151 !important;">
-                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                    <a href="{{ route('seller.notifications.index') }}" class="mobile-modal-item">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifikasi</span>
                     </a>
                     @else
-                    <a href="{{ route('customer.notifications.index') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        style="display: block !important; color: #374151 !important;">
-                        <i class="fas fa-bell mr-2"></i>Notifikasi
+                    <a href="{{ route('customer.notifications.index') }}" class="mobile-modal-item">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifikasi</span>
                     </a>
                     @endif
-                    <form method="POST" action="{{ route('logout') }}" class="block">
+                    <form method="POST" action="{{ route('logout') }}" class="mobile-modal-form">
                         @csrf
-                        <button type="submit"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            style="display: block !important; width: 100% !important; text-align: left !important; color: #374151 !important; background: none !important; border: none !important;">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Keluar
+                        <button type="submit" class="mobile-modal-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Keluar</span>
                         </button>
                     </form>
                 </div>
             </div>
-        </nav>
+        </div>
         <!-- Desktop Nav -->
         <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
             <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
@@ -546,33 +547,30 @@
     </script>
     @endauth
 
-    <!-- Mobile Dropdown Fallback Script -->
+    <!-- Mobile Profile Modal Script -->
     <script>
-        // Fallback for mobile dropdown if Alpine.js hasn't loaded yet
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add debugging
-            console.log('DOM loaded, checking mobile dropdown...');
-            
-            // Ensure mobile dropdown works
-            const mobileProfileBtn = document.querySelector('.mobile-nav-bar button[\\@click]');
-            if (mobileProfileBtn) {
-                console.log('Mobile profile button found');
-                
-                // Add click event as fallback
-                mobileProfileBtn.addEventListener('click', function(e) {
-                    console.log('Mobile profile button clicked');
-                    const dropdown = this.nextElementSibling;
-                    if (dropdown) {
-                        console.log('Dropdown found, toggling...');
-                        if (dropdown.style.display === 'none' || !dropdown.style.display) {
-                            dropdown.style.display = 'block';
-                            dropdown.style.opacity = '1';
-                            dropdown.style.visibility = 'visible';
-                        } else {
-                            dropdown.style.display = 'none';
-                        }
-                    }
-                });
+        function openMobileProfileModal() {
+            console.log('Opening mobile profile modal...');
+            const modal = document.getElementById('mobileProfileModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+            }
+        }
+
+        function closeMobileProfileModal() {
+            console.log('Closing mobile profile modal...');
+            const modal = document.getElementById('mobileProfileModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = ''; // Restore scroll
+            }
+        }
+
+        // Close modal when pressing Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileProfileModal();
             }
         });
     </script>
@@ -588,6 +586,97 @@
         body {
             overflow-x: hidden;
         }
+        
+        /* Mobile Modal */
+        .mobile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .mobile-modal.hidden {
+            display: none;
+        }
+        .mobile-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .mobile-modal-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            z-index: 1;
+        }
+        .mobile-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 0 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+            margin-bottom: 0;
+        }
+        .mobile-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        .mobile-modal-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+        }
+        .mobile-modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .mobile-modal-body {
+            padding: 15px 0 20px 0;
+        }
+        .mobile-modal-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 15px 20px;
+            color: #374151;
+            text-decoration: none;
+            border: none;
+            background: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .mobile-modal-item:hover {
+            background: #f9fafb;
+        }
+        .mobile-modal-item i {
+            font-size: 18px;
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+        .mobile-modal-form {
+            margin: 0;
+        }
+        
         /* Mobile nav bar */
         @media (max-width: 768px) {
             .mobile-nav-bar {
@@ -633,49 +722,9 @@
             .mobile-nav-bar {
                 display: flex !important;
             }
-            
-            /* Ensure mobile dropdown is visible */
-            .mobile-nav-bar .relative {
-                position: relative !important;
-            }
-            .mobile-nav-bar .absolute {
-                position: absolute !important;
-                z-index: 9999 !important;
-                background: white !important;
-                border: 1px solid #e5e7eb !important;
-                border-radius: 8px !important;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-                min-width: 192px !important;
-                top: 60px !important;
-                right: 0 !important;
-            }
-            .mobile-nav-bar .absolute a,
-            .mobile-nav-bar .absolute button {
-                display: block !important;
-                padding: 12px 16px !important;
-                color: #374151 !important;
-                text-decoration: none !important;
-                border-bottom: 1px solid #f3f4f6 !important;
-                font-size: 14px !important;
-                width: 100% !important;
-                text-align: left !important;
-                background: transparent !important;
-                border-left: none !important;
-                border-right: none !important;
-                border-top: none !important;
-                border-radius: 0 !important;
-            }
-            .mobile-nav-bar .absolute a:hover,
-            .mobile-nav-bar .absolute button:hover {
-                background: #f9fafb !important;
-            }
-            .mobile-nav-bar .absolute a:last-child,
-            .mobile-nav-bar .absolute form:last-child button {
-                border-bottom: none !important;
-            }
         }
         @media (min-width: 769px) {
-            .mobile-nav-bar {
+            .mobile-nav-bar, .mobile-modal {
                 display: none !important;
             }
             .desktop-nav {
