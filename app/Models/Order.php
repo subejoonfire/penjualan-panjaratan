@@ -21,6 +21,7 @@ class Order extends Model
         'order_number',
         'grandtotal',
         'status',
+        'status_updated_at',
         'shipping_address',
     ];
 
