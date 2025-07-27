@@ -3,36 +3,36 @@
 @section('title', 'Dashboard Penjual - Penjualan Panjaratan')
 
 @section('content')
-<div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="py-3 sm:py-6">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard Penjual</h1>
-            <p class="mt-2 text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ??
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard Penjual</h1>
+            <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ??
                 auth()->user()->username }}!</p>
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
             <!-- Total Products -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-box text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-box text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Produk</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Produk</dt>
+                                <dd class="text-base sm:text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3">
-                    <div class="text-sm">
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($activeProducts) }}</span>
                         <span class="text-gray-500"> produk aktif</span>
                     </div>
@@ -41,23 +41,23 @@
 
             <!-- Total Orders -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-shopping-bag text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-shopping-bag text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
+                                <dd class="text-base sm:text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-5 py-3">
-                    <div class="text-sm">
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
                         <span class="text-yellow-600 font-medium">{{ number_format($pendingOrders) }}</span>
                         <span class="text-gray-500"> menunggu</span>
                     </div>
@@ -66,17 +66,17 @@
 
             <!-- Total Revenue -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-money-bill-wave text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-money-bill-wave text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
-                                <dd class="text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue) }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
+                                <dd class="text-sm sm:text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue) }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -85,17 +85,17 @@
 
             <!-- Monthly Revenue -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-chart-line text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-chart-line text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Bulan Ini</dt>
-                                <dd class="text-lg font-medium text-gray-900">
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Bulan Ini</dt>
+                                <dd class="text-sm sm:text-lg font-medium text-gray-900">
                                     Rp {{ number_format($monthlyRevenue->where('month', date('m'))->where('year',
                                     date('Y'))->first()->total ?? 0) }}
                                 </dd>
@@ -107,53 +107,53 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-white shadow rounded-lg mb-8">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Aksi Cepat</h3>
+        <div class="bg-white shadow rounded-lg mb-6 sm:mb-8">
+            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900">Aksi Cepat</h3>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="p-4 sm:p-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <a href="{{ route('seller.products.create') }}"
-                        class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-plus text-blue-600 text-xl"></i>
+                        class="flex flex-col sm:flex-row items-center p-3 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="flex-shrink-0 mb-2 sm:mb-0">
+                            <i class="fas fa-plus text-blue-600 text-lg sm:text-xl"></i>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-blue-600">Tambah Produk</p>
-                            <p class="text-sm text-gray-500">Buat listing baru</p>
+                        <div class="text-center sm:text-left sm:ml-4">
+                            <p class="text-xs sm:text-sm font-medium text-blue-600">Tambah Produk</p>
+                            <p class="text-xs text-gray-500 hidden sm:block">Buat listing baru</p>
                         </div>
                     </a>
 
                     <a href="{{ route('seller.products.index') }}"
-                        class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-list text-green-600 text-xl"></i>
+                        class="flex flex-col sm:flex-row items-center p-3 sm:p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="flex-shrink-0 mb-2 sm:mb-0">
+                            <i class="fas fa-list text-green-600 text-lg sm:text-xl"></i>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-green-600">Produk Saya</p>
-                            <p class="text-sm text-gray-500">Kelola inventaris</p>
+                        <div class="text-center sm:text-left sm:ml-4">
+                            <p class="text-xs sm:text-sm font-medium text-green-600">Produk Saya</p>
+                            <p class="text-xs text-gray-500 hidden sm:block">Kelola inventaris</p>
                         </div>
                     </a>
 
                     <a href="{{ route('seller.orders.index') }}"
-                        class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-shopping-cart text-purple-600 text-xl"></i>
+                        class="flex flex-col sm:flex-row items-center p-3 sm:p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="flex-shrink-0 mb-2 sm:mb-0">
+                            <i class="fas fa-shopping-cart text-purple-600 text-lg sm:text-xl"></i>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-purple-600">Pesanan</p>
-                            <p class="text-sm text-gray-500">Proses pesanan</p>
+                        <div class="text-center sm:text-left sm:ml-4">
+                            <p class="text-xs sm:text-sm font-medium text-purple-600">Pesanan</p>
+                            <p class="text-xs text-gray-500 hidden sm:block">Proses pesanan</p>
                         </div>
                     </a>
 
                     <a href="{{ route('seller.sales') }}"
-                        class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-chart-bar text-yellow-600 text-xl"></i>
+                        class="flex flex-col sm:flex-row items-center p-3 sm:p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
+                        <div class="flex-shrink-0 mb-2 sm:mb-0">
+                            <i class="fas fa-chart-bar text-yellow-600 text-lg sm:text-xl"></i>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-yellow-600">Laporan Penjualan</p>
-                            <p class="text-sm text-gray-500">Lihat analitik</p>
+                        <div class="text-center sm:text-left sm:ml-4">
+                            <p class="text-xs sm:text-sm font-medium text-yellow-600">Laporan Penjualan</p>
+                            <p class="text-xs text-gray-500 hidden sm:block">Lihat analitik</p>
                         </div>
                     </a>
                 </div>
@@ -161,43 +161,43 @@
         </div>
 
         <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <!-- Monthly Sales Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Penjualan Bulanan</h3>
-                <div class="relative h-48">
+            <div class="bg-white shadow rounded-lg p-3 sm:p-6">
+                <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Penjualan Bulanan</h3>
+                <div class="relative h-32 sm:h-48">
                     <canvas id="monthlySalesChart"></canvas>
                 </div>
             </div>
 
             <!-- Product Performance Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Performa Produk</h3>
-                <div class="relative h-48">
+            <div class="bg-white shadow rounded-lg p-3 sm:p-6">
+                <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Performa Produk</h3>
+                <div class="relative h-32 sm:h-48">
                     <canvas id="productPerformanceChart"></canvas>
                 </div>
             </div>
 
             <!-- Order Status Distribution -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Status Pesanan</h3>
-                <div class="relative h-48">
+            <div class="bg-white shadow rounded-lg p-3 sm:p-6">
+                <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Status Pesanan</h3>
+                <div class="relative h-32 sm:h-48">
                     <canvas id="orderStatusChart"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- Statistik View Produk -->
-        <div class="bg-white shadow rounded-lg mb-8">
-            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 class="text-lg font-medium text-gray-900">Statistik Dilihat Produk</h3>
+        <div class="bg-white shadow rounded-lg mb-6 sm:mb-8">
+            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900">Statistik Dilihat Produk</h3>
             </div>
-            <div class="p-6">
-                <canvas id="productViewsChart" height="120"></canvas>
+            <div class="p-3 sm:p-6">
+                <canvas id="productViewsChart" height="100"></canvas>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
             <!-- Recent Orders -->
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -304,27 +304,27 @@
         <!-- Low Stock Alert -->
         @if($lowStockProducts->count() > 0)
         <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
                 <div class="flex items-center">
                     <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
-                    <h3 class="text-lg font-medium text-gray-900">Peringatan Stok Rendah</h3>
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900">Peringatan Stok Rendah</h3>
                 </div>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+            <div class="p-3 sm:p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-4">
                     @foreach($lowStockProducts as $product)
-                    <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
+                    <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-3 sm:p-4">
                         <div class="flex items-center">
                             @if($product->images->count() > 0)
                             <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                                alt="{{ $product->productname }}" class="w-12 h-12 rounded object-cover">
+                                alt="{{ $product->productname }}" class="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover">
                             @else
-                            <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                                <i class="fas fa-image text-gray-400"></i>
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400 text-sm"></i>
                             </div>
                             @endif
-                            <div class="ml-3 flex-1">
-                                <p class="text-sm font-medium text-gray-900">{{ Str::limit($product->productname, 20) }}
+                            <div class="ml-2 sm:ml-3 flex-1">
+                                <p class="text-xs sm:text-sm font-medium text-gray-900">{{ Str::limit($product->productname, 15) }}
                                 </p>
                                 <p class="text-xs text-gray-600">Stok: <span class="font-medium text-red-600">{{
                                         $product->productstock }}</span></p>

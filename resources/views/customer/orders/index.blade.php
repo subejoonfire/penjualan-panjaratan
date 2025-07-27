@@ -3,19 +3,19 @@
 @section('title', 'Pesanan Saya - Penjualan Panjaratan')
 
 @section('content')
-<div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="py-3 sm:py-6">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
-        <div class="mb-6 md:mb-8">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Pesanan Saya</h1>
-            <p class="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Lacak dan kelola pesanan Anda</p>
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Pesanan Saya</h1>
+            <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Lacak dan kelola pesanan Anda</p>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white shadow rounded-lg mb-6">
-            <div class="p-4 md:p-6">
-                <form method="GET" action="{{ route('customer.orders.index') }}" class="space-y-4">
-                    <div class="flex flex-col sm:flex-row gap-4">
+        <div class="bg-white shadow rounded-lg mb-4 sm:mb-6">
+            <div class="p-3 sm:p-6">
+                <form method="GET" action="{{ route('customer.orders.index') }}" class="space-y-3 sm:space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <div class="flex-1">
                             <label for="status" class="block text-xs font-medium text-gray-700 mb-1">Status</label>
                             <select name="status" id="status"
@@ -35,12 +35,12 @@
                         </div>
                         <div class="flex flex-col sm:flex-row gap-2 sm:items-end">
                             <button type="submit"
-                                class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                class="w-full sm:w-auto bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 <i class="fas fa-filter mr-1"></i>Filter
                             </button>
                             @if(request()->hasAny(['status']))
                             <a href="{{ route('customer.orders.index') }}"
-                                class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 text-sm text-center">
+                                class="w-full sm:w-auto bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-gray-700 text-sm text-center">
                                 <i class="fas fa-times mr-1"></i>Reset
                             </a>
                             @endif
@@ -51,15 +51,15 @@
         </div>
 
         <!-- Orders List -->
-        <div class="space-y-4 sm:space-y-6">
+        <div class="space-y-3 sm:space-y-6">
             @forelse($orders as $order)
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <!-- Mobile Layout -->
                 <div class="block md:hidden">
-                    <div class="p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-base font-medium text-gray-900">{{ $order->order_number }}</h3>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                    <div class="p-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-medium text-gray-900">{{ $order->order_number }}</h3>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium
                                     @if($order->status === 'pending') bg-yellow-100 text-yellow-800
                                     @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
                                     @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
@@ -88,22 +88,22 @@
                             </span>
                         </div>
 
-                        <div class="flex items-center space-x-3 mb-3">
+                        <div class="flex items-center space-x-2 mb-2">
                             @if($order->cart && $order->cart->cartDetails->count() > 0)
                             @php $firstDetail = $order->cart->cartDetails->first(); @endphp
                             <div class="flex-shrink-0">
                                 @if($firstDetail->product->images->count() > 0)
                                 <img src="{{ asset('storage/' . $firstDetail->product->images->first()->image) }}"
                                     alt="{{ $firstDetail->product->productname }}"
-                                    class="w-10 h-10 rounded-lg object-cover">
+                                    class="w-8 h-8 rounded-lg object-cover">
                                 @else
-                                <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-image text-gray-400 text-xs"></i>
                                 </div>
                                 @endif
                             </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-medium text-gray-900 truncate">
                                     {{ $firstDetail->product->productname }}
                                     @if($order->cart->cartDetails->count() > 1)
                                     <span class="text-gray-500">+{{ $order->cart->cartDetails->count() - 1 }}
@@ -115,31 +115,31 @@
                             </div>
                             @else
                             <div class="flex-shrink-0">
-                                <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-box text-gray-400 text-xs"></i>
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">Detail pesanan tidak tersedia</p>
+                                <p class="text-xs font-medium text-gray-900">Detail pesanan tidak tersedia</p>
                             </div>
                             @endif
                         </div>
 
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center justify-between mb-2">
                             <div>
                                 <p class="text-xs text-gray-500">{{ $order->created_at->format('d M Y, H:i') }}</p>
                             </div>
-                            <p class="text-base font-bold text-gray-900">Rp {{ number_format($order->grandtotal) }}</p>
+                            <p class="text-sm font-bold text-gray-900">Rp {{ number_format($order->grandtotal) }}</p>
                         </div>
 
-                        <div class="flex flex-col space-y-2">
+                        <div class="flex flex-col space-y-1.5">
                             <a href="{{ route('customer.orders.show', $order) }}"
-                                class="w-full bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-center text-sm">
+                                class="w-full bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 text-center text-xs">
                                 Lihat Detail
                             </a>
                             @if($order->status === 'pending')
                             <button type="button"
-                                class="w-full bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 text-sm"
+                                class="w-full bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 text-xs"
                                 onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm{{ $order->id }}').submit(); })">
                                 Batalkan Pesanan
                             </button>

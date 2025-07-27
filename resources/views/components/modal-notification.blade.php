@@ -1,29 +1,29 @@
 <!-- Modal Notification Component -->
-<div id="modalNotification" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50">
-    <div class="relative mx-auto p-5 border w-96 max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
-        <div class="mt-3">
+<div id="modalNotification" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50 p-2 sm:p-4">
+    <div class="relative mx-auto p-3 sm:p-5 border w-full max-w-sm sm:max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
+        <div class="mt-2 sm:mt-3">
             <!-- Icon -->
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full" id="modalIcon">
-                <i class="fas fa-info-circle text-2xl text-blue-500" id="modalIconClass"></i>
+            <div class="mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full" id="modalIcon">
+                <i class="fas fa-info-circle text-lg sm:text-2xl text-blue-500" id="modalIconClass"></i>
             </div>
             
             <!-- Title -->
-            <div class="mt-3 text-center">
-                <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Konfirmasi</h3>
+            <div class="mt-2 sm:mt-3 text-center">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900" id="modalTitle">Konfirmasi</h3>
                 
                 <!-- Message -->
-                <div class="mt-2 px-7 py-3">
+                <div class="mt-2 px-2 py-2 sm:px-7 sm:py-3">
                     <p class="text-sm text-gray-500" id="modalMessage">
                         Apakah Anda yakin ingin melakukan tindakan ini?
                     </p>
                 </div>
                 
                 <!-- Buttons -->
-                <div class="items-center px-4 py-3" id="modalButtons">
-                    <button id="modalCancelBtn" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <div class="items-center px-2 py-2 sm:px-4 sm:py-3 space-y-2 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row" id="modalButtons">
+                    <button id="modalCancelBtn" class="w-full sm:w-24 px-3 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
                         Batal
                     </button>
-                    <button id="modalConfirmBtn" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <button id="modalConfirmBtn" class="w-full sm:w-24 px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
                         Ya
                     </button>
                 </div>
@@ -73,31 +73,31 @@ function showModalNotification(options = {}) {
     // Set icon and colors based on type
     switch(config.type) {
         case 'success':
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100';
-            iconClass.className = 'fas fa-check-circle text-2xl text-green-600';
-            confirmBtn.className = 'px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-24 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300';
+            icon.className = 'mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-green-100';
+            iconClass.className = 'fas fa-check-circle text-lg sm:text-2xl text-green-600';
+            confirmBtn.className = 'w-full sm:w-24 px-3 py-2 bg-green-500 text-white text-sm font-medium rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300';
             break;
         case 'error':
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100';
-            iconClass.className = 'fas fa-exclamation-circle text-2xl text-red-600';
-            confirmBtn.className = 'px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300';
+            icon.className = 'mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-red-100';
+            iconClass.className = 'fas fa-exclamation-circle text-lg sm:text-2xl text-red-600';
+            confirmBtn.className = 'w-full sm:w-24 px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300';
             break;
         case 'warning':
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100';
-            iconClass.className = 'fas fa-exclamation-triangle text-2xl text-yellow-600';
-            confirmBtn.className = 'px-4 py-2 bg-yellow-500 text-white text-base font-medium rounded-md w-24 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-300';
+            icon.className = 'mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-yellow-100';
+            iconClass.className = 'fas fa-exclamation-triangle text-lg sm:text-2xl text-yellow-600';
+            confirmBtn.className = 'w-full sm:w-24 px-3 py-2 bg-yellow-500 text-white text-sm font-medium rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-300';
             break;
         default:
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100';
-            iconClass.className = 'fas fa-info-circle text-2xl text-blue-600';
-            confirmBtn.className = 'px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-24 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300';
+            icon.className = 'mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-blue-100';
+            iconClass.className = 'fas fa-info-circle text-lg sm:text-2xl text-blue-600';
+            confirmBtn.className = 'w-full sm:w-24 px-3 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300';
     }
     
     // Show/hide cancel button
     if (!config.showCancel) {
         cancelBtn.style.display = 'none';
     } else {
-        cancelBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'block';
     }
     
     // Set event listeners

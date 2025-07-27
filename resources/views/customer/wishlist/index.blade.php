@@ -3,17 +3,17 @@
 @section('title', 'Wishlist - Produk Favorit')
 
 @section('content')
-<div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="py-3 sm:py-6">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Wishlist</h1>
-            <p class="mt-2 text-gray-600">Produk-produk yang Anda simpan sebagai favorit</p>
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Wishlist</h1>
+            <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Produk-produk yang Anda simpan sebagai favorit</p>
         </div>
 
         @if($wishlists->count() > 0)
         <!-- Wishlist Items -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-6">
             @foreach($wishlists as $wishlist)
             @php $product = $wishlist->product; @endphp
             <div
@@ -22,49 +22,49 @@
                 <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
                     @if($product->images->count() > 0)
                     <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                        alt="{{ $product->productname }}" class="w-full h-36 object-cover">
+                        alt="{{ $product->productname }}" class="w-full h-28 sm:h-36 object-cover">
                     @else
-                    <div class="w-full h-36 flex items-center justify-center">
-                        <i class="fas fa-image text-gray-400 text-2xl"></i>
+                    <div class="w-full h-28 sm:h-36 flex items-center justify-center">
+                        <i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i>
                     </div>
                     @endif
                     <!-- Remove from Wishlist Button -->
                     <button onclick="removeFromWishlist({{ $product->id }})"
-                        class="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
-                        <i class="fas fa-heart text-sm"></i>
+                        class="absolute top-1 right-1 p-1.5 sm:p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
+                        <i class="fas fa-heart text-xs sm:text-sm"></i>
                     </button>
                     <!-- Stock Status -->
                     @if($product->productstock <= 0) <div
-                        class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                        class="absolute top-1 left-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
                         Habis
                 </div>
                 @elseif($product->productstock <= 10) <div
-                    class="absolute top-2 left-2 bg-yellow-600 text-white text-xs px-2 py-1 rounded">
+                    class="absolute top-1 left-1 bg-yellow-600 text-white text-xs px-1.5 py-0.5 rounded">
                     Stok Terbatas
             </div>
             @endif
         </div>
         <!-- Product Info & Actions -->
-        <div class="flex flex-col flex-1 justify-between p-3">
+        <div class="flex flex-col flex-1 justify-between p-2 sm:p-3">
             <div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem]">
+                <h3 class="text-xs sm:text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
                     <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
                         {{ $product->productname }}
                     </a>
                 </h3>
                 <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
+                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
                     @php
                     $desc = strip_tags($product->productdescription);
                     $words = explode(' ', $desc);
-                    if(count($words) > 15) {
-                    $desc = implode(' ', array_slice($words, 0, 15)) . '...';
+                    if(count($words) > 10) {
+                    $desc = implode(' ', array_slice($words, 0, 10)) . '...';
                     }
                     @endphp
                     {{ $desc }}
                 </p>
                 <div class="mb-2">
-                    <span class="text-sm font-bold text-blue-600">
+                    <span class="text-xs sm:text-sm font-bold text-blue-600">
                         Rp {{ number_format($product->productprice) }}
                     </span>
                 </div>
@@ -91,14 +91,14 @@
                         Terjual {{ $soldCount }}
                     </div>
                 </div>
-                <p class="text-xs text-gray-400 mt-2">
+                <p class="text-xs text-gray-400 mt-1 sm:mt-2">
                     Ditambahkan {{ $wishlist->created_at->diffForHumans() }}
                 </p>
             </div>
-            <div class="flex flex-col gap-2 mt-2">
-                <div class="flex gap-2 w-full">
+            <div class="flex flex-col gap-1 sm:gap-2 mt-2">
+                <div class="flex gap-1 sm:gap-2 w-full">
                     <a href="{{ route('products.show', $product) }}"
-                        class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
+                        class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
                         Detail
                     </a>
                     @if($product->productstock > 0)
@@ -107,13 +107,13 @@
                         @csrf
                         <input type="hidden" name="quantity" value="1">
                         <button type="submit"
-                            class="w-full bg-blue-600 text-white px-2 py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
+                            class="w-full bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
                             <i class="fas fa-shopping-cart text-xs"></i>
                         </button>
                     </form>
                     @else
                     <button disabled
-                        class="w-full bg-gray-400 text-white px-2 py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
+                        class="w-full bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
                         <i class="fas fa-shopping-cart text-xs"></i>
                     </button>
                     @endif

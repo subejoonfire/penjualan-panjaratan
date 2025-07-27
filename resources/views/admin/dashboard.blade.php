@@ -3,36 +3,36 @@
 @section('title', 'Admin Dashboard - Penjualan Panjaratan')
 
 @section('content')
-<div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="py-3 sm:py-6">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
-        <div class="mb-6 md:mb-8">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p class="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ??
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Selamat datang kembali, {{ auth()->user()->nickname ??
                 auth()->user()->username }}!</p>
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
             <!-- Total Users -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-4 md:p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-users text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-users text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-4 md:ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pengguna</dt>
-                                <dd class="text-base md:text-lg font-medium text-gray-900">{{ number_format($totalUsers) }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Pengguna</dt>
+                                <dd class="text-base sm:text-lg font-medium text-gray-900">{{ number_format($totalUsers) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
-                    <div class="text-xs md:text-sm">
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalCustomers) }}</span>
                         <span class="text-gray-500"> pelanggan, </span>
                         <span class="text-blue-600 font-medium">{{ number_format($totalSellers) }}</span>
@@ -43,23 +43,23 @@
 
             <!-- Total Products -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-4 md:p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-box text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-box text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-4 md:ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Produk</dt>
-                                <dd class="text-base md:text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Produk</dt>
+                                <dd class="text-base sm:text-lg font-medium text-gray-900">{{ number_format($totalProducts) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
-                    <div class="text-xs md:text-sm">
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
                         <span class="text-green-600 font-medium">{{ number_format($totalActiveProducts) }}</span>
                         <span class="text-gray-500"> produk aktif</span>
                     </div>
@@ -68,23 +68,23 @@
 
             <!-- Total Orders -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-4 md:p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-shopping-cart text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-shopping-cart text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-4 md:ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
-                                <dd class="text-base md:text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Pesanan</dt>
+                                <dd class="text-base sm:text-lg font-medium text-gray-900">{{ number_format($totalOrders) }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
-                    <div class="text-xs md:text-sm">
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
                         <span class="text-yellow-600 font-medium">{{ $orderStats['pending'] ?? 0 }}</span>
                         <span class="text-gray-500"> menunggu</span>
                     </div>
@@ -93,24 +93,24 @@
 
             <!-- Total Revenue -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-4 md:p-5">
+                <div class="p-3 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                                <i class="fas fa-chart-line text-white text-sm"></i>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                                <i class="fas fa-chart-line text-white text-xs sm:text-sm"></i>
                             </div>
                         </div>
-                        <div class="ml-4 md:ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
-                                <dd class="text-base md:text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue, 0, ',',
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
+                                <dd class="text-sm sm:text-lg font-medium text-gray-900">Rp {{ number_format($totalRevenue, 0, ',',
                                     '.') }}</dd>
                             </dl>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 md:px-5 py-2 md:py-3">
-                    <div class="text-xs md:text-sm">
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
                         <span class="text-green-600 font-medium">{{ $transactionStats['paid'] ?? 0 }}</span>
                         <span class="text-gray-500"> transaksi terbayar</span>
                     </div>
@@ -118,33 +118,33 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <!-- Order Status Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Pesanan</h3>
-                <div class="relative h-64">
+            <div class="bg-white shadow rounded-lg p-3 sm:p-6">
+                <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Distribusi Status Pesanan</h3>
+                <div class="relative h-48 sm:h-64">
                     <canvas id="orderStatusChart"></canvas>
                 </div>
             </div>
 
             <!-- Transaction Status Chart -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Distribusi Status Transaksi</h3>
-                <div class="relative h-64">
+            <div class="bg-white shadow rounded-lg p-3 sm:p-6">
+                <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Distribusi Status Transaksi</h3>
+                <div class="relative h-48 sm:h-64">
                     <canvas id="transactionStatusChart"></canvas>
                 </div>
             </div>
 
             <!-- Monthly Revenue Trend -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Tren Pendapatan Bulanan</h3>
-                <div class="relative h-64">
+            <div class="bg-white shadow rounded-lg p-3 sm:p-6">
+                <h3 class="text-sm sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Tren Pendapatan Bulanan</h3>
+                <div class="relative h-48 sm:h-64">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <!-- Recent Orders -->
             <div class="bg-white shadow rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -228,20 +228,20 @@
         </div>
 
         <!-- Category Statistics -->
-        <div class="bg-white shadow rounded-lg mb-8">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Ikhtisar Kategori</h3>
+        <div class="bg-white shadow rounded-lg mb-6 sm:mb-8">
+            <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900">Ikhtisar Kategori</h3>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-4">
+            <div class="p-3 sm:p-6">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 sm:gap-4">
                     @foreach($categoryStats as $category)
                     <div class="text-center">
                         <div
-                            class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-tag text-white text-lg"></i>
+                            class="w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-1 sm:mb-2">
+                            <i class="fas fa-tag text-white text-sm sm:text-lg"></i>
                         </div>
-                        <h4 class="text-sm font-medium text-gray-900">{{ $category->category }}</h4>
-                        <p class="text-sm text-gray-500">{{ $category->products_count }} produk</p>
+                        <h4 class="text-xs sm:text-sm font-medium text-gray-900">{{ $category->category }}</h4>
+                        <p class="text-xs sm:text-sm text-gray-500">{{ $category->products_count }} produk</p>
                     </div>
                     @endforeach
                 </div>
