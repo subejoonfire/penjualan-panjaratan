@@ -371,6 +371,37 @@ class DashboardController extends Controller
             'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
         ]);
 
+        // Cek apakah masih bisa mengupdate status (dalam 6 jam sejak update terakhir)
+        $lastUpdated = $order->updated_at;
+        $sixHoursAgo = now()->subHours(6);
+        
+        // Jika status sudah pernah diupdate dan sudah lebih dari 6 jam
+        if ($lastUpdated->lt($sixHoursAgo) && $order->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat mengupdate status. Sudah lebih dari 6 jam sejak update terakhir.'
+            ], 400);
+        }
+
+        // Validasi transisi status yang diperbolehkan
+        $allowedTransitions = [
+            'pending' => ['confirmed', 'cancelled'],
+            'confirmed' => ['shipped', 'cancelled'], 
+            'shipped' => ['delivered'],
+            'delivered' => [], // Tidak bisa diubah lagi
+            'cancelled' => [] // Tidak bisa diubah lagi
+        ];
+
+        $currentStatus = $order->status;
+        $newStatus = $request->status;
+
+        if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transisi status tidak diperbolehkan dari ' . $currentStatus . ' ke ' . $newStatus
+            ], 400);
+        }
+
         $order->update(['status' => $request->status]);
 
         return response()->json([

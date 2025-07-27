@@ -98,4 +98,39 @@ class Order extends Model
     {
         return $query->where('status', 'delivered');
     }
+
+    // Helper method untuk mengecek apakah order masih bisa diupdate (dalam 6 jam)
+    public function canBeUpdated()
+    {
+        // Jika status sudah delivered atau cancelled, tidak bisa diupdate
+        if (in_array($this->status, ['delivered', 'cancelled'])) {
+            return false;
+        }
+
+        // Jika masih pending, selalu bisa diupdate
+        if ($this->status === 'pending') {
+            return true;
+        }
+
+        // Untuk status lainnya, cek apakah masih dalam 6 jam
+        $sixHoursAgo = now()->subHours(6);
+        return $this->updated_at->gt($sixHoursAgo);
+    }
+
+    // Helper method untuk mendapatkan waktu tersisa update (dalam menit)
+    public function getRemainingUpdateTimeAttribute()
+    {
+        if (!$this->canBeUpdated() || $this->status === 'pending') {
+            return 0;
+        }
+
+        $sixHoursFromUpdate = $this->updated_at->addHours(6);
+        $now = now();
+        
+        if ($sixHoursFromUpdate->gt($now)) {
+            return $now->diffInMinutes($sixHoursFromUpdate);
+        }
+        
+        return 0;
+    }
 }

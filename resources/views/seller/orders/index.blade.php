@@ -218,7 +218,7 @@
                             return $item->quantity * $item->productprice;
                         });
                     @endphp
-                    <div class="order-card order-{{ $order->status }} p-6 hover:bg-gray-50">
+                    <div class="order-card order-{{ $order->status }} p-6 hover:bg-gray-50" data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">
                         <div class="flex items-center justify-between">
                             <div class="flex items-start space-x-4 flex-1">
                                 <!-- Order Info -->
@@ -312,12 +312,24 @@
                                                 <i class="fas fa-eye mr-1"></i>
                                                 Detail
                                             </button>
-                                            @if(in_array($order->status, ['pending', 'processing']))
+                                            @if($order->canBeUpdated())
                                             <button onclick="updateOrderStatus('{{ $order->id }}')"
                                                 class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                 <i class="fas fa-edit mr-1"></i>
                                                 Update Status
                                             </button>
+                                            @if($order->remaining_update_time > 0)
+                                                <span class="text-xs text-gray-500 ml-2">
+                                                    Bisa diupdate {{ floor($order->remaining_update_time / 60) }}j {{ $order->remaining_update_time % 60 }}m lagi
+                                                </span>
+                                            @endif
+                                            @else
+                                                @if(in_array($order->status, ['confirmed', 'shipped']) && !$order->canBeUpdated())
+                                                <span class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-gray-100">
+                                                    <i class="fas fa-clock mr-1"></i>
+                                                    Tidak dapat diupdate (lebih dari 6 jam)
+                                                </span>
+                                                @endif
                                             @endif
                                         </div>
                                     </div>
@@ -449,6 +461,44 @@
 
     function updateOrderStatus(orderId) {
         currentOrderId = orderId;
+        
+        // Cari order untuk mendapatkan status saat ini
+        const orderRow = document.querySelector(`[data-order-id="${orderId}"]`);
+        const currentStatus = orderRow ? orderRow.dataset.orderStatus : '';
+        
+        // Atur opsi dropdown berdasarkan status saat ini
+        const statusSelect = document.getElementById('newStatus');
+        statusSelect.innerHTML = '';
+        
+        const statusTransitions = {
+            'pending': [
+                { value: 'confirmed', text: 'Konfirmasi' },
+                { value: 'cancelled', text: 'Batalkan' }
+            ],
+            'confirmed': [
+                { value: 'shipped', text: 'Kirim' },
+                { value: 'cancelled', text: 'Batalkan' }
+            ],
+            'shipped': [
+                { value: 'delivered', text: 'Selesai' }
+            ],
+            'delivered': [],
+            'cancelled': []
+        };
+        
+        const allowedStatuses = statusTransitions[currentStatus] || [];
+        
+        if (allowedStatuses.length === 0) {
+            statusSelect.innerHTML = '<option value="">Tidak ada status yang dapat diubah</option>';
+        } else {
+            allowedStatuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status.value;
+                option.textContent = status.text;
+                statusSelect.appendChild(option);
+            });
+        }
+        
         document.getElementById('statusModal').classList.remove('hidden');
     }
 
