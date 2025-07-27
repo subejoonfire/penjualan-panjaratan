@@ -24,18 +24,7 @@ class AppServiceProvider extends ServiceProvider
         // Register model observers
         \App\Models\Order::observe(\App\Observers\OrderObserver::class);
         
-        // Share notification data dengan semua view
-        View::composer('*', function ($view) {
-            if (auth()->check()) {
-                $user = auth()->user();
-                
-                // Share data notifikasi untuk semua view
-                $view->with([
-                    'unreadNotifications' => $user->unreadNotifications()->count(),
-                    'allNotifications' => $user->notifications()->latest()->limit(5)->get(),
-                    'userNotifications' => $user->notifications()->latest()->paginate(10)
-                ]);
-            }
-        });
+        // Remove notification view composer since navbar uses AJAX for dynamic loading
+        // This prevents duplicate queries on every page load
     }
 }

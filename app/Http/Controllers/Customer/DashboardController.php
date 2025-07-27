@@ -19,56 +19,43 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     /**
-     * Display customer dashboard
+     * Show customer dashboard
      */
     public function index()
     {
         $user = Auth::user();
         
-        // Customer statistics
-        $totalOrders = Order::whereHas('cart', function($query) use ($user) {
-            $query->where('iduser', $user->id);
-        })->count();
+        // Get user's cart details for cart summary
+        $cart = $user->cart;
+        $cartItems = [];
+        $cartTotal = 0;
         
-        $totalSpent = Transaction::whereHas('order.cart', function($query) use ($user) {
-            $query->where('iduser', $user->id);
-        })->where('transactionstatus', 'paid')->sum('amount');
-        
-        $pendingOrders = Order::whereHas('cart', function($query) use ($user) {
-            $query->where('iduser', $user->id);
-        })->where('status', 'pending')->count();
-        
-        // Notifications - sudah tersedia dari AppServiceProvider
-        
-        // Recent orders
-        $recentOrders = Order::with(['cart.cartDetails.product', 'transaction'])
-            ->whereHas('cart', function($query) use ($user) {
-                $query->where('iduser', $user->id);
-            })
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-        
-        // Cart items count
-        $cartItemsCount = 0;
-        $activeCart = $user->activeCart;
-        if ($activeCart) {
-            $cartItemsCount = $activeCart->cartDetails()->sum('quantity');
+        if ($cart) {
+            $cartItems = $cart->cartDetails()->with('product.images')->get();
+            $cartTotal = $cartItems->sum(function ($item) {
+                return $item->quantity * $item->product->productprice;
+            });
         }
         
-        // Favorite products (most reviewed by user)
-        $favoriteProducts = Product::whereHas('reviews', function($query) use ($user) {
-            $query->where('iduser', $user->id);
-        })->with('reviews')->limit(5)->get();
+        // Get recent orders
+        $recentOrders = $user->orders()
+            ->with(['cart.cartDetails.product.images', 'transaction'])
+            ->latest()
+            ->limit(5)
+            ->get();
+            
+        // Get wishlist count
+        $wishlistCount = $user->wishlist()->count();
+        
+        // Get notification data for dashboard
+        $unreadNotifications = $user->unread_notification_count;
         
         return view('customer.dashboard', compact(
-            'totalOrders',
-            'totalSpent', 
-            'pendingOrders',
-
-            'recentOrders',
-            'cartItemsCount',
-            'favoriteProducts'
+            'cartItems', 
+            'cartTotal', 
+            'recentOrders', 
+            'wishlistCount',
+            'unreadNotifications'
         ));
     }
     
@@ -193,9 +180,12 @@ class DashboardController extends Controller
      */
     public function notifications()
     {
-        // Data notifikasi sudah tersedia dari AppServiceProvider
-        // Gunakan $userNotifications yang sudah di-share
-        return view('customer.notifications.index');
+        $user = Auth::user();
+        $notifications = $user->notifications()
+            ->latest()
+            ->paginate(10);
+            
+        return view('customer.notifications.index', compact('notifications'));
     }
     
     /**
@@ -225,9 +215,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        $user->notifications()
-            ->where('readstatus', false)
-            ->update(['readstatus' => true]);
+        $user->unreadNotifications()->update(['readstatus' => true]);
         
         if (request()->expectsJson()) {
             return response()->json(['success' => true]);

@@ -84,16 +84,39 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class, 'iduser')->where('checkoutstatus', 'active');
     }
 
-    // Relasi ke Notification (One to Many)
+    /**
+     * Get notifications for the user
+     */
     public function notifications()
     {
         return $this->hasMany(Notification::class, 'iduser');
     }
 
-    // Relasi ke unread notifications (One to Many)
+    /**
+     * Get unread notifications for the user
+     */
     public function unreadNotifications()
     {
-        return $this->hasMany(Notification::class, 'iduser')->where('readstatus', false);
+        return $this->notifications()->where('readstatus', false);
+    }
+
+    /**
+     * Get unread notification count efficiently
+     */
+    public function getUnreadNotificationCountAttribute()
+    {
+        return $this->unreadNotifications()->count();
+    }
+
+    /**
+     * Get recent notifications for navbar/dropdown
+     */
+    public function getRecentNotifications($limit = 5)
+    {
+        return $this->notifications()
+            ->latest()
+            ->limit($limit)
+            ->get(['id', 'title', 'notification', 'type', 'readstatus', 'created_at']);
     }
 
     // Relasi ke Wishlist (One to Many)

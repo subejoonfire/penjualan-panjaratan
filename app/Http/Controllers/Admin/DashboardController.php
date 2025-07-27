@@ -432,7 +432,7 @@ class DashboardController extends Controller
         // Get notification statistics
         $stats = [
             'total' => $user->notifications()->count(),
-            'unread' => $user->notifications()->where('readstatus', false)->count(),
+            'unread' => $user->unread_notification_count,
             'today' => $user->notifications()->whereDate('created_at', today())->count(),
         ];
 
@@ -481,7 +481,7 @@ class DashboardController extends Controller
     public function markAllAsRead()
     {
         $user = auth()->user();
-        $user->notifications()->where('readstatus', false)->update(['readstatus' => true]);
+        $user->unreadNotifications()->update(['readstatus' => true]);
 
         return response()->json(['success' => true]);
     }
