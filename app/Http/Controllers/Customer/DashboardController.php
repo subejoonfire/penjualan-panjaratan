@@ -210,6 +210,26 @@ class DashboardController extends Controller
     }
     
     /**
+     * Show notification detail
+     */
+    public function showNotification(Notification $notification)
+    {
+        $user = Auth::user();
+        
+        // Check if notification belongs to the user
+        if ($notification->iduser !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+        
+        // Mark as read when viewed
+        if (!$notification->readstatus) {
+            $notification->update(['readstatus' => true]);
+        }
+        
+        return view('customer.notifications.show', compact('notification'));
+    }
+    
+    /**
      * Mark notification as read
      */
     public function markAsRead(Notification $notification)

@@ -56,18 +56,35 @@
                                     <div class="flex items-start justify-between">
                                         <div class="flex-1">
                                             <h3 class="text-sm font-medium text-gray-900 {{ !$notification->readstatus ? 'font-semibold' : '' }}">
-                                                {{ $notification->title }}
+                                                <a href="{{ route('customer.notifications.show', $notification) }}" 
+                                                   class="hover:text-blue-600 transition-colors">
+                                                    {{ $notification->title }}
+                                                </a>
                                             </h3>
                                             <p class="mt-1 text-sm text-gray-600">
-                                                {{ $notification->notification }}
+                                                @if(strlen($notification->notification) > 100)
+                                                    {{ substr($notification->notification, 0, 100) }}...
+                                                    <a href="{{ route('customer.notifications.show', $notification) }}" 
+                                                       class="text-blue-600 hover:text-blue-800 ml-1 font-medium">
+                                                        lihat selengkapnya
+                                                    </a>
+                                                @else
+                                                    {{ $notification->notification }}
+                                                @endif
                                             </p>
                                             <p class="mt-2 text-xs text-gray-400">
-                                                {{ $notification->created_at->diffForHumans() }}
+                                                {{ $notification->created_at->diffForHumans() }} • 
+                                                <span class="capitalize">{{ $notification->type }}</span>
                                             </p>
                                         </div>
                                         
                                         <!-- Actions -->
                                         <div class="flex items-center space-x-2 ml-4">
+                                            <a href="{{ route('customer.notifications.show', $notification) }}" 
+                                               class="text-blue-600 hover:text-blue-900 text-sm" 
+                                               title="Lihat Detail">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                             @if(!$notification->readstatus)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     Baru
@@ -75,8 +92,8 @@
                                                 <form action="{{ route('customer.notifications.read', $notification) }}" method="POST" class="inline-block">
                                                     @csrf
                                                     @method('PUT')
-                                                    <button type="submit" class="text-blue-600 hover:text-blue-500 text-sm">
-                                                        Tandai Sebagai Dibaca
+                                                    <button type="submit" class="text-green-600 hover:text-green-500 text-sm" title="Tandai Dibaca">
+                                                        <i class="fas fa-check"></i>
                                                     </button>
                                                 </form>
                                             @endif

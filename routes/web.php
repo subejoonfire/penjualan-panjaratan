@@ -96,9 +96,10 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/orders/{order}', [CustomerDashboardController::class, 'orderDetail'])->name('orders.show');
     Route::put('/orders/{order}/cancel', [CustomerDashboardController::class, 'cancelOrder'])->name('orders.cancel');
     Route::post('/products/{product}/reviews', [CustomerDashboardController::class, 'addReview'])->name('products.reviews.store');
-    Route::get('/notifications', [CustomerDashboardController::class, 'notifications'])->name('notifications.index');
-    Route::put('/notifications/{notification}/read', [CustomerDashboardController::class, 'markAsRead'])->name('notifications.read');
-    Route::put('/notifications/mark-all-read', [CustomerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+            Route::get('/notifications', [CustomerDashboardController::class, 'notifications'])->name('notifications.index');
+        Route::get('/notifications/{notification}', [CustomerDashboardController::class, 'showNotification'])->name('notifications.show');
+        Route::put('/notifications/{notification}/read', [CustomerDashboardController::class, 'markAsRead'])->name('notifications.read');
+        Route::put('/notifications/mark-all-read', [CustomerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     
     // Wishlist routes
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
