@@ -32,153 +32,170 @@
             </ol>
         </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Product Images -->
-            <div class="space-y-4">
+            <div class="lg:col-span-1">
                 @if($product->images->count() > 0)
                 <!-- Main Image -->
-                <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-200 rounded-lg overflow-hidden mb-4">
                     <img id="mainImage" src="{{ asset('storage/' . $product->images->first()->image) }}"
-                        alt="{{ $product->productname }}" class="w-full h-96 object-cover">
+                        alt="{{ $product->productname }}" class="w-full h-80 object-cover">
                 </div>
 
                 <!-- Thumbnail Images -->
                 @if($product->images->count() > 1)
                 <div class="grid grid-cols-4 gap-2">
                     @foreach($product->images as $image)
-                    <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-75"
+                    <div class="bg-gray-200 rounded-md overflow-hidden cursor-pointer hover:opacity-75 border-2 border-transparent hover:border-blue-500 transition-colors"
                         onclick="changeMainImage('{{ asset('storage/' . $image->image) }}')">
                         <img src="{{ asset('storage/' . $image->image) }}" alt="{{ $product->productname }}"
-                            class="w-full h-20 object-cover">
+                            class="w-full h-16 object-cover">
                     </div>
                     @endforeach
                 </div>
                 @endif
                 @else
-                <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg flex items-center justify-center">
+                <div class="bg-gray-200 rounded-lg h-80 flex items-center justify-center">
                     <div class="text-center">
-                        <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
-                        <p class="text-gray-500">Tidak ada gambar tersedia</p>
+                        <i class="fas fa-image text-gray-400 text-4xl mb-2"></i>
+                        <p class="text-gray-500 text-sm">No image available</p>
                     </div>
                 </div>
                 @endif
             </div>
 
             <!-- Product Information -->
-            <div class="space-y-6">
-                <!-- Title and Price -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Product Title -->
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $product->productname }}</h1>
-                    <p class="text-sm text-gray-500 mt-1">Detail Produk</p>
-                    <div class="mt-4 flex items-center justify-between">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $product->productname }}</h1>
+
+                    <!-- Quick Info -->
+                    <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                        <span class="flex items-center">
+                            <i class="fas fa-tag mr-1"></i>
+                            <a href="{{ route('products.category', $product->category) }}"
+                                class="text-blue-600 hover:text-blue-500">
+                                {{ $product->category->category }}
+                            </a>
+                        </span>
+                        <span class="flex items-center">
+                            <i class="fas fa-store mr-1"></i>
+                            {{ $product->seller->nickname ?? $product->seller->username }}
+                        </span>
+                        @if($totalReviews > 0)
+                        <span class="flex items-center">
+                            <div class="flex items-center mr-1">
+                                @for($i = 1; $i <= 5; $i++) <i
+                                    class="fas fa-star text-xs {{ $i <= round($averageRating) ? 'text-yellow-400' : 'text-gray-300' }}">
+                                    </i>
+                                    @endfor
+                            </div>
+                            <span>{{ number_format($averageRating, 1) }} ({{ $totalReviews }} reviews)</span>
+                        </span>
+                        @endif
+                    </div>
+
+                    <!-- Price and Status -->
+                    <div class="flex items-center justify-between mb-4">
                         <div>
-                            <p class="text-3xl font-bold text-blue-600">Rp {{ number_format($product->productprice) }}
+                            <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($product->productprice) }}
                             </p>
-                            <p class="text-sm text-gray-500 mt-1">Harga per item</p>
                         </div>
-                        <div class="text-right">
+                        <div class="flex items-center space-x-2">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                 {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $product->is_active ? 'Tersedia' : 'Tidak Tersedia' }}
                             </span>
                         </div>
                     </div>
+
+                    <!-- Stock Info -->
+                    <div class="mb-4">
+                        <span class="text-sm font-medium text-gray-700">Stock: </span>
+                        <span
+                            class="text-sm font-semibold
+                            {{ $product->productstock > 10 ? 'text-green-600' : ($product->productstock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
+                            {{ $product->productstock }} items available
+                        </span>
+                        @if($product->productstock <= 10 && $product->productstock > 0)
+                            <p class="text-sm text-yellow-600 mt-1">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Only {{ $product->productstock }} left in stock!
+                            </p>
+                            @elseif($product->productstock === 0)
+                            <p class="text-sm text-red-600 mt-1">
+                                <i class="fas fa-times-circle mr-1"></i>
+                                Out of stock
+                            </p>
+                            @endif
+                    </div>
                 </div>
 
-                <!-- Product Details -->
-                <div class="border-t border-gray-200 pt-6">
-                    <dl class="space-y-4">
-                        <div>
-                            <dt class="text-sm font-medium text-gray-900">Kategori</dt>
-                            <dd class="mt-1">
-                                <a href="{{ route('products.category', $product->category) }}"
-                                    class="text-blue-600 hover:text-blue-500">
-                                    {{ $product->category->category }}
-                                </a>
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-900">Seller</dt>
-                            <dd class="mt-1 text-gray-700">{{ $product->seller->nickname ?? $product->seller->username
-                                }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm font-medium text-gray-900">Stok</dt>
-                            <dd class="mt-1">
-                                <span
-                                    class="text-lg font-semibold
-                                    {{ $product->productstock > 10 ? 'text-green-600' : ($product->productstock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
-                                    {{ $product->productstock }} {{ $product->productstock === 1 ? 'item' : 'items' }}
-                                    tersedia
-                                </span>
-                                @if($product->productstock <= 10 && $product->productstock > 0)
-                                    <p class="text-sm text-yellow-600 mt-1">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        Hanya tersisa {{ $product->productstock }} item!
-                                    </p>
-                                    @elseif($product->productstock === 0)
-                                    <p class="text-sm text-red-600 mt-1">
-                                        <i class="fas fa-times-circle mr-1"></i>
-                                        Stok habis
-                                    </p>
-                                    @endif
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
 
-                <!-- Add to Cart Section -->
+
+                <!-- Action Buttons -->
                 @auth
                 @if(auth()->user()->role === 'customer')
-                <!-- Wishlist Button -->
                 <div class="border-t border-gray-200 pt-6">
-                    @php
-                    $isInWishlist = auth()->user() && \App\Models\Wishlist::where('user_id',
-                    auth()->id())->where('product_id', $product->id)->exists();
-                    @endphp
-                    <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
-                        class="w-full mb-4 {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-2 px-4 rounded-md transition-colors">
-                        <i class="fas fa-heart mr-2"></i>
-                        <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'
-                            }}</span>
-                    </button>
-                </div>
-                @endif
+                    <!-- Wishlist and Cart Actions -->
+                    <div class="space-y-3">
+                        @php
+                        $isInWishlist = auth()->user() && \App\Models\Wishlist::where('user_id',
+                        auth()->id())->where('product_id', $product->id)->exists();
+                        @endphp
 
-                @if(auth()->user()->role === 'customer' && $product->is_active && $product->productstock > 0)
-                <div class="border-t border-gray-200 pt-6">
-                    <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
-                        @csrf
-                        <!-- Quantity Selector -->
-                        <div>
-                            <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                                Jumlah
-                            </label>
-                            <div class="flex items-center space-x-2">
-                                <button type="button" onclick="decreaseQuantity()"
-                                    class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                                    <i class="fas fa-minus text-sm"></i>
-                                </button>
-                                <input type="number" name="quantity" id="quantity" min="1"
-                                    max="{{ $product->productstock }}" value="1"
-                                    class="w-20 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <button type="button" onclick="increaseQuantity()"
-                                    class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                                    <i class="fas fa-plus text-sm"></i>
-                                </button>
-                                <span class="text-sm text-gray-500">Max: {{ $product->productstock }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Add to Cart Button -->
-                        <button type="submit"
-                            class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
-                            <i class="fas fa-shopping-cart mr-2"></i>
-                            Tambah ke Keranjang
+                        <!-- Wishlist Button -->
+                        <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
+                            class="w-full {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-2 px-4 rounded-md transition-colors">
+                            <i class="fas fa-heart mr-2"></i>
+                            <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'
+                                }}</span>
                         </button>
-                    </form>
+
+                        @if($product->is_active && $product->productstock > 0)
+                        <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <!-- Quantity Selector -->
+                            <div>
+                                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Jumlah
+                                </label>
+                                <div class="flex items-center space-x-2">
+                                    <button type="button" onclick="decreaseQuantity()"
+                                        class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                                        <i class="fas fa-minus text-sm"></i>
+                                    </button>
+                                    <input type="number" name="quantity" id="quantity" min="1"
+                                        max="{{ $product->productstock }}" value="1"
+                                        class="w-20 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <button type="button" onclick="increaseQuantity()"
+                                        class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                                        <i class="fas fa-plus text-sm"></i>
+                                    </button>
+                                    <span class="text-sm text-gray-500">Max: {{ $product->productstock }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Add to Cart Button -->
+                            <button type="submit"
+                                class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                <i class="fas fa-shopping-cart mr-2"></i>
+                                Tambah ke Keranjang
+                            </button>
+                        </form>
+                        @else
+                        <!-- Out of Stock Message -->
+                        <div class="bg-gray-100 border border-gray-300 rounded-md p-4 text-center">
+                            <p class="text-gray-600 font-medium">
+                                <i class="fas fa-times-circle mr-2"></i>
+                                Produk sedang tidak tersedia
+                            </p>
+                        </div>
+                        @endif
+                    </div>
                 </div>
-                @elseif(auth()->user()->role === 'seller' && auth()->user()->id === $product->seller_id)
+                @elseif(auth()->user()->role === 'seller' && auth()->user()->id === $product->iduserseller)
                 <div class="border-t border-gray-200 pt-6">
                     <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
                         <div class="flex">
@@ -201,7 +218,7 @@
                 @else
                 <div class="border-t border-gray-200 pt-6">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-4 text-center">
-                        <p class="text-gray-700 mb-4">Silakan masuk untuk membeli produk ini</p>
+                        <p class="text-gray-700 mb-4">Silakan login untuk membeli produk ini</p>
                         <div class="space-x-4">
                             <a href="{{ route('login') }}"
                                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
@@ -215,25 +232,29 @@
                     </div>
                 </div>
                 @endauth
+            </div>
+        </div>
 
-                <!-- Product Statistics -->
-                <div class="border-t border-gray-200 pt-6">
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-900">{{ $product->view_count ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Dilihat</div>
+        <!-- Product Statistics -->
+        <div class="bg-white shadow rounded-lg mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Statistik Produk</h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">{{ $product->views ?? 0 }}</div>
+                        <div class="text-sm text-gray-500">Dilihat</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">{{ $product->sold ?? 0 }}</div>
+                        <div class="text-sm text-gray-500">Terjual</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">
+                            {{ $totalReviews > 0 ? number_format($averageRating, 1) : 'N/A' }}
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-900">{{ $product->sold_count ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Terjual</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-gray-900">
-                                {{ $product->reviews()->count() > 0 ? number_format($product->reviews()->avg('rating'),
-                                1) : 'N/A' }}
-                            </div>
-                            <div class="text-sm text-gray-500">Rating</div>
-                        </div>
+                        <div class="text-sm text-gray-500">Rating</div>
                     </div>
                 </div>
             </div>

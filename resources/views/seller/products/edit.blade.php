@@ -8,55 +8,58 @@
         transition: all 0.2s ease;
         backdrop-filter: blur(4px);
     }
+
     .image-overlay-button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
     .group:hover .image-overlay-button {
         opacity: 1;
     }
-    
+
     /* Drag and Drop Styles */
     #dropArea {
         transition: all 0.3s ease;
     }
-    
+
     #dropArea.dragover {
         border-color: #3B82F6 !important;
         background-color: #EFF6FF !important;
         transform: scale(1.02);
     }
-    
+
     .upload-preview {
         transition: all 0.3s ease;
     }
-    
+
     .upload-preview:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
-    
+
     .file-remove-btn {
         opacity: 0;
         transition: opacity 0.2s ease;
     }
-    
+
     .upload-preview:hover .file-remove-btn {
         opacity: 1;
     }
-    
+
     /* Animation for new uploads */
     @keyframes fadeInUp {
         from {
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-    
+
     .upload-preview {
         animation: fadeInUp 0.4s ease;
     }
@@ -68,21 +71,21 @@
 
 <!-- Session Messages -->
 @if(session('success'))
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
-            <strong class="font-bold">Berhasil!</strong>
-            <span class="block sm:inline">{{ session('success') }}</span>
-        </div>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
+        <strong class="font-bold">Berhasil!</strong>
+        <span class="block sm:inline">{{ session('success') }}</span>
     </div>
+</div>
 @endif
 
 @if(session('error'))
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
-            <strong class="font-bold">Error!</strong>
-            <span class="block sm:inline">{{ session('error') }}</span>
-        </div>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline">{{ session('error') }}</span>
     </div>
+</div>
 @endif
 
 <div class="py-6">
@@ -107,7 +110,7 @@
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-16 w-16">
                     @if($product->images->count() > 0)
-                                            <img src="{{ url('storage/' . $product->images->where('is_primary', true)->first()?->image ?? $product->images->first()?->image) }}"
+                    <img src="{{ url('storage/' . $product->images->where('is_primary', true)->first()?->image ?? $product->images->first()?->image) }}"
                         alt="{{ $product->productname }}" class="h-16 w-16 rounded-lg object-cover">
                     @else
                     <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -232,12 +235,14 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status Produk</label>
                         <div class="flex items-center space-x-6">
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="is_active" value="1" {{ old('is_active', $product->is_active) == '1' || old('is_active', $product->is_active) === true ? 'checked' : '' }}
+                                <input type="radio" name="is_active" value="1" {{ old('is_active', $product->is_active)
+                                == '1' || old('is_active', $product->is_active) === true ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Aktif</span>
                             </label>
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="is_active" value="0" {{ old('is_active', $product->is_active) == '0' || old('is_active', $product->is_active) === false ? 'checked' : '' }}
+                                <input type="radio" name="is_active" value="0" {{ old('is_active', $product->is_active)
+                                == '0' || old('is_active', $product->is_active) === false ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Tidak Aktif</span>
                             </label>
@@ -273,8 +278,8 @@
                                 Jadikan Utama
                             </button>
                             @endif
-                            <button type="button" onclick="confirmDeleteImage({{ $image->id }})" 
-                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <button type="button" onclick="deleteImage({{ $image->id }})"
+                                class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">
                                 Hapus
                             </button>
                         </div>
@@ -301,53 +306,44 @@
                                     <li>• Maksimal 5 gambar baru (total maksimal 6 dengan gambar utama)</li>
                                     <li>• Format: JPG, PNG, GIF</li>
                                     <li>• Ukuran maksimal: 2MB per gambar</li>
-                                    <li>• Gambar saat ini: <span id="currentImageCount">{{ $product->images->count() }}</span></li>
-                                    <li id="remainingSlotsInfo">• Sisa slot untuk gambar baru: <span id="remainingSlots">{{ 6 - $product->images->count() }}</span></li>
+                                    <li>• Gambar saat ini: <span id="currentImageCount">{{ $product->images->count()
+                                            }}</span></li>
+                                    <li id="remainingSlotsInfo">• Sisa slot untuk gambar baru: <span
+                                            id="remainingSlots">{{ 6 - $product->images->count() }}</span></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Tambah Gambar Produk
+                        <label for="images" class="block text-sm font-medium text-gray-700 mb-3">
+                            Upload Gambar Tambahan
                         </label>
-                        
-                        <!-- Hidden file input -->
-                        <input type="file" name="images[]" id="images" multiple accept="image/*" class="hidden">
-                        
-                        <!-- Drag and Drop Area -->
-                        <div id="dropArea" class="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors duration-300 bg-gray-50 hover:bg-blue-50">
-                            <div id="dropContent">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                <h3 class="text-lg font-medium text-gray-900 mb-2">Drag & Drop gambar di sini</h3>
-                                <p class="text-sm text-gray-600 mb-4">atau</p>
-                                <button type="button" id="browseBtn" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <i class="fas fa-folder-open mr-2"></i>
-                                    Pilih Gambar
-                                </button>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    Maksimal 5 gambar, ukuran masing-masing maksimal 2MB
-                                </p>
-                            </div>
-                            
-                            <!-- Upload Progress -->
-                            <div id="uploadProgress" class="hidden">
-                                <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
-                                <p class="text-sm text-blue-600">Memproses gambar...</p>
+
+                        <!-- File Upload Area -->
+                        <div
+                            class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                            <div class="text-center">
+                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
+                                <div class="flex text-sm text-gray-600 justify-center">
+                                    <label for="images"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        <span>Pilih file</span>
+                                        <input type="file" name="images[]" id="images" multiple accept="image/*"
+                                            class="sr-only">
+                                    </label>
+                                    <p class="pl-1">atau seret dan lepas</p>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF maksimal 2MB per gambar</p>
                             </div>
                         </div>
-                        
+
                         @error('images')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @error('images.*')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
-                        
-                        <!-- Selected Files Info -->
-                        <div id="selectedFilesInfo" class="mt-2 hidden">
-                            <p class="text-sm text-gray-600">
-                                <span id="selectedCount">0</span> gambar dipilih
-                            </p>
-                        </div>
                     </div>
 
                     <!-- Image Preview -->
@@ -599,153 +595,30 @@
         updateSelectedInfo(); // Update initial state
     });
 
-    function confirmDeleteImage(imageId) {
-        confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
-            // Update current image count
-            const currentCount = document.getElementById('currentImageCount');
-            if (currentCount) {
-                const newCount = parseInt(currentCount.textContent) - 1;
-                currentCount.textContent = newCount;
-                
-                // Update remaining slots
-                updateSelectedInfo();
+function deleteImage(imageId) {
+    confirmAction('Apakah Anda yakin ingin menghapus gambar ini?', function() {
+        fetch(`/seller/products/images/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
-            
-            // Create a form dynamically to submit
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/seller/products/images/${imageId}`;
-            
-            // Add CSRF token
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-            
-            // Add method field for DELETE
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'DELETE';
-            form.appendChild(methodInput);
-            
-            console.log('Deleting image with form action:', form.action);
-            console.log('Delete form method:', form.method);
-            
-            // Submit the form
-            document.body.appendChild(form);
-            form.submit();
-            
-            // Show loading indicator
-            showAlert('Menghapus gambar...', 'info');
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Gambar berhasil dihapus', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showAlert('Gagal menghapus gambar', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Terjadi kesalahan saat menghapus gambar', 'error');
         });
-    }
-
-    function setPrimaryImage(imageId) {
-        confirmAction('Jadikan gambar ini sebagai gambar utama?', function() {
-            // Create a form dynamically to submit
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/seller/products/images/${imageId}/primary`;
-            
-            // Add CSRF token
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-            
-            // Add method field for PUT
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'PUT';
-            form.appendChild(methodInput);
-            
-            // Submit the form
-            document.body.appendChild(form);
-            form.submit();
-            
-            // Show loading indicator
-            showAlert('Mengubah gambar utama...', 'info');
-        });
-    }
-
-    // Form submission handling
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form[action*="products"][action*="update"]');
-        console.log('Main form found:', form);
-        
-        if (form) {
-            console.log('Form action:', form.action);
-            console.log('Form method:', form.method);
-            
-            form.addEventListener('submit', function(e) {
-                console.log('Main form is being submitted');
-                console.log('Form action at submit:', this.action);
-                console.log('Form method at submit:', this.method);
-                
-                // Check for method override
-                const methodInput = this.querySelector('input[name="_method"]');
-                console.log('Method override:', methodInput ? methodInput.value : 'none');
-                
-                // Basic validation
-                const productName = document.getElementById('productname');
-                const productPrice = document.getElementById('productprice');
-                const productStock = document.getElementById('productstock');
-                const category = document.getElementById('idcategories');
-                
-                if (!productName || !productName.value.trim()) {
-                    e.preventDefault();
-                    showAlert('Nama produk harus diisi', 'error');
-                    return false;
-                }
-                
-                if (!productPrice || !productPrice.value || parseFloat(productPrice.value) <= 0) {
-                    e.preventDefault();
-                    showAlert('Harga produk harus diisi dan lebih dari 0', 'error');
-                    return false;
-                }
-                
-                if (!productStock || productStock.value === '' || parseInt(productStock.value) < 0) {
-                    e.preventDefault();
-                    showAlert('Stok produk harus diisi dan tidak boleh negatif', 'error');
-                    return false;
-                }
-                
-                if (!category || !category.value) {
-                    e.preventDefault();
-                    showAlert('Kategori harus dipilih', 'error');
-                    return false;
-                }
-                
-                console.log('Form validation passed, allowing submission...');
-                
-                // Show loading state
-                const submitBtn = this.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    const originalText = submitBtn.innerHTML;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
-                    submitBtn.disabled = true;
-                    
-                    // Enable back if there's an error (form will reload if successful)
-                    setTimeout(() => {
-                        if (submitBtn) {
-                            submitBtn.innerHTML = originalText;
-                            submitBtn.disabled = false;
-                        }
-                    }, 10000);
-                }
-                
-                return true; // Allow form submission
-            });
-        }
-        
-        // Log info about dynamic forms
-        console.log('Using dynamic forms for image operations to prevent conflicts');
     });
+}
 </script>
 @endsection

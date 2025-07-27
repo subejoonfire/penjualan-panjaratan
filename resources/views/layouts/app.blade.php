@@ -92,6 +92,10 @@
                             <i class="fas fa-shopping-cart mr-2"></i>Keranjang
                             <span class="cart-count bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1">0</span>
                         </a>
+                        <a href="{{ route('customer.wishlist.index') }}"
+                            class="nav-link {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
+                            <i class="fas fa-heart mr-2"></i>Wishlist
+                        </a>
                         <a href="{{ route('customer.orders.index') }}"
                             class="nav-link {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
                             <i class="fas fa-list-alt mr-2"></i>Pesanan Saya
@@ -136,10 +140,9 @@
                             <button @click="open = !open"
                                 class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
                                 <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                    <span class="text-white text-sm font-medium">{{ substr(auth()->user()->username, 0,
-                                        1) }}</span>
+                                    <span class="text-white text-sm font-medium">{{ substr(auth()->user()->nickname ?? auth()->user()->username, 0, 1) }}</span>
                                 </div>
-                                <span class="hidden md:block text-sm font-medium">{{ auth()->user()->username }}</span>
+                                <span class="hidden md:block text-sm font-medium">{{ auth()->user()->nickname ?? auth()->user()->username }}</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
 
