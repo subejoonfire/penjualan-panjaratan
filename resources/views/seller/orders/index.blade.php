@@ -268,7 +268,7 @@
                                                     <i class="fas fa-user text-gray-600 text-xs"></i>
                                                 </div>
                                                 <div class="ml-2">
-                                                    <p class="text-sm font-medium text-gray-900">{{ $order->cart->user->username }}</p>
+                                                    <p class="text-sm font-medium text-gray-900">{{ $order->cart->user->nickname ?? $order->cart->user->username }}</p>
                                                     <p class="text-xs text-gray-500">{{ $order->cart->user->email }}</p>
                                                 </div>
                                             </div>

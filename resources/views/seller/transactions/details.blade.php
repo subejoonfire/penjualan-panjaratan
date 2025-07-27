@@ -60,7 +60,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <p class="text-sm text-blue-700 font-medium">Nama</p>
-                    <p class="text-blue-900 font-semibold">{{ $transaction->order->cart->user->username }}</p>
+                    <p class="text-blue-900 font-semibold">{{ $transaction->order->cart->user->nickname ?? $transaction->order->cart->user->username }}</p>
                 </div>
                 <div>
                     <p class="text-sm text-blue-700 font-medium">Email</p>
@@ -76,6 +76,50 @@
                     <p class="text-sm text-blue-700 font-medium">Bergabung</p>
                     <p class="text-blue-900">{{ $transaction->order->cart->user->created_at->format('d M Y') }}</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+            <h4 class="text-lg font-semibold text-green-900 mb-4 flex items-center">
+                <i class="fas fa-map-marker-alt mr-2"></i>
+                Alamat Pengiriman
+            </h4>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                @if($transaction->order->shipping_address)
+                    <div class="whitespace-pre-line text-green-900">{{ $transaction->order->shipping_address }}</div>
+                @elseif($transaction->order->cart->user->addresses && $transaction->order->cart->user->addresses->count() > 0)
+                    @php $address = $transaction->order->cart->user->addresses->first(); @endphp
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @if($address->label)
+                        <div class="md:col-span-2">
+                            <p class="text-sm text-green-700 font-medium">Label</p>
+                            <p class="text-green-900 font-semibold">{{ $address->label }}</p>
+                        </div>
+                        @endif
+                        <div class="md:col-span-2">
+                            <p class="text-sm text-green-700 font-medium">Alamat Lengkap</p>
+                            <p class="text-green-900">{{ $address->full_address }}</p>
+                        </div>
+                        @if($address->city)
+                        <div>
+                            <p class="text-sm text-green-700 font-medium">Kota</p>
+                            <p class="text-green-900">{{ $address->city }}</p>
+                        </div>
+                        @endif
+                        @if($address->postal_code)
+                        <div>
+                            <p class="text-sm text-green-700 font-medium">Kode Pos</p>
+                            <p class="text-green-900">{{ $address->postal_code }}</p>
+                        </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="fas fa-map-marker-alt text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-gray-500">Alamat pengiriman tidak tersedia</p>
+                    </div>
+                @endif
             </div>
         </div>
 

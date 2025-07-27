@@ -13,7 +13,7 @@
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Products -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
                 <div class="p-5">
@@ -213,7 +213,7 @@
                                     </div>
                                     <div class="ml-3">
                                         <p class="text-sm font-medium text-gray-900">{{ $order->order_number }}</p>
-                                        <p class="text-xs text-gray-500">{{ $order->cart->user->username }}</p>
+                                        <p class="text-xs text-gray-500">{{ $order->cart->user->nickname ?? $order->cart->user->username }}</p>
                                         <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y') }}</p>
                                     </div>
                                 </div>

@@ -164,6 +164,52 @@
         </div>
     </div>
 
+    <!-- Shipping Address -->
+    <div class="bg-orange-50 p-4 rounded-lg">
+        <h4 class="font-medium text-gray-900 mb-3 flex items-center">
+            <i class="fas fa-map-marker-alt text-orange-600 mr-2"></i>
+            Alamat Pengiriman
+        </h4>
+        @if($transaction->order->shipping_address)
+            <div class="bg-white rounded p-3 border border-orange-200">
+                <div class="whitespace-pre-line text-gray-900">{{ $transaction->order->shipping_address }}</div>
+            </div>
+        @elseif($transaction->order->cart->user->addresses && $transaction->order->cart->user->addresses->count() > 0)
+            @php $address = $transaction->order->cart->user->addresses->first(); @endphp
+            <div class="bg-white rounded p-3 border border-orange-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @if($address->label)
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-orange-700 font-medium">Label</p>
+                        <p class="text-gray-900 font-semibold">{{ $address->label }}</p>
+                    </div>
+                    @endif
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-orange-700 font-medium">Alamat Lengkap</p>
+                        <p class="text-gray-900">{{ $address->full_address }}</p>
+                    </div>
+                    @if($address->city)
+                    <div>
+                        <p class="text-sm text-orange-700 font-medium">Kota</p>
+                        <p class="text-gray-900">{{ $address->city }}</p>
+                    </div>
+                    @endif
+                    @if($address->postal_code)
+                    <div>
+                        <p class="text-sm text-orange-700 font-medium">Kode Pos</p>
+                        <p class="text-gray-900">{{ $address->postal_code }}</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        @else
+            <div class="bg-white rounded p-3 border border-orange-200 text-center">
+                <i class="fas fa-map-marker-alt text-gray-400 text-2xl mb-2"></i>
+                <p class="text-gray-500">Alamat pengiriman tidak tersedia</p>
+            </div>
+        @endif
+    </div>
+
     @if($transaction->order->cart->cartDetails->count() > 0)
     <!-- Order Items -->
     <div class="bg-white border border-gray-200 rounded-lg">

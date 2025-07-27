@@ -28,7 +28,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <p class="text-sm text-blue-700 font-medium">Nama</p>
-                    <p class="text-blue-900 font-semibold">{{ $order->cart->user->username }}</p>
+                    <p class="text-blue-900 font-semibold">{{ $order->cart->user->nickname ?? $order->cart->user->username }}</p>
                 </div>
                 <div>
                     <p class="text-sm text-blue-700 font-medium">Email</p>
@@ -48,14 +48,16 @@
         </div>
 
         <!-- Shipping Address -->
-        @if($order->cart->user->addresses && $order->cart->user->addresses->count() > 0)
-            @php $address = $order->cart->user->addresses->first(); @endphp
-            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
-                <h4 class="text-lg font-semibold text-green-900 mb-4 flex items-center">
-                    <i class="fas fa-map-marker-alt mr-2"></i>
-                    Alamat Pengiriman
-                </h4>
-                <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+            <h4 class="text-lg font-semibold text-green-900 mb-4 flex items-center">
+                <i class="fas fa-map-marker-alt mr-2"></i>
+                Alamat Pengiriman
+            </h4>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                @if($order->shipping_address)
+                    <div class="whitespace-pre-line text-green-900">{{ $order->shipping_address }}</div>
+                @elseif($order->cart->user->addresses && $order->cart->user->addresses->count() > 0)
+                    @php $address = $order->cart->user->addresses->first(); @endphp
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if($address->label)
                         <div class="md:col-span-2">
@@ -80,17 +82,14 @@
                         </div>
                         @endif
                     </div>
-                </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="fas fa-map-marker-alt text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-gray-500">Alamat pengiriman tidak tersedia</p>
+                    </div>
+                @endif
             </div>
-        @else
-            <div class="bg-yellow-50 rounded-lg p-6 border border-yellow-200">
-                <h4 class="text-lg font-semibold text-yellow-800 mb-2 flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    Alamat Pengiriman
-                </h4>
-                <p class="text-yellow-700">Pelanggan belum menambahkan alamat pengiriman</p>
-            </div>
-        @endif
+        </div>
 
         <!-- Order Timeline -->
         <div class="bg-gray-50 rounded-lg p-6">
