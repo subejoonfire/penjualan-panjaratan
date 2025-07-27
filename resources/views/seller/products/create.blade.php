@@ -195,17 +195,35 @@
         const sortable = Sortable.create(sortableImages, {
             animation: 150,
             ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            handle: '.group', // Allow dragging from the entire container
+            filter: 'button', // Prevent dragging when clicking on buttons
+            preventOnFilter: false, // Allow button clicks to work
+            onStart: function(evt) {
+                // Add visual feedback when dragging starts
+                evt.item.style.transform = 'rotate(5deg) scale(1.05)';
+            },
             onEnd: function (evt) {
+                // Reset transform
+                evt.item.style.transform = '';
+                
                 // Reorder files array
                 const oldIndex = evt.oldIndex;
                 const newIndex = evt.newIndex;
-                const movedFile = currentFiles.splice(oldIndex, 1)[0];
-                currentFiles.splice(newIndex, 0, movedFile);
                 
-                // Update file input
-                updateFileInput();
-                // Update preview
-                updateImagePreview();
+                if (oldIndex !== newIndex) {
+                    const movedFile = currentFiles.splice(oldIndex, 1)[0];
+                    currentFiles.splice(newIndex, 0, movedFile);
+                    
+                    // Update file input
+                    updateFileInput();
+                    // Update preview with new order
+                    updateImagePreview();
+                    
+                    // Show success message
+                    showAlert('Urutan gambar berhasil diubah', 'success');
+                }
             }
         });
         
@@ -232,10 +250,43 @@
         
         function highlight() {
             dropArea.classList.add('border-blue-500', 'bg-blue-50');
+            dropArea.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-cloud-upload-alt text-blue-500 text-4xl mb-4 animate-bounce"></i>
+                    <div class="flex text-sm text-blue-600">
+                        <span class="font-medium">Lepaskan file di sini</span>
+                    </div>
+                    <p class="text-xs text-blue-500 mt-1">PNG, JPG, GIF maksimal 2MB per gambar (maksimal 5 gambar)</p>
+                </div>
+            `;
         }
         
         function unhighlight() {
             dropArea.classList.remove('border-blue-500', 'bg-blue-50');
+            // Restore original content
+            dropArea.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
+                    <div class="flex text-sm text-gray-600">
+                        <label for="images"
+                            class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                            <span>Unggah gambar</span>
+                            <input id="images" name="images[]" type="file" class="sr-only" multiple accept="image/*" required>
+                        </label>
+                        <p class="pl-1">atau seret dan lepas</p>
+                    </div>
+                    <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar (maksimal 5 gambar)</p>
+                    <p id="imageCount" class="text-xs text-blue-600 mt-1 ${currentFiles.length === 0 ? 'hidden' : ''}">${currentFiles.length}/5 gambar dipilih</p>
+                </div>
+            `;
+            
+            // Re-attach event listener to the new file input
+            const newImageInput = document.getElementById('images');
+            if (newImageInput) {
+                newImageInput.addEventListener('change', function(e) {
+                    handleFiles(e.target.files);
+                });
+            }
         }
         
         function handleDrop(e) {
@@ -248,40 +299,41 @@
             handleFiles(e.target.files);
         });
         
-        function handleFiles(files) {
-            const newFiles = Array.from(files).filter(file => {
-                // Check file type
-                if (!file.type.startsWith('image/')) {
-                    alert(`File ${file.name} bukan file gambar yang valid.`);
-                    return false;
-                }
-                
-                // Check file size
-                if (file.size > maxFileSize) {
-                    alert(`File ${file.name} terlalu besar. Maksimal 2MB per gambar.`);
-                    return false;
-                }
-                
-                return true;
-            });
-            
-            // Check total files limit
-            if (currentFiles.length + newFiles.length > maxFiles) {
-                const remainingSlots = maxFiles - currentFiles.length;
-                if (remainingSlots > 0) {
-                    alert(`Maksimal ${maxFiles} gambar. Hanya ${remainingSlots} gambar yang dapat ditambahkan.`);
-                    currentFiles = currentFiles.concat(newFiles.slice(0, remainingSlots));
-                } else {
-                    alert(`Maksimal ${maxFiles} gambar sudah tercapai.`);
-                }
-            } else {
-                currentFiles = currentFiles.concat(newFiles);
-            }
-            
-            updateFileInput();
-            updateImagePreview();
-            updateImageCount();
-        }
+                 function handleFiles(files) {
+             const newFiles = Array.from(files).filter(file => {
+                 // Check file type
+                 if (!file.type.startsWith('image/')) {
+                     showAlert(`File ${file.name} bukan file gambar yang valid.`, 'error');
+                     return false;
+                 }
+                 
+                 // Check file size
+                 if (file.size > maxFileSize) {
+                     showAlert(`File ${file.name} terlalu besar. Maksimal 2MB per gambar.`, 'error');
+                     return false;
+                 }
+                 
+                 return true;
+             });
+             
+             // Check total files limit
+             if (currentFiles.length + newFiles.length > maxFiles) {
+                 const remainingSlots = maxFiles - currentFiles.length;
+                 if (remainingSlots > 0) {
+                     showAlert(`Maksimal ${maxFiles} gambar. Hanya ${remainingSlots} gambar yang dapat ditambahkan.`, 'warning');
+                     currentFiles = currentFiles.concat(newFiles.slice(0, remainingSlots));
+                 } else {
+                     showAlert(`Maksimal ${maxFiles} gambar sudah tercapai.`, 'warning');
+                     return; // Don't add any files if limit reached
+                 }
+             } else {
+                 currentFiles = currentFiles.concat(newFiles);
+             }
+             
+             updateFileInput();
+             updateImagePreview();
+             updateImageCount();
+         }
         
         function updateFileInput() {
             const dt = new DataTransfer();
@@ -296,24 +348,43 @@
                 imagePreview.classList.remove('hidden');
                 
                 currentFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageDiv = document.createElement('div');
-                        imageDiv.className = 'relative group cursor-move';
-                        imageDiv.innerHTML = `
-                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
-                                 class="w-full h-24 object-cover rounded-md border-2 ${index === 0 ? 'border-blue-500' : 'border-gray-200'}">
-                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : `<span class="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-1 rounded">${index + 1}</span>`}
-                            <button type="button" onclick="removeImage(${index})" 
-                                    class="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-md">
-                                <i class="fas fa-arrows-alt text-white text-lg"></i>
-                            </div>
-                        `;
-                        sortableImages.appendChild(imageDiv);
-                    };
+                                         const reader = new FileReader();
+                     reader.onload = function(e) {
+                         const imageDiv = document.createElement('div');
+                         imageDiv.className = 'relative group';
+                         imageDiv.innerHTML = `
+                             <div class="relative overflow-hidden rounded-md border-2 ${index === 0 ? 'border-blue-500' : 'border-gray-200'}">
+                                 <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
+                                      class="w-full h-24 object-cover">
+                                 
+                                 <!-- Drag Handle (only visible on hover, positioned to not overlap with remove button) -->
+                                 <div class="absolute bottom-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-move bg-black bg-opacity-60 rounded px-2 py-1">
+                                     <i class="fas fa-arrows-alt text-white text-xs"></i>
+                                 </div>
+                                 
+                                 <!-- Position/Status Badge -->
+                                 ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : `<span class="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-1 rounded">${index + 1}</span>`}
+                                 
+                                 <!-- Remove Button (always visible but subtle, becomes prominent on hover) -->
+                                 <button type="button" onclick="removeImage(${index})" 
+                                         class="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full hover:bg-red-700 transition-all duration-200 flex items-center justify-center text-xs opacity-80 hover:opacity-100 z-10">
+                                     <i class="fas fa-times"></i>
+                                 </button>
+                             </div>
+                         `;
+                         
+                         // Make the entire div draggable, but prevent drag when clicking remove button
+                         imageDiv.draggable = true;
+                         imageDiv.addEventListener('dragstart', function(e) {
+                             // Prevent drag if clicking on remove button
+                             if (e.target.closest('button')) {
+                                 e.preventDefault();
+                                 return false;
+                             }
+                         });
+                         
+                         sortableImages.appendChild(imageDiv);
+                     };
                     reader.readAsDataURL(file);
                 });
             } else {
@@ -326,13 +397,19 @@
             imageCount.classList.toggle('hidden', currentFiles.length === 0);
         }
         
-        // Make removeImage function global
-        window.removeImage = function(index) {
-            currentFiles.splice(index, 1);
-            updateFileInput();
-            updateImagePreview();
-            updateImageCount();
-        };
+                 // Make removeImage function global
+         window.removeImage = function(index) {
+             confirmAction(
+                 'Apakah Anda yakin ingin menghapus gambar ini?',
+                 function() {
+                     currentFiles.splice(index, 1);
+                     updateFileInput();
+                     updateImagePreview();
+                     updateImageCount();
+                     showAlert('Gambar berhasil dihapus', 'success');
+                 }
+             );
+         };
         
         // Price formatting
         const priceInput = document.getElementById('productprice');
@@ -353,6 +430,43 @@
 <style>
 .sortable-ghost {
     opacity: 0.4;
+    transform: rotate(5deg);
+}
+
+.sortable-chosen {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: #3B82F6;
+}
+
+/* Hover effects for image containers */
+.image-container:hover .drag-handle {
+    opacity: 1;
+}
+
+.image-container .remove-btn {
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.image-container:hover .remove-btn {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Drag area styling */
+#dropArea.border-blue-500 {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Image preview responsive grid */
+#sortableImages {
+    min-height: 100px;
+}
+
+@media (max-width: 768px) {
+    #sortableImages {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 </style>
 @endsection
