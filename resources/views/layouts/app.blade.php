@@ -78,6 +78,10 @@
                             class="nav-link {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
                             <i class="fas fa-chart-line mr-2"></i>Penjualan
                         </a>
+                        <a href="{{ route('seller.transactions.index') }}"
+                            class="nav-link {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}">
+                            <i class="fas fa-credit-card mr-2"></i>Transaksi
+                        </a>
                         @elseif(auth()->user()->isCustomer())
                         <a href="{{ route('customer.dashboard') }}"
                             class="nav-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">

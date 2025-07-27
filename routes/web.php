@@ -70,8 +70,11 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::put('/products/{product}', [SellerDashboardController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/images/{image}', [SellerDashboardController::class, 'deleteImage'])->name('products.images.delete');
     Route::get('/orders', [SellerDashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{order}/details', [SellerDashboardController::class, 'orderDetails'])->name('orders.details');
     Route::put('/orders/{order}/status', [SellerDashboardController::class, 'updateOrderStatus'])->name('orders.status');
     Route::get('/sales', [SellerDashboardController::class, 'sales'])->name('sales');
+    Route::get('/transactions', [SellerDashboardController::class, 'transactions'])->name('transactions.index');
+    Route::get('/transactions/{transaction}/details', [SellerDashboardController::class, 'transactionDetails'])->name('transactions.details');
     Route::post('/products/{product}/images', [SellerDashboardController::class, 'uploadImage'])->name('products.images.upload');
     Route::put('/products/images/{image}/primary', [SellerDashboardController::class, 'setPrimaryImage'])->name('products.images.primary');
     Route::get('/notifications', [SellerDashboardController::class, 'notifications'])->name('notifications.index');

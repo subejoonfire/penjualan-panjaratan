@@ -256,7 +256,7 @@ class DashboardController extends Controller
     public function orders(Request $request)
     {
         $user = Auth::user();
-        $query = Order::with(['cart.user', 'cart.cartDetails.product', 'transaction'])
+        $query = Order::with(['cart.user.addresses', 'cart.cartDetails.product.images', 'transaction'])
             ->whereHas('cart.cartDetails.product', function ($q) use ($user) {
                 $q->where('iduserseller', $user->id);
             });
@@ -266,9 +266,81 @@ class DashboardController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Search by order number or customer name
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('order_number', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('cart.user', function ($userQuery) use ($request) {
+                      $userQuery->where('username', 'like', '%' . $request->search . '%')
+                                ->orWhere('email', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
         $orders = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return view('seller.orders.index', compact('orders'));
+        // Calculate statistics
+        $allOrders = Order::whereHas('cart.cartDetails.product', function ($q) use ($user) {
+            $q->where('iduserseller', $user->id);
+        })->get();
+
+        $stats = [
+            'total' => $allOrders->count(),
+            'pending' => $allOrders->where('status', 'pending')->count(),
+            'processing' => $allOrders->where('status', 'processing')->count(),
+            'shipped' => $allOrders->where('status', 'shipped')->count(),
+            'delivered' => $allOrders->where('status', 'delivered')->count(),
+            'cancelled' => $allOrders->where('status', 'cancelled')->count(),
+        ];
+
+        // Calculate total revenue from completed orders
+        $totalRevenue = $allOrders->where('status', 'delivered')
+            ->sum(function ($order) use ($user) {
+                return $order->cart->cartDetails
+                    ->where('product.iduserseller', $user->id)
+                    ->sum(function ($item) {
+                        return $item->quantity * $item->productprice;
+                    });
+            });
+
+        return view('seller.orders.index', compact('orders', 'stats', 'totalRevenue'));
+    }
+
+    /**
+     * Get order details for modal
+     */
+    public function orderDetails(Order $order)
+    {
+        $user = Auth::user();
+
+        // Check if order contains seller's products
+        $hasSellerProducts = $order->cart->cartDetails()
+            ->whereHas('product', function ($query) use ($user) {
+                $query->where('iduserseller', $user->id);
+            })->exists();
+
+        if (!$hasSellerProducts) {
+            abort(403, 'Unauthorized');
+        }
+
+        $order->load([
+            'cart.user.addresses', 
+            'cart.cartDetails.product.images', 
+            'cart.cartDetails.product.category',
+            'transaction'
+        ]);
+
+        // Get only seller's products from this order
+        $sellerItems = $order->cart->cartDetails->filter(function ($item) use ($user) {
+            return $item->product->iduserseller === $user->id;
+        });
+
+        return response()->json([
+            'success' => true,
+            'order' => $order,
+            'sellerItems' => $sellerItems,
+            'html' => view('seller.orders.details', compact('order', 'sellerItems'))->render()
+        ]);
     }
 
     /**
@@ -504,5 +576,96 @@ class DashboardController extends Controller
         $user->notifications()->where('readstatus', false)->update(['readstatus' => true]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Display transactions for seller
+     */
+    public function transactions(Request $request)
+    {
+        $user = Auth::user();
+        $query = Transaction::with(['order.cart.user', 'order.cart.cartDetails.product.images'])
+            ->whereHas('order.cart.cartDetails.product', function ($q) use ($user) {
+                $q->where('iduserseller', $user->id);
+            });
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('transactionstatus', $request->status);
+        }
+
+        // Search by transaction number or customer name
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('transaction_number', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('order.cart.user', function ($userQuery) use ($request) {
+                      $userQuery->where('username', 'like', '%' . $request->search . '%')
+                                ->orWhere('email', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        // Calculate statistics
+        $allTransactions = Transaction::whereHas('order.cart.cartDetails.product', function ($q) use ($user) {
+            $q->where('iduserseller', $user->id);
+        })->get();
+
+        $stats = [
+            'total' => $allTransactions->count(),
+            'pending' => $allTransactions->where('transactionstatus', 'pending')->count(),
+            'paid' => $allTransactions->where('transactionstatus', 'paid')->count(),
+            'cancelled' => $allTransactions->where('transactionstatus', 'cancelled')->count(),
+            'failed' => $allTransactions->where('transactionstatus', 'failed')->count(),
+        ];
+
+        // Calculate total revenue from paid transactions
+        $totalRevenue = $allTransactions->where('transactionstatus', 'paid')
+            ->sum(function ($transaction) use ($user) {
+                return $transaction->order->cart->cartDetails
+                    ->where('product.iduserseller', $user->id)
+                    ->sum(function ($item) {
+                        return $item->quantity * $item->productprice;
+                    });
+            });
+
+        return view('seller.transactions.index', compact('transactions', 'stats', 'totalRevenue'));
+    }
+
+    /**
+     * Get transaction details for modal
+     */
+    public function transactionDetails(Transaction $transaction)
+    {
+        $user = Auth::user();
+
+        // Check if transaction contains seller's products
+        $hasSellerProducts = $transaction->order->cart->cartDetails()
+            ->whereHas('product', function ($query) use ($user) {
+                $query->where('iduserseller', $user->id);
+            })->exists();
+
+        if (!$hasSellerProducts) {
+            abort(403, 'Unauthorized');
+        }
+
+        $transaction->load([
+            'order.cart.user.addresses', 
+            'order.cart.cartDetails.product.images', 
+            'order.cart.cartDetails.product.category'
+        ]);
+
+        // Get only seller's products from this transaction
+        $sellerItems = $transaction->order->cart->cartDetails->filter(function ($item) use ($user) {
+            return $item->product->iduserseller === $user->id;
+        });
+
+        return response()->json([
+            'success' => true,
+            'transaction' => $transaction,
+            'sellerItems' => $sellerItems,
+            'html' => view('seller.transactions.details', compact('transaction', 'sellerItems'))->render()
+        ]);
     }
 }
