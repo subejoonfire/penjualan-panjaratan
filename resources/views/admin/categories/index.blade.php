@@ -133,7 +133,7 @@
         <!-- Categories Table -->
         <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-[700px] w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left">

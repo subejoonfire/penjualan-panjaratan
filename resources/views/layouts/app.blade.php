@@ -443,16 +443,40 @@
     <!-- Custom Styles -->
     <style>
         .nav-link {
-            @apply text-gray-600 hover: text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
+            @apply text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
         }
-
         .nav-link.active {
             @apply text-blue-600 bg-blue-50;
         }
-
         /* Prevent horizontal scrolling */
         body {
             overflow-x: hidden;
+        }
+        /* Hamburger menu for mobile */
+        .mobile-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 0;
+        }
+        @media (max-width: 768px) {
+            .md\:flex {
+                display: none !important;
+            }
+            .mobile-nav-toggle {
+                display: block !important;
+            }
+            .mobile-nav-menu {
+                display: block !important;
+            }
+        }
+        @media (min-width: 768px) {
+            .mobile-nav-toggle {
+                display: none !important;
+            }
+            .mobile-nav-menu {
+                display: none !important;
+            }
         }
     </style>
 </body>
