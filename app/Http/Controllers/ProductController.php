@@ -54,7 +54,7 @@ class ProductController extends Controller
                 $query->orderBy('created_at', 'desc');
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(25);
         $categories = Category::withCount('products')->get();
 
         // Get price range for filters
@@ -185,7 +185,7 @@ class ProductController extends Controller
                 $query->orderBy('created_at', 'desc');
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(25);
         $categories = Category::withCount('products')->get();
 
         // Get price range for this category
@@ -278,7 +278,7 @@ class ProductController extends Controller
                 ", [$searchTerm, $searchTerm . '%', '%' . $searchTerm . '%']);
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(25);
         $categories = Category::withCount('products')->get();
 
         // Get price range for search results
