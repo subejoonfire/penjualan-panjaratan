@@ -2,6 +2,22 @@
 
 @section('title', 'Edit Produk - Dashboard Penjual')
 
+@push('styles')
+<style>
+    .image-overlay-button {
+        transition: all 0.2s ease;
+        backdrop-filter: blur(4px);
+    }
+    .image-overlay-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .group:hover .image-overlay-button {
+        opacity: 1;
+    }
+</style>
+@endpush
+
 @section('content')
 @include('components.modal-notification')
 
@@ -170,15 +186,13 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status Produk</label>
                         <div class="flex items-center space-x-6">
-                            <label class="flex items-center">
-                                <input type="radio" name="is_active" value="1" {{ old('is_active', $product->is_active)
-                                == 1 ? 'checked' : '' }}
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="is_active" value="1" {{ old('is_active', $product->is_active) == '1' || old('is_active', $product->is_active) === true ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Aktif</span>
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="is_active" value="0" {{ old('is_active', $product->is_active)
-                                == 0 ? 'checked' : '' }}
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="is_active" value="0" {{ old('is_active', $product->is_active) == '0' || old('is_active', $product->is_active) === false ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-sm text-gray-700">Tidak Aktif</span>
                             </label>
@@ -205,23 +219,19 @@
                                 class="w-full h-32 object-cover rounded-lg border border-gray-200">
                             @if($image->is_primary)
                             <span
-                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>
+                                class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded z-10 image-overlay-button">Utama</span>
                             @else
-                            <form action="{{ route('seller.products.images.primary', $image) }}" method="POST" style="display: inline;">
-                                @csrf
-                                @method('PUT')
-                                <button type="submit" 
-                                    class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">
-                                    Jadikan Utama
-                                </button>
-                            </form>
+                            <button type="button" onclick="setPrimaryImage({{ $image->id }})"
+                                class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                Jadikan Utama
+                            </button>
                             @endif
                             <form action="{{ route('seller.products.images.delete', $image) }}" method="POST" 
                                 style="display: inline;" id="deleteImageForm{{ $image->id }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" onclick="confirmDeleteImage({{ $image->id }})" 
-                                    class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">
+                                    class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 z-10 cursor-pointer image-overlay-button focus:outline-none focus:ring-2 focus:ring-red-500">
                                     Hapus
                                 </button>
                             </form>
@@ -325,5 +335,105 @@
             document.getElementById('deleteImageForm' + imageId).submit();
         });
     }
+
+    function setPrimaryImage(imageId) {
+        confirmAction('Jadikan gambar ini sebagai gambar utama?', function() {
+            // Create a form dynamically to submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/seller/products/images/${imageId}/primary`;
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            // Add method field for PUT
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'PUT';
+            form.appendChild(methodInput);
+            
+            // Submit the form
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Show loading indicator
+            showAlert('Mengubah gambar utama...', 'info');
+        });
+    }
+
+    // Debug form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form[action*="products"][action*="update"]');
+        console.log('Form found:', form);
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Form is being submitted');
+                
+                // Basic validation
+                const productName = document.getElementById('productname').value.trim();
+                const productPrice = document.getElementById('productprice').value;
+                const productStock = document.getElementById('productstock').value;
+                const category = document.getElementById('idcategories').value;
+                
+                console.log('Validation data:', {
+                    productName, 
+                    productPrice, 
+                    productStock, 
+                    category
+                });
+                
+                if (!productName) {
+                    e.preventDefault();
+                    showAlert('Nama produk harus diisi', 'error');
+                    return false;
+                }
+                
+                if (!productPrice || parseFloat(productPrice) <= 0) {
+                    e.preventDefault();
+                    showAlert('Harga produk harus diisi dan lebih dari 0', 'error');
+                    return false;
+                }
+                
+                if (productStock === '' || parseInt(productStock) < 0) {
+                    e.preventDefault();
+                    showAlert('Stok produk harus diisi dan tidak boleh negatif', 'error');
+                    return false;
+                }
+                
+                if (!category) {
+                    e.preventDefault();
+                    showAlert('Kategori harus dipilih', 'error');
+                    return false;
+                }
+                
+                console.log('Form validation passed, submitting...');
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+                    submitBtn.disabled = true;
+                    
+                    // Enable back if there's an error (form will reload if successful)
+                    setTimeout(() => {
+                        if (submitBtn) {
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    }, 10000);
+                }
+                
+                return true; // Allow form submission
+            });
+        }
+    });
 </script>
 @endsection
