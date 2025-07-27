@@ -81,12 +81,12 @@
             <!-- Notifikasi & Cart -->
             <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
                 <i class="fas fa-bell"></i>
-                <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1rem] h-4 flex items-center justify-center" style="display: none;">0</span>
+                <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
             </a>
             @if(auth()->user()->isCustomer())
             <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1rem] h-4 flex items-center justify-center" style="display: none;">0</span>
+                <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
             </a>
             @endif
             <!-- Profile Button -->
@@ -223,8 +223,7 @@
                             <button @click="open = !open"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
-                                <span
-                                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                                <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
                             </button>
 
                             <!-- Notification Dropdown -->
