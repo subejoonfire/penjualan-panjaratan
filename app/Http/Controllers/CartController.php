@@ -60,11 +60,17 @@ class CartController extends Controller
 
         // Check if product is active
         if (!$product->is_active) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Produk tidak tersedia']);
+            }
             return back()->with('error', 'Produk tidak tersedia');
         }
 
         // Check stock
         if ($product->productstock < $request->quantity) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
+            }
             return back()->with('error', 'Stok tidak mencukupi');
         }
 
@@ -86,6 +92,9 @@ class CartController extends Controller
             $newQuantity = $existingDetail->quantity + $request->quantity;
 
             if ($newQuantity > $product->productstock) {
+                if ($request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
+                }
                 return back()->with('error', 'Stok tidak mencukupi');
             }
 
@@ -99,6 +108,9 @@ class CartController extends Controller
             ]);
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Produk berhasil ditambahkan ke keranjang']);
+        }
         return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
     }
 
