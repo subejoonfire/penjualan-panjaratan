@@ -364,10 +364,11 @@
 
                     <!-- Image Preview -->
                     <div id="imagePreview" class="mt-4 sm:mt-6 hidden">
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar Baru</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar Baru (Seret untuk mengurutkan)</h4>
+                        <div id="sortableImages" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                             <!-- Images will be previewed here -->
                         </div>
+                        <p class="text-xs text-gray-500 mt-2">Gambar pertama akan menjadi gambar utama produk</p>
                     </div>
                 </div>
             </div>
@@ -396,6 +397,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 // Drag and Drop Upload Implementation
 
@@ -411,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropArea = document.getElementById('dropArea');
     const fileInput = document.getElementById('images');
     const preview = document.getElementById('imagePreview');
+    const sortableImages = document.getElementById('sortableImages');
     const selectedFilesInfo = document.getElementById('selectedFilesInfo');
     const selectedCount = document.getElementById('selectedCount');
     
@@ -418,6 +421,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxFiles = 5;
     const maxFileSize = 2 * 1024 * 1024; // 2MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    // Initialize Sortable
+    const sortable = Sortable.create(sortableImages, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        handle: '.group', // Allow dragging from the entire container
+        filter: 'button', // Prevent dragging when clicking on buttons
+        preventOnFilter: false, // Allow button clicks to work
+        onStart: function(evt) {
+            // Add visual feedback when dragging starts
+            evt.item.style.transform = 'rotate(5deg) scale(1.05)';
+        },
+        onEnd: function (evt) {
+            // Reset transform
+            evt.item.style.transform = '';
+            
+            // Reorder files array
+            const oldIndex = evt.oldIndex;
+            const newIndex = evt.newIndex;
+            
+            if (oldIndex !== newIndex) {
+                const movedFile = selectedFiles.splice(oldIndex, 1)[0];
+                selectedFiles.splice(newIndex, 0, movedFile);
+                
+                // Update file input
+                updateFileInput();
+                // Update preview with new order
+                updatePreview();
+                
+                // Show success message
+                showAlert('Urutan gambar berhasil diubah', 'success');
+            }
+        }
+    });
 
     // File input change
     fileInput.addEventListener('change', (e) => {
@@ -546,12 +585,11 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
     function updatePreview() {
-        const previewContainer = document.getElementById('imagePreview');
-        const previewGrid = previewContainer.querySelector('.grid');
-        previewGrid.innerHTML = '';
+        sortableImages.innerHTML = '';
         
         if (selectedFiles.length > 0) {
-            previewContainer.classList.remove('hidden');
+            preview.classList.remove('hidden');
+            
             selectedFiles.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -562,6 +600,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
                                  class="w-full h-24 object-cover">
                             
+                            <!-- Drag Handle (only visible on hover, positioned to not overlap with remove button) -->
+                            <div class="absolute bottom-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-move bg-black bg-opacity-60 rounded px-2 py-1">
+                                <i class="fas fa-arrows-alt text-white text-xs"></i>
+                            </div>
+                            
                             <!-- New Badge -->
                             <div class="absolute top-1 left-1">
                                 <span class="bg-green-600 text-white text-xs px-2 py-1 rounded shadow">
@@ -569,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </span>
                             </div>
                             
-                            <!-- Remove Button -->
+                            <!-- Remove Button (always visible but subtle, becomes prominent on hover) -->
                             <button type="button" onclick="removeFile(${index})" 
                                     class="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full hover:bg-red-700 transition-all duration-200 flex items-center justify-center text-xs opacity-80 hover:opacity-100 z-10">
                                 <i class="fas fa-times"></i>
@@ -583,12 +626,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                     
-                    previewGrid.appendChild(imageDiv);
+                    // Make the entire div draggable, but prevent drag when clicking remove button
+                    imageDiv.draggable = true;
+                    imageDiv.addEventListener('dragstart', function(e) {
+                        // Prevent drag if clicking on remove button
+                        if (e.target.closest('button')) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    });
+                    
+                    sortableImages.appendChild(imageDiv);
                 };
                 reader.readAsDataURL(file);
             });
         } else {
-            previewContainer.classList.add('hidden');
+            preview.classList.add('hidden');
         }
     }
     function removeFile(index) {
@@ -703,9 +756,14 @@ function deleteImage(imageId) {
 </script>
 
 <style>
-    /* Image preview responsive grid */
-    #imagePreview {
-        min-height: 100px;
+    .sortable-ghost {
+        opacity: 0.4;
+        transform: rotate(5deg);
+    }
+
+    .sortable-chosen {
+        background-color: rgba(59, 130, 246, 0.1);
+        border-color: #3B82F6;
     }
 
     /* Hover effects for image containers */
@@ -728,8 +786,13 @@ function deleteImage(imageId) {
         background-color: rgba(59, 130, 246, 0.05);
     }
 
+    /* Image preview responsive grid */
+    #sortableImages {
+        min-height: 100px;
+    }
+
     @media (max-width: 768px) {
-        #imagePreview {
+        #sortableImages {
             grid-template-columns: repeat(2, 1fr);
         }
     }

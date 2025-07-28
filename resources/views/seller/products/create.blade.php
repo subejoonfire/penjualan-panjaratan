@@ -130,16 +130,21 @@
                 </div>
                 <div class="p-6">
                     <!-- Upload Info -->
-                    <div class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                        <h4 class="text-sm font-medium text-gray-900 mb-2">Info Upload Gambar:</h4>
-                        <ul class="text-xs text-gray-600 space-y-1">
-                            <li>• Maksimal 5 gambar produk</li>
-                            <li>• Format: JPG, PNG, GIF</li>
-                            <li>• Ukuran maksimal: 2MB per gambar</li>
-                            <li>• Gambar pertama akan menjadi gambar utama</li>
-                            <li>• Gambar saat ini: <span id="currentImageCount">0</span></li>
-                            <li>• Sisa slot untuk gambar: <span id="remainingSlots">5</span></li>
-                        </ul>
+                    <div class="mb-3 sm:mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-600 mr-2 mt-0.5 text-sm sm:text-base"></i>
+                            <div class="text-xs sm:text-sm text-blue-800">
+                                <p class="font-medium">Info Upload Gambar:</p>
+                                <ul class="mt-1 space-y-1">
+                                    <li>• Maksimal 5 gambar produk</li>
+                                    <li>• Format: JPG, PNG, GIF</li>
+                                    <li>• Ukuran maksimal: 2MB per gambar</li>
+                                    <li>• Gambar pertama akan menjadi gambar utama</li>
+                                    <li>• Gambar saat ini: <span id="currentImageCount">0</span></li>
+                                    <li id="remainingSlotsInfo">• Sisa slot untuk gambar: <span id="remainingSlots">5</span></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Upload Area -->
