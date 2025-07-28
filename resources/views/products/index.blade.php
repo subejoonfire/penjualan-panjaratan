@@ -427,63 +427,7 @@
         }
     });
 
-    // Handle add to cart forms
-    document.querySelectorAll('.add-to-cart-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const button = this.querySelector('button[type="submit"]');
-            const originalText = button.innerHTML;
-            
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            
-            fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this),
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Cart response:', data);
-                if (data.success) {
-                    button.innerHTML = '<i class="fas fa-check"></i>';
-                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    button.classList.add('bg-green-600');
-                    
-                    // Update cart count
-                    if (typeof loadCartCount === 'function') {
-                        setTimeout(loadCartCount, 500); // Small delay to ensure database is updated
-                    }
-                    
-                    setTimeout(() => {
-                        button.innerHTML = originalText;
-                        button.classList.remove('bg-green-600');
-                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                        button.disabled = false;
-                    }, 2000);
-                } else {
-                    showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Cart error:', error);
-                showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
-                button.innerHTML = originalText;
-                button.disabled = false;
-            });
-        });
-    });
+
 </script>
 @endsection
 
