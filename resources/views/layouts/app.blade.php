@@ -18,7 +18,9 @@
 
     <!-- Alpine.js cloak CSS -->
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 
     @stack('styles')
@@ -30,67 +32,89 @@
         <!-- Mobile Nav Bar -->
         <nav class="mobile-nav-bar" style="display:none">
             @if(auth()->user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt"></i>
-                </a>
-                <a href="{{ route('admin.users.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                </a>
-                <a href="{{ route('admin.products.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                    <i class="fas fa-box"></i>
-                </a>
-                <a href="{{ route('admin.categories.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                    <i class="fas fa-list"></i>
-                </a>
-                <a href="{{ route('admin.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-                <a href="{{ route('admin.transactions.index') }}" class="mobile-nav-item {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
-                    <i class="fas fa-credit-card"></i>
-                </a>
+            <a href="{{ route('admin.dashboard') }}"
+                class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i>
+            </a>
+            <a href="{{ route('admin.users.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+            </a>
+            <a href="{{ route('admin.products.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                <i class="fas fa-box"></i>
+            </a>
+            <a href="{{ route('admin.categories.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                <i class="fas fa-list"></i>
+            </a>
+            <a href="{{ route('admin.orders.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            <a href="{{ route('admin.transactions.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
+                <i class="fas fa-credit-card"></i>
+            </a>
             @elseif(auth()->user()->isSeller())
-                <a href="{{ route('seller.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt"></i>
-                </a>
-                <a href="{{ route('seller.products.index') }}" class="mobile-nav-item {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
-                    <i class="fas fa-box"></i>
-                </a>
-                <a href="{{ route('seller.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('seller.orders.*') ? 'active' : '' }}">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-                <a href="{{ route('seller.sales') }}" class="mobile-nav-item {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
-                    <i class="fas fa-chart-line"></i>
-                </a>
-                <a href="{{ route('seller.transactions.index') }}" class="mobile-nav-item {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}">
-                    <i class="fas fa-credit-card"></i>
-                </a>
+            <a href="{{ route('seller.dashboard') }}"
+                class="mobile-nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i>
+            </a>
+            <a href="{{ route('seller.products.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
+                <i class="fas fa-box"></i>
+            </a>
+            <a href="{{ route('seller.orders.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('seller.orders.*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            <a href="{{ route('seller.sales') }}"
+                class="mobile-nav-item {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+            </a>
+            <a href="{{ route('seller.transactions.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}">
+                <i class="fas fa-credit-card"></i>
+            </a>
             @elseif(auth()->user()->isCustomer())
-                <a href="{{ route('customer.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt"></i>
-                </a>
-                <a href="{{ route('products.index') }}" class="mobile-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                    <i class="fas fa-shopping-bag"></i>
-                </a>
-                <a href="{{ route('customer.wishlist.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
-                    <i class="fas fa-heart"></i>
-                </a>
-                <a href="{{ route('customer.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
-                    <i class="fas fa-list-alt"></i>
-                </a>
+            <a href="{{ route('customer.dashboard') }}"
+                class="mobile-nav-item {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt"></i>
+            </a>
+            <a href="{{ route('products.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                <i class="fas fa-shopping-bag"></i>
+            </a>
+            <a href="{{ route('customer.wishlist.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
+                <i class="fas fa-heart"></i>
+            </a>
+            <a href="{{ route('customer.orders.index') }}"
+                class="mobile-nav-item {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
+                <i class="fas fa-list-alt"></i>
+            </a>
             @endif
             <!-- Notifikasi & Cart -->
-            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}"
+                class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
                 <i class="fas fa-bell"></i>
-                <span id="notification-count-mobile" class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                <span id="notification-count-mobile"
+                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
+                    style="display: none;">0</span>
             </a>
             @if(auth()->user()->isCustomer())
-            <a href="{{ route('customer.cart.index') }}" class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
+            <a href="{{ route('customer.cart.index') }}"
+                class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
                 <i class="fas fa-shopping-cart"></i>
-                <span id="cart-count-mobile" class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                <span id="cart-count-mobile"
+                    class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
+                    style="display: none;">0</span>
             </a>
             @endif
             <!-- Profile Button -->
-            <button onclick="openMobileProfileModal()" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+            <button onclick="openMobileProfileModal()"
+                class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                 <i class="fas fa-user"></i>
             </button>
         </nav>
@@ -220,17 +244,19 @@
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open"
+                            <button
+                                @click="open = !open; if(open) { console.log('Dropdown opened, loading notifications...'); loadNotifications(); }"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
-                                <span id="notification-count-desktop" class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                                <span id="notification-count-desktop"
+                                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
+                                    style="display: none;">0</span>
                             </button>
 
                             <!-- Notification Dropdown -->
-                            <div x-show="open" @click.away="open = false" x-transition
-                                x-cloak
-                                class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
-                                <div class="px-4 py-2 border-b">
+                            <div x-show="open" @click.away="open = false" x-transition x-cloak
+                                class="absolute right-0 mt-2 notification-dropdown bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                                <div class="px-4 py-2 border-b border-gray-200">
                                     <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
                                 </div>
                                 <div id="notificationList" class="max-h-64 overflow-y-auto">
@@ -241,20 +267,20 @@
                                 </div>
                                 <div class="px-4 py-2 border-t border-gray-200">
                                     @if(auth()->user()->isAdmin())
-                                        <a href="{{ route('admin.notifications.index') }}"
-                                            class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                            Lihat Semua Notifikasi
-                                        </a>
+                                    <a href="{{ route('admin.notifications.index') }}"
+                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                        Lihat Semua Notifikasi
+                                    </a>
                                     @elseif(auth()->user()->isSeller())
-                                        <a href="{{ route('seller.notifications.index') }}"
-                                            class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                            Lihat Semua Notifikasi
-                                        </a>
+                                    <a href="{{ route('seller.notifications.index') }}"
+                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                        Lihat Semua Notifikasi
+                                    </a>
                                     @else
-                                        <a href="{{ route('customer.notifications.index') }}"
-                                            class="block text-sm text-blue-600 hover:text-blue-500 text-center">
-                                            Lihat Semua Notifikasi
-                                        </a>
+                                    <a href="{{ route('customer.notifications.index') }}"
+                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                        Lihat Semua Notifikasi
+                                    </a>
                                     @endif
                                 </div>
                             </div>
@@ -266,7 +292,9 @@
                             <a href="{{ route('customer.cart.index') }}"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none {{ request()->routeIs('customer.cart.*') ? 'text-blue-600' : '' }}">
                                 <i class="fas fa-shopping-cart text-lg"></i>
-                                <span id="cart-count-desktop" class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center" style="display: none;">0</span>
+                                <span id="cart-count-desktop"
+                                    class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
+                                    style="display: none;">0</span>
                             </a>
                         </div>
                         @endif
@@ -276,14 +304,15 @@
                             <button @click="open = !open"
                                 class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
                                 <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                    <span class="text-white text-sm font-medium">{{ substr(auth()->user()->nickname ?? auth()->user()->username, 0, 1) }}</span>
+                                    <span class="text-white text-sm font-medium">{{ substr(auth()->user()->nickname ??
+                                        auth()->user()->username, 0, 1) }}</span>
                                 </div>
-                                <span class="hidden md:block text-sm font-medium">{{ auth()->user()->nickname ?? auth()->user()->username }}</span>
+                                <span class="hidden md:block text-sm font-medium">{{ auth()->user()->nickname ??
+                                    auth()->user()->username }}</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
 
-                            <div x-show="open" @click.away="open = false" x-transition
-                                x-cloak
+                            <div x-show="open" @click.away="open = false" x-transition x-cloak
                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                                 <a href="{{ route('profile') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -370,54 +399,51 @@
     <script>
         // Load notification count for all users
             function loadNotificationCount() {
+                console.log('Loading notification count...');
                 fetch('{{ route('api.notifications.unread') }}')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Count response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        console.log('NotifCount API data:', data);
-                        // Desktop
-                        const notifDesktop = document.getElementById('notification-count-desktop');
-                        if (notifDesktop) {
-                            notifDesktop.textContent = data.count;
-                            notifDesktop.style.display = 'flex';
-                        }
-                        const cartDesktop = document.getElementById('cart-count-desktop');
-                        if (cartDesktop && data.cart_count !== undefined) {
-                            cartDesktop.textContent = data.cart_count;
-                            cartDesktop.style.display = 'flex';
-                        }
-                        // Mobile
-                        const notifMobile = document.getElementById('notification-count-mobile');
-                        if (notifMobile) {
-                            notifMobile.textContent = data.count;
-                            notifMobile.style.display = 'flex';
-                        }
-                        const cartMobile = document.getElementById('cart-count-mobile');
-                        if (cartMobile && data.cart_count !== undefined) {
-                            cartMobile.textContent = data.cart_count;
-                            cartMobile.style.display = 'flex';
+                        console.log('Count data:', data);
+                        const notificationCount = document.querySelector('.notification-count');
+                        if (notificationCount) {
+                            notificationCount.textContent = data.count || 0;
+                            notificationCount.style.display = (data.count && data.count > 0) ? 'flex' : 'none';
+                            console.log('Notification count updated:', data.count);
                         }
                     })
                     .catch(error => {
-                        const notifDesktop = document.getElementById('notification-count-desktop');
-                        if (notifDesktop) {
-                            notifDesktop.textContent = '!';
-                            notifDesktop.style.display = 'flex';
-                        }
-                        const notifMobile = document.getElementById('notification-count-mobile');
-                        if (notifMobile) {
-                            notifMobile.textContent = '!';
-                            notifMobile.style.display = 'flex';
-                        }
                         console.error('Error loading notification count:', error);
+                        const notificationCount = document.querySelector('.notification-count');
+                        if (notificationCount) {
+                            notificationCount.style.display = 'none';
+                        }
                     });
             }
 
             // Load notifications when dropdown is opened
-            function loadNotificationsDesktop() {
+            function loadNotifications() {
+                console.log('Loading notifications...');
+                const notificationList = document.getElementById('notificationList');
+                if (notificationList) {
+                    notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Memuat notifikasi...</div>';
+                }
+                
                 fetch('{{ route('api.notifications.unread') }}')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        console.log('NotifDropdown Desktop API data:', data);
+                        console.log('Notification data:', data);
                         const notificationList = document.getElementById('notificationList');
                         if (notificationList) {
                             if (data.notifications && data.notifications.length > 0) {
@@ -438,21 +464,22 @@
                                     const maxLength = 60;
                                     let displayText = notification.notification;
                                     let showMore = '';
-                                    if (displayText.length > maxLength) {
+                                    
+                                    if (displayText && displayText.length > maxLength) {
                                         displayText = displayText.substring(0, maxLength) + '...';
                                         showMore = '<span class="text-blue-600 hover:text-blue-800 text-xs cursor-pointer ml-1">lihat</span>';
                                     }
                                     return `
-                                        <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.readstatus ? '' : 'bg-blue-50'}">
+                                        <div class="notification-item px-4 py-3 border-b border-gray-100 cursor-pointer ${!notification.readstatus ? 'unread' : ''}" onclick="viewNotificationDetail(${notification.id})">
                                             <div class="flex items-start space-x-3">
                                                 <div class="flex-shrink-0">
                                                     <i class="${icon} ${iconColor} text-sm"></i>
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title}</p>
-                                                    <p class="text-sm text-gray-600">${displayText}${showMore}</p>
+                                                    <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title || 'Notifikasi'}</p>
+                                                    <p class="text-sm text-gray-600">${displayText || 'Tidak ada pesan'}${showMore}</p>
                                                     <div class="flex items-center justify-between mt-1">
-                                                        <p class="text-xs text-gray-500">${notification.created_at}</p>
+                                                        <p class="text-xs text-gray-500">${notification.created_at || 'Baru saja'}</p>
                                                         ${!notification.readstatus ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Baru</span>' : ''}
                                                     </div>
                                                 </div>
@@ -466,8 +493,11 @@
                                     `;
                                 }).join('');
                             } else {
-                                notificationList.innerHTML = '<div class="px-4 py-6 text-center text-gray-500 text-sm">Tidak ada notifikasi</div>';
+                                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
                             }
+                        } else {
+                            console.error('Notification list element not found');
+                        }
                         }
                     })
                     .catch(error => {
@@ -489,7 +519,12 @@
                         'Content-Type': 'application/json',
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         // Redirect to appropriate notification detail page based on user role
@@ -497,7 +532,12 @@
                         window.location.href = `/${userRole}/notifications/${notificationId}`;
                     }
                 })
-                .catch(error => console.error('Error viewing notification:', error));
+                .catch(error => {
+                    console.error('Error viewing notification:', error);
+                    // Still redirect even if marking as read fails
+                    const userRole = '{{ auth()->user()->role }}';
+                    window.location.href = `/${userRole}/notifications/${notificationId}`;
+                });
             }
 
             // Mark notification as read
@@ -509,42 +549,55 @@
                         'Content-Type': 'application/json',
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         loadNotificationCount(); // Refresh count
                         loadNotificationsDesktop(); // Refresh list
                     }
                 })
-                .catch(error => console.error('Error marking notification as read:', error));
+                .catch(error => {
+                    console.error('Error marking notification as read:', error);
+                    // Still refresh the list even if marking as read fails
+                    loadNotificationCount();
+                    loadNotifications();
+                });
             }
 
             // Load notification count on page load
             document.addEventListener('DOMContentLoaded', function() {
                 loadNotificationCount();
-                
-                // Add click event to notification button
-                const notificationButton = document.querySelector('.notification-count').closest('button');
-                if (notificationButton) {
-                    notificationButton.addEventListener('click', function() {
-                        setTimeout(loadNotificationsDesktop, 100); // Small delay to ensure dropdown is open
-                    });
-                }
             });
 
             @if(auth()->user()->isCustomer())
             // Load cart count for customers only
             function loadCartCount() {
                 fetch('{{ route('api.cart.count') }}')
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         const cartCount = document.querySelector('.cart-count');
                         if (cartCount) {
-                            cartCount.textContent = data.count;
-                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                            cartCount.textContent = data.count || 0;
+                            cartCount.style.display = (data.count && data.count > 0) ? 'inline-flex' : 'none';
                         }
                     })
-                    .catch(error => console.error('Error loading cart count:', error));
+                    .catch(error => {
+                        console.error('Error loading cart count:', error);
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.style.display = 'none';
+                        }
+                    });
             }
 
             // Load cart count on page load for customers
@@ -586,15 +639,39 @@
     <!-- Custom Styles -->
     <style>
         .nav-link {
-            @apply text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
+            @apply text-gray-600 hover: text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200;
         }
+
         .nav-link.active {
             @apply text-blue-600 bg-blue-50;
         }
+
         body {
             overflow-x: hidden;
         }
-        
+
+        /* Notification dropdown styles */
+        .notification-dropdown {
+            min-width: 320px;
+            max-width: 400px;
+        }
+
+        .notification-item {
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .notification-item.unread {
+            background-color: #eff6ff;
+        }
+
+        .notification-item.unread:hover {
+            background-color: #dbeafe;
+        }
+
         /* Mobile Modal */
         .mobile-modal {
             position: fixed;
@@ -608,9 +685,11 @@
             justify-content: center;
             padding: 20px;
         }
+
         .mobile-modal.hidden {
             display: none;
         }
+
         .mobile-modal-overlay {
             position: absolute;
             top: 0;
@@ -619,6 +698,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
         }
+
         .mobile-modal-content {
             background: white;
             border-radius: 12px;
@@ -628,6 +708,7 @@
             position: relative;
             z-index: 1;
         }
+
         .mobile-modal-header {
             display: flex;
             align-items: center;
@@ -637,12 +718,14 @@
             padding-bottom: 15px;
             margin-bottom: 0;
         }
+
         .mobile-modal-title {
             font-size: 18px;
             font-weight: 600;
             color: #1f2937;
             margin: 0;
         }
+
         .mobile-modal-close {
             background: none;
             border: none;
@@ -652,13 +735,16 @@
             padding: 5px;
             border-radius: 6px;
         }
+
         .mobile-modal-close:hover {
             background: #f3f4f6;
             color: #374151;
         }
+
         .mobile-modal-body {
             padding: 15px 0 20px 0;
         }
+
         .mobile-modal-item {
             display: flex;
             align-items: center;
@@ -672,19 +758,22 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
+
         .mobile-modal-item:hover {
             background: #f9fafb;
         }
+
         .mobile-modal-item i {
             font-size: 18px;
             margin-right: 15px;
             width: 20px;
             text-align: center;
         }
+
         .mobile-modal-form {
             margin: 0;
         }
-        
+
         /* Mobile nav bar */
         @media (max-width: 768px) {
             .mobile-nav-bar {
@@ -699,11 +788,13 @@
                 top: 0;
                 z-index: 50;
                 padding: 0.5rem 0.75rem;
-                box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+                box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
             }
+
             .mobile-nav-bar::-webkit-scrollbar {
                 display: none;
             }
+
             .mobile-nav-item {
                 display: flex;
                 flex-direction: column;
@@ -718,28 +809,37 @@
                 background: none;
                 border: none;
             }
+
             .mobile-nav-item.active {
                 background: #e0e7ff;
                 color: #2563eb;
             }
+
             .mobile-nav-label {
                 display: none;
             }
+
             .desktop-nav {
                 display: none !important;
             }
+
             .mobile-nav-bar {
                 display: flex !important;
             }
         }
+
         @media (min-width: 769px) {
-            .mobile-nav-bar, .mobile-modal {
+
+            .mobile-nav-bar,
+            .mobile-modal {
                 display: none !important;
             }
+
             .desktop-nav {
                 display: flex !important;
             }
         }
+
         .notification-count {
             display: flex !important;
         }
