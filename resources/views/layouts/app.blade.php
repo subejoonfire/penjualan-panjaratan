@@ -220,7 +220,7 @@
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open"
+                            <button @click="open = !open; if(open) { console.log('Dropdown opened, loading notifications...'); loadNotifications(); }"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
                                 <span
@@ -230,8 +230,8 @@
                             <!-- Notification Dropdown -->
                             <div x-show="open" @click.away="open = false" x-transition
                                 x-cloak
-                                class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
-                                <div class="px-4 py-2 border-b">
+                                class="absolute right-0 mt-2 notification-dropdown bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                                <div class="px-4 py-2 border-b border-gray-200">
                                     <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
                                 </div>
                                 <div id="notificationList" class="max-h-64 overflow-y-auto">
@@ -371,23 +371,51 @@
     <script>
         // Load notification count for all users
             function loadNotificationCount() {
+                console.log('Loading notification count...');
                 fetch('{{ route('api.notifications.unread') }}')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Count response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Count data:', data);
                         const notificationCount = document.querySelector('.notification-count');
                         if (notificationCount) {
-                            notificationCount.textContent = data.count;
-                            notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                            notificationCount.textContent = data.count || 0;
+                            notificationCount.style.display = (data.count && data.count > 0) ? 'flex' : 'none';
+                            console.log('Notification count updated:', data.count);
                         }
                     })
-                    .catch(error => console.error('Error loading notification count:', error));
+                    .catch(error => {
+                        console.error('Error loading notification count:', error);
+                        const notificationCount = document.querySelector('.notification-count');
+                        if (notificationCount) {
+                            notificationCount.style.display = 'none';
+                        }
+                    });
             }
 
             // Load notifications when dropdown is opened
             function loadNotifications() {
+                console.log('Loading notifications...');
+                const notificationList = document.getElementById('notificationList');
+                if (notificationList) {
+                    notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Memuat notifikasi...</div>';
+                }
+                
                 fetch('{{ route('api.notifications.unread') }}')
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Notification data:', data);
                         const notificationList = document.getElementById('notificationList');
                         if (notificationList) {
                             if (data.notifications && data.notifications.length > 0) {
@@ -431,22 +459,22 @@
                                     let displayText = notification.notification;
                                     let showMore = '';
                                     
-                                    if (displayText.length > maxLength) {
+                                    if (displayText && displayText.length > maxLength) {
                                         displayText = displayText.substring(0, maxLength) + '...';
                                         showMore = '<span class="text-blue-600 hover:text-blue-800 text-xs cursor-pointer ml-1">lihat</span>';
                                     }
                                     
                                     return `
-                                        <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.readstatus ? '' : 'bg-blue-50'}" onclick="viewNotificationDetail(${notification.id})">
+                                        <div class="notification-item px-4 py-3 border-b border-gray-100 cursor-pointer ${!notification.readstatus ? 'unread' : ''}" onclick="viewNotificationDetail(${notification.id})">
                                             <div class="flex items-start space-x-3">
                                                 <div class="flex-shrink-0">
                                                     <i class="${icon} ${iconColor} text-sm"></i>
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title}</p>
-                                                    <p class="text-sm text-gray-600">${displayText}${showMore}</p>
+                                                    <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title || 'Notifikasi'}</p>
+                                                    <p class="text-sm text-gray-600">${displayText || 'Tidak ada pesan'}${showMore}</p>
                                                     <div class="flex items-center justify-between mt-1">
-                                                        <p class="text-xs text-gray-500">${notification.created_at}</p>
+                                                        <p class="text-xs text-gray-500">${notification.created_at || 'Baru saja'}</p>
                                                         ${!notification.readstatus ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Baru</span>' : ''}
                                                     </div>
                                                 </div>
@@ -462,6 +490,9 @@
                             } else {
                                 notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
                             }
+                        } else {
+                            console.error('Notification list element not found');
+                        }
                         }
                     })
                     .catch(error => {
@@ -483,7 +514,12 @@
                         'Content-Type': 'application/json',
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         // Redirect to appropriate notification detail page based on user role
@@ -491,7 +527,12 @@
                         window.location.href = `/${userRole}/notifications/${notificationId}`;
                     }
                 })
-                .catch(error => console.error('Error viewing notification:', error));
+                .catch(error => {
+                    console.error('Error viewing notification:', error);
+                    // Still redirect even if marking as read fails
+                    const userRole = '{{ auth()->user()->role }}';
+                    window.location.href = `/${userRole}/notifications/${notificationId}`;
+                });
             }
 
             // Mark notification as read
@@ -503,42 +544,55 @@
                         'Content-Type': 'application/json',
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         loadNotificationCount(); // Refresh count
                         loadNotifications(); // Refresh list
                     }
                 })
-                .catch(error => console.error('Error marking notification as read:', error));
+                .catch(error => {
+                    console.error('Error marking notification as read:', error);
+                    // Still refresh the list even if marking as read fails
+                    loadNotificationCount();
+                    loadNotifications();
+                });
             }
 
             // Load notification count on page load
             document.addEventListener('DOMContentLoaded', function() {
                 loadNotificationCount();
-                
-                // Add click event to notification button
-                const notificationButton = document.querySelector('.notification-count').closest('button');
-                if (notificationButton) {
-                    notificationButton.addEventListener('click', function() {
-                        setTimeout(loadNotifications, 100); // Small delay to ensure dropdown is open
-                    });
-                }
             });
 
             @if(auth()->user()->isCustomer())
             // Load cart count for customers only
             function loadCartCount() {
                 fetch('{{ route('api.cart.count') }}')
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         const cartCount = document.querySelector('.cart-count');
                         if (cartCount) {
-                            cartCount.textContent = data.count;
-                            cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                            cartCount.textContent = data.count || 0;
+                            cartCount.style.display = (data.count && data.count > 0) ? 'inline-flex' : 'none';
                         }
                     })
-                    .catch(error => console.error('Error loading cart count:', error));
+                    .catch(error => {
+                        console.error('Error loading cart count:', error);
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.style.display = 'none';
+                        }
+                    });
             }
 
             // Load cart count on page load for customers
@@ -587,6 +641,28 @@
         }
         body {
             overflow-x: hidden;
+        }
+        
+        /* Notification dropdown styles */
+        .notification-dropdown {
+            min-width: 320px;
+            max-width: 400px;
+        }
+        
+        .notification-item {
+            transition: background-color 0.2s ease;
+        }
+        
+        .notification-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .notification-item.unread {
+            background-color: #eff6ff;
+        }
+        
+        .notification-item.unread:hover {
+            background-color: #dbeafe;
         }
         
         /* Mobile Modal */
