@@ -287,7 +287,6 @@
                                     @if(auth()->user()->isCustomer() && $product->productstock > 0)
                                     <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1 add-to-cart-form">
                                         @csrf
-                                        <input type="hidden" name="quantity" value="1">
                                         <button type="submit" 
                                             class="w-full bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
                                             <i class="fas fa-shopping-cart text-xs"></i>

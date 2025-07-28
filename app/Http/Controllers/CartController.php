@@ -55,8 +55,11 @@ class CartController extends Controller
         try {
             $user = Auth::user();
 
+            // Set default quantity to 1 if not provided
+            $quantity = $request->input('quantity', 1);
+            
             $request->validate([
-                'quantity' => 'required|integer|min:1|max:' . $product->productstock
+                'quantity' => 'integer|min:1|max:' . $product->productstock
             ]);
 
             // Check if product is active
@@ -68,7 +71,7 @@ class CartController extends Controller
             }
 
             // Check stock
-            if ($product->productstock < $request->quantity) {
+            if ($product->productstock < $quantity) {
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
                 }
@@ -90,7 +93,7 @@ class CartController extends Controller
                 ->first();
 
             if ($existingDetail) {
-                $newQuantity = $existingDetail->quantity + $request->quantity;
+                $newQuantity = $existingDetail->quantity + $quantity;
 
                 if ($newQuantity > $product->productstock) {
                     if ($request->ajax() || $request->wantsJson()) {
@@ -104,7 +107,7 @@ class CartController extends Controller
                 CartDetail::create([
                     'idcart' => $cart->id,
                     'idproduct' => $product->id,
-                    'quantity' => $request->quantity,
+                    'quantity' => $quantity,
                     'productprice' => $product->productprice
                 ]);
             }
