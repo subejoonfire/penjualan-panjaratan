@@ -603,17 +603,24 @@ function setPrimaryImage(imageId) {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
         })
         .then(response => {
-            if (response.ok) {
-                showAlert('Gambar utama berhasil diubah', 'success');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message || 'Gambar utama berhasil diubah', 'success');
                 setTimeout(() => {
                     location.reload();
                 }, 1500);
             } else {
-                throw new Error('Failed to set primary image');
+                showAlert(data.message || 'Gagal mengubah gambar utama', 'error');
             }
         })
         .catch(error => {
@@ -628,18 +635,25 @@ function deleteImage(imageId) {
         fetch(`/seller/products/images/${imageId}`, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                showAlert('Gambar berhasil dihapus', 'success');
+                showAlert(data.message || 'Gambar berhasil dihapus', 'success');
                 setTimeout(() => {
                     location.reload();
                 }, 1500);
             } else {
-                showAlert('Gagal menghapus gambar', 'error');
+                showAlert(data.message || 'Gagal menghapus gambar', 'error');
             }
         })
         .catch(error => {
