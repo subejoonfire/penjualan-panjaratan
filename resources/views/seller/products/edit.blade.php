@@ -67,6 +67,10 @@
 @endpush
 
 @section('content')
+@php
+    $hasPrimaryImage = $product->images->where('is_primary', true)->count() > 0;
+    $sortedImages = $product->images->sortByDesc('is_primary');
+@endphp
 @include('components.modal-notification')
 
 <!-- Session Messages -->
@@ -262,7 +266,7 @@
                 </div>
                 <div class="px-3 sm:px-6 py-4 sm:py-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                        @foreach($product->images as $image)
+                        @foreach($sortedImages as $image)
                         <div class="relative group">
                             <img src="{{ url('storage/' . $image->image) }}" alt="Gambar Produk"
                                 class="w-full h-24 sm:h-32 object-cover rounded-lg border border-gray-200">
@@ -307,6 +311,11 @@
                                     <li>• Maksimal 5 gambar baru (total maksimal 6 dengan gambar utama)</li>
                                     <li>• Format: JPG, PNG, GIF</li>
                                     <li>• Ukuran maksimal: 2MB per gambar</li>
+                                    @if($hasPrimaryImage)
+                                    <li>• Gambar utama sudah ada</li>
+                                    @else
+                                    <li>• Gambar pertama akan menjadi gambar utama</li>
+                                    @endif
                                     <li>• Gambar saat ini: <span id="currentImageCount">{{ $product->images->count()
                                             }}</span></li>
                                     <li id="remainingSlotsInfo">• Sisa slot untuk gambar baru: <span
@@ -424,6 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxFiles = 5;
     const maxFileSize = 2 * 1024 * 1024; // 2MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const hasPrimaryImage = {{ $hasPrimaryImage ? 'true' : 'false' }};
 
     // Initialize Sortable
     let sortable;
@@ -651,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imageDiv = document.createElement('div');
                     imageDiv.className = 'relative group';
                     imageDiv.innerHTML = `
-                        <div class="relative overflow-hidden rounded-md border-2 ${index === 0 ? 'border-blue-500' : 'border-gray-200'}">
+                        <div class="relative overflow-hidden rounded-md border-2 ${index === 0 && !hasPrimaryImage ? 'border-blue-500' : 'border-gray-200'}">
                             <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
                                  class="w-full h-24 object-cover">
                             
@@ -661,7 +671,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             
                             <!-- Position/Status Badge -->
-                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : `<span class="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-1 rounded">${index + 1}</span>`}
+                            ${index === 0 && !hasPrimaryImage ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : `<span class="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-1 rounded">${index + 1}</span>`}
                             
                             <!-- Remove Button (always visible but subtle, becomes prominent on hover) -->
                             <button type="button" onclick="removeFile(${index})" 
