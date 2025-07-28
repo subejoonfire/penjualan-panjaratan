@@ -205,149 +205,301 @@
                 </div>
 
                 <!-- Products Grid -->
-                @if($products->count() > 0)
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3 sm:gap-6">
-                    @foreach($products as $product)
-                    <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
-                        <!-- Product Image -->
-                        <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
-                            <a href="{{ route('products.show', $product) }}">
-                                @if($product->images->count() > 0)
-                                <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                                    alt="{{ $product->productname }}" class="w-full h-32 sm:h-48 object-cover">
-                                @else
-                                <div class="w-full h-32 sm:h-48 flex items-center justify-center">
-                                    <i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i>
-                                </div>
-                                @endif
-                            </a>
-                            <!-- Stock Status -->
-                            @if($product->productstock <= 0)
-                            <div class="absolute top-1 left-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
-                                Habis
-                            </div>
-                            @elseif($product->productstock <= 10)
-                            <div class="absolute top-1 left-1 bg-yellow-600 text-white text-xs px-1.5 py-0.5 rounded">
-                                Stok Terbatas
-                            </div>
-                            @endif
-                        </div>
-                        <!-- Product Info & Actions -->
-                        <div class="flex flex-col flex-1 justify-between p-2 sm:p-3">
-                            <div>
-                                <h3 class="text-xs sm:text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
-                                    <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
-                                        {{ $product->productname }}
-                                    </a>
-                                </h3>
-                                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
-                                    @php
-                                        $desc = strip_tags($product->productdescription);
-                                        $words = explode(' ', $desc);
-                                        if(count($words) > 10) {
-                                            $desc = implode(' ', array_slice($words, 0, 10)) . '...';
-                                        }
-                                    @endphp
-                                    {{ $desc }}
-                                </p>
-                                <div class="mb-2">
-                                    <span class="text-xs sm:text-sm font-bold text-blue-600">Rp {{ number_format($product->productprice) }}</span>
-                                </div>
-                                <!-- Rating and Sales -->
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        @php
-                                        $avgRating = $product->reviews->avg('rating') ?? 0;
-                                        $reviewsCount = $product->reviews->count();
-                                        @endphp
-                                        <div class="flex items-center">
-                                            @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
-                                            @endfor
-                                        </div>
-                                        <span class="ml-1 text-xs text-gray-500">({{ $reviewsCount }})</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        @php
-                                            // Placeholder for sold count - bisa diganti dengan logic database yang sesuai
-                                            $soldCount = rand(0, 100);
-                                        @endphp
-                                        Terjual {{ $soldCount }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1 sm:gap-2 mt-2">
-                                <div class="flex gap-1 sm:gap-2 w-full">
-                                    <button type="button" onclick="window.location.href='{{ route('products.show', $product) }}'"
-                                        class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 flex items-center justify-center">
-                                        Detail
-                                    </button>
-                                    @auth
-                                    @if(auth()->user()->isCustomer() && $product->productstock > 0)
-                                    <button type="button" onclick="addToCart({{ $product->id }})" 
-                                        class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart text-xs"></i>
-                                    </button>
-                                    @else
-                                    <button disabled 
-                                        class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart text-xs"></i>
-                                    </button>
-                                    @endif
-                                    @else
-                                    <a href="{{ route('login') }}"
-                                        class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart text-xs"></i>
-                                    </a>
-                                    @endauth
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
+                <div id="products-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3 sm:gap-6">
+                    <!-- Products will be loaded here via JavaScript -->
                 </div>
 
-                <!-- Pagination -->
-                @if($products->hasPages())
-                <div class="mt-8">
-                    {{ $products->appends(request()->query())->links() }}
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="flex justify-center items-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
-                @endif
-                @else
-                <!-- Empty State -->
-                <div class="bg-white shadow rounded-lg">
+
+                <!-- No Products Message -->
+                <div id="no-products" class="hidden bg-white shadow rounded-lg">
                     <div class="px-6 py-12 text-center">
                         <i class="fas fa-search text-gray-400 text-6xl mb-4"></i>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Produk Ditemukan</h3>
                         <p class="text-gray-600 mb-6">
-                            @if(request()->hasAny(['search', 'category', 'min_price', 'max_price']))
                             Tidak ada produk yang sesuai dengan kriteria pencarian Anda. Coba sesuaikan filter Anda.
-                            @else
-                            Tidak ada produk yang tersedia saat ini.
-                            @endif
                         </p>
-                        @if(request()->hasAny(['search', 'category', 'min_price', 'max_price']))
-                        <a href="{{ route('products.index') }}"
+                        <button onclick="resetFilters()"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                             <i class="fas fa-refresh mr-2"></i>
                             Reset Semua
-                        </a>
-                        @endif
+                        </button>
                     </div>
                 </div>
-                @endif
+
+                <!-- Load More Button -->
+                <div id="load-more-container" class="mt-8 text-center hidden">
+                    <button id="load-more-btn" onclick="loadMoreProducts()"
+                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-spinner fa-spin mr-2 hidden" id="load-more-spinner"></i>
+                        Muat Lebih Banyak
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    function updateSort(sortValue) {
-        const url = new URL(window.location);
-        url.searchParams.set('sort', sortValue);
-        window.location.href = url.toString();
+    // Global variables for product loading
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMorePages = true;
+
+    // Load products function
+    function loadProducts(page = 1, reset = false) {
+        if (isLoading) return;
+        
+        isLoading = true;
+        
+        if (reset) {
+            currentPage = 1;
+            hasMorePages = true;
+            document.getElementById('products-container').innerHTML = '';
+            document.getElementById('no-products').classList.add('hidden');
+            document.getElementById('load-more-container').classList.add('hidden');
+        }
+        
+        // Show loading spinner
+        document.getElementById('loading-spinner').classList.remove('hidden');
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        params.append('page', page);
+        
+        const searchInput = document.getElementById('search');
+        if (searchInput && searchInput.value) {
+            params.append('search', searchInput.value);
+        }
+        
+        const categorySelect = document.getElementById('category');
+        if (categorySelect && categorySelect.value) {
+            params.append('category', categorySelect.value);
+        }
+        
+        const minPriceInput = document.getElementById('min_price');
+        if (minPriceInput && minPriceInput.value) {
+            params.append('min_price', minPriceInput.value);
+        }
+        
+        const maxPriceInput = document.getElementById('max_price');
+        if (maxPriceInput && maxPriceInput.value) {
+            params.append('max_price', maxPriceInput.value);
+        }
+        
+        const sortSelect = document.getElementById('sort');
+        if (sortSelect && sortSelect.value) {
+            params.append('sort', sortSelect.value);
+        }
+        
+        // Fetch products
+        fetch(`{{ route('api.products.list') }}?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                isLoading = false;
+                document.getElementById('loading-spinner').classList.add('hidden');
+                
+                if (data.products.length === 0 && page === 1) {
+                    document.getElementById('no-products').classList.remove('hidden');
+                    return;
+                }
+                
+                // Render products
+                renderProducts(data.products, reset);
+                
+                // Update pagination info
+                hasMorePages = data.pagination.has_more_pages;
+                currentPage = data.pagination.current_page;
+                
+                // Show/hide load more button
+                if (hasMorePages) {
+                    document.getElementById('load-more-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('load-more-container').classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                isLoading = false;
+                document.getElementById('loading-spinner').classList.add('hidden');
+                showAlert('Terjadi kesalahan saat memuat produk', 'error');
+            });
     }
+
+    // Render products function
+    function renderProducts(products, reset = false) {
+        const container = document.getElementById('products-container');
+        
+        products.forEach(product => {
+            const productCard = createProductCard(product);
+            container.appendChild(productCard);
+        });
+    }
+
+    // Create product card function
+    function createProductCard(product) {
+        const card = document.createElement('div');
+        card.className = 'bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full';
+        
+        // Create stock status badge
+        let stockBadge = '';
+        if (product.stock <= 0) {
+            stockBadge = '<div class="absolute top-1 left-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">Habis</div>';
+        } else if (product.stock <= 10) {
+            stockBadge = '<div class="absolute top-1 left-1 bg-yellow-600 text-white text-xs px-1.5 py-0.5 rounded">Stok Terbatas</div>';
+        }
+        
+        // Create rating stars
+        let ratingStars = '';
+        for (let i = 1; i <= 5; i++) {
+            const starClass = i <= product.avg_rating ? 'text-yellow-400' : 'text-gray-300';
+            ratingStars += `<i class="fas fa-star text-xs ${starClass}"></i>`;
+        }
+        
+        // Create cart button
+        let cartButton = '';
+        @auth
+        @if(auth()->user()->isCustomer())
+        if (product.stock > 0) {
+            cartButton = `<button type="button" onclick="addToCart(${product.id})" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+        } else {
+            cartButton = `<button disabled class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+        }
+        @else
+        cartButton = `<a href="{{ route('login') }}" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></a>`;
+        @endauth
+        
+        card.innerHTML = `
+            <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
+                <a href="${product.url}">
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="w-full h-32 sm:h-48 object-cover">` : `<div class="w-full h-32 sm:h-48 flex items-center justify-center"><i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i></div>`}
+                </a>
+                ${stockBadge}
+            </div>
+            <div class="flex flex-col flex-1 justify-between p-2 sm:p-3">
+                <div>
+                    <h3 class="text-xs sm:text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
+                        <a href="${product.url}" class="hover:text-blue-600">${product.name}</a>
+                    </h3>
+                    <p class="text-xs text-gray-600 mb-1">${product.category}</p>
+                    <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">${product.description}</p>
+                    <div class="mb-2">
+                        <span class="text-xs sm:text-sm font-bold text-blue-600">Rp ${product.price_formatted}</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center">
+                            <div class="flex items-center">
+                                ${ratingStars}
+                            </div>
+                            <span class="ml-1 text-xs text-gray-500">(${product.reviews_count})</span>
+                        </div>
+                        <div class="text-xs text-gray-500">Terjual ${Math.floor(Math.random() * 100)}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1 sm:gap-2 mt-2">
+                    <div class="flex gap-1 sm:gap-2 w-full">
+                        <button type="button" onclick="window.location.href='${product.url}'" class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 flex items-center justify-center">Detail</button>
+                        ${cartButton}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return card;
+    }
+
+    // Load more products function
+    function loadMoreProducts() {
+        if (!hasMorePages || isLoading) return;
+        
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const loadMoreSpinner = document.getElementById('load-more-spinner');
+        
+        loadMoreBtn.disabled = true;
+        loadMoreSpinner.classList.remove('hidden');
+        
+        loadProducts(currentPage + 1, false);
+        
+        setTimeout(() => {
+            loadMoreBtn.disabled = false;
+            loadMoreSpinner.classList.add('hidden');
+        }, 1000);
+    }
+
+    // Reset filters function
+    function resetFilters() {
+        const searchInput = document.getElementById('search');
+        const categorySelect = document.getElementById('category');
+        const minPriceInput = document.getElementById('min_price');
+        const maxPriceInput = document.getElementById('max_price');
+        const sortSelect = document.getElementById('sort');
+        
+        if (searchInput) searchInput.value = '';
+        if (categorySelect) categorySelect.value = '';
+        if (minPriceInput) minPriceInput.value = '';
+        if (maxPriceInput) maxPriceInput.value = '';
+        if (sortSelect) sortSelect.value = 'latest';
+        
+        loadProducts(1, true);
+    }
+
+    // Update sort function
+    function updateSort(sortValue) {
+        const sortSelect = document.getElementById('sort');
+        if (sortSelect) {
+            sortSelect.value = sortValue;
+        }
+        loadProducts(1, true);
+    }
+
+    // Initialize products loading when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProducts(1, true);
+        
+        // Add event listeners for filters
+        const searchInput = document.getElementById('search');
+        const categorySelect = document.getElementById('category');
+        const minPriceInput = document.getElementById('min_price');
+        const maxPriceInput = document.getElementById('max_price');
+        const sortSelect = document.getElementById('sort');
+        
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    loadProducts(1, true);
+                }, 500);
+            });
+        }
+        
+        if (categorySelect) {
+            categorySelect.addEventListener('change', function() {
+                loadProducts(1, true);
+            });
+        }
+        
+        if (minPriceInput) {
+            minPriceInput.addEventListener('change', function() {
+                loadProducts(1, true);
+            });
+        }
+        
+        if (maxPriceInput) {
+            maxPriceInput.addEventListener('change', function() {
+                loadProducts(1, true);
+            });
+        }
+        
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                loadProducts(1, true);
+            });
+        }
+    });
 
     // Add to cart function
     function addToCart(productId) {

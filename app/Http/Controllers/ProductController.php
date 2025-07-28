@@ -327,4 +327,87 @@ class ProductController extends Controller
 
         return response()->json($suggestions);
     }
+
+    /**
+     * Get products for API (for JavaScript loading)
+     */
+    public function getProducts(Request $request)
+    {
+        $query = Product::with(['category', 'images', 'seller'])
+            ->where('is_active', true)
+            ->where('productstock', '>', 0);
+
+        // Search by product name
+        if ($request->filled('search')) {
+            $query->where('productname', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('idcategories', $request->category);
+        }
+
+        // Filter by price range
+        if ($request->filled('min_price')) {
+            $query->where('productprice', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('productprice', '<=', $request->max_price);
+        }
+
+        // Sort products
+        $sortBy = $request->get('sort', 'latest');
+        switch ($sortBy) {
+            case 'price_low':
+                $query->orderBy('productprice', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('productprice', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('productname', 'asc');
+                break;
+            case 'popular':
+                $query->withSoldCount()->orderBy('sold_count', 'desc');
+                break;
+            default: // latest
+                $query->orderBy('created_at', 'desc');
+        }
+
+        $products = $query->paginate(25);
+
+        $productsData = $products->getCollection()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->productname,
+                'description' => $product->productdescription,
+                'price' => $product->productprice,
+                'price_formatted' => number_format($product->productprice),
+                'stock' => $product->productstock,
+                'category' => $product->category->category,
+                'seller' => [
+                    'id' => $product->seller->id,
+                    'name' => $product->seller->nickname ?? $product->seller->username,
+                ],
+                'image' => $product->images->count() > 0 
+                    ? asset('storage/' . $product->images->first()->image)
+                    : null,
+                'url' => route('products.show', $product),
+                'created_at' => $product->created_at->diffForHumans(),
+                'avg_rating' => $product->reviews()->avg('rating') ?? 0,
+                'reviews_count' => $product->reviews()->count(),
+            ];
+        });
+
+        return response()->json([
+            'products' => $productsData,
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'has_more_pages' => $products->hasMorePages(),
+            ]
+        ]);
+    }
 }
