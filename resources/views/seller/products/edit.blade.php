@@ -423,40 +423,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
     // Initialize Sortable
-    const sortable = Sortable.create(sortableImages, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        chosenClass: 'sortable-chosen',
-        dragClass: 'sortable-drag',
-        handle: '.group', // Allow dragging from the entire container
-        filter: 'button', // Prevent dragging when clicking on buttons
-        preventOnFilter: false, // Allow button clicks to work
-        onStart: function(evt) {
-            // Add visual feedback when dragging starts
-            evt.item.style.transform = 'rotate(5deg) scale(1.05)';
-        },
-        onEnd: function (evt) {
-            // Reset transform
-            evt.item.style.transform = '';
-            
-            // Reorder files array
-            const oldIndex = evt.oldIndex;
-            const newIndex = evt.newIndex;
-            
-            if (oldIndex !== newIndex) {
-                const movedFile = selectedFiles.splice(oldIndex, 1)[0];
-                selectedFiles.splice(newIndex, 0, movedFile);
-                
-                // Update file input
-                updateFileInput();
-                // Update preview with new order
-                updatePreview();
-                
-                // Show success message
-                showAlert('Urutan gambar berhasil diubah', 'success');
-            }
+    let sortable;
+    
+    function initializeSortable() {
+        if (sortable) {
+            sortable.destroy();
         }
-    });
+        
+        sortable = Sortable.create(sortableImages, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            handle: '.group', // Allow dragging from the entire container
+            filter: 'button', // Prevent dragging when clicking on buttons
+            preventOnFilter: false, // Allow button clicks to work
+            onStart: function(evt) {
+                // Add visual feedback when dragging starts
+                evt.item.style.transform = 'rotate(5deg) scale(1.05)';
+            },
+            onEnd: function (evt) {
+                // Reset transform
+                evt.item.style.transform = '';
+                
+                // Reorder files array
+                const oldIndex = evt.oldIndex;
+                const newIndex = evt.newIndex;
+                
+                if (oldIndex !== newIndex) {
+                    const movedFile = selectedFiles.splice(oldIndex, 1)[0];
+                    selectedFiles.splice(newIndex, 0, movedFile);
+                    
+                    // Update file input
+                    updateFileInput();
+                    // Update preview with new order
+                    updatePreview();
+                    
+                    // Show success message
+                    showAlert('Urutan gambar berhasil diubah', 'success');
+                }
+            }
+        });
+    }
 
     // File input change
     fileInput.addEventListener('change', (e) => {
@@ -596,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imageDiv = document.createElement('div');
                     imageDiv.className = 'relative group';
                     imageDiv.innerHTML = `
-                        <div class="relative overflow-hidden rounded-md border-2 border-green-500">
+                        <div class="relative overflow-hidden rounded-md border-2 ${index === 0 ? 'border-blue-500' : 'border-gray-200'}">
                             <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
                                  class="w-full h-24 object-cover">
                             
@@ -605,24 +613,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <i class="fas fa-arrows-alt text-white text-xs"></i>
                             </div>
                             
-                            <!-- New Badge -->
-                            <div class="absolute top-1 left-1">
-                                <span class="bg-green-600 text-white text-xs px-2 py-1 rounded shadow">
-                                    <i class="fas fa-plus mr-1"></i>Baru
-                                </span>
-                            </div>
+                            <!-- Position/Status Badge -->
+                            ${index === 0 ? '<span class="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Utama</span>' : `<span class="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-1 rounded">${index + 1}</span>`}
                             
                             <!-- Remove Button (always visible but subtle, becomes prominent on hover) -->
                             <button type="button" onclick="removeFile(${index})" 
                                     class="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full hover:bg-red-700 transition-all duration-200 flex items-center justify-center text-xs opacity-80 hover:opacity-100 z-10">
                                 <i class="fas fa-times"></i>
                             </button>
-                            
-                            <!-- File Info -->
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-2">
-                                <p class="text-xs truncate font-medium">${file.name}</p>
-                                <p class="text-xs text-gray-300">${formatFileSize(file.size)}</p>
-                            </div>
                         </div>
                     `;
                     
@@ -640,6 +638,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 reader.readAsDataURL(file);
             });
+            
+            // Initialize sortable after adding images
+            setTimeout(() => {
+                initializeSortable();
+            }, 100);
         } else {
             preview.classList.add('hidden');
         }
@@ -686,6 +689,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize on page load
     updateSelectedInfo(); // Update initial state
     updateRemainingSlots(); // Update remaining slots
+    initializeSortable(); // Initialize sortable
 });
 
 function setPrimaryImage(imageId) {
