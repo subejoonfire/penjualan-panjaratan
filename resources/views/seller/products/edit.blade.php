@@ -338,6 +338,22 @@
                             </div>
                         </div>
 
+                        <!-- Upload Info Box -->
+                        <div id="selectedFilesInfo" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                                    <span class="text-sm text-blue-800">
+                                        <span id="selectedCount">0</span> gambar dipilih
+                                    </span>
+                                </div>
+                                <button type="button" onclick="clearAllFiles()" 
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                    Hapus Semua
+                                </button>
+                            </div>
+                        </div>
+
                         @error('images')
                         <p class="mt-2 text-xs sm:text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -379,6 +395,14 @@
 // Drag and Drop Upload Implementation
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Prevent default drag behaviors on document level
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        document.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
+
     const dropArea = document.getElementById('dropArea');
     const fileInput = document.getElementById('images');
     const preview = document.getElementById('imagePreview');
@@ -395,81 +419,47 @@ document.addEventListener('DOMContentLoaded', function() {
         handleFiles(e.target.files);
     });
 
-    // Drag and drop functionality
-    function setupDragAndDrop() {
-        // Prevent default drag behaviors on document level
-        ['dragenter', 'dragover'].forEach(eventName => {
-            document.addEventListener(eventName, function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-
-        ['drop'].forEach(eventName => {
-            document.addEventListener(eventName, function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-
-        // Drop area specific events
-        dropArea.addEventListener('dragenter', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            highlight();
-        });
-
-        dropArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            highlight();
-        });
-
-        dropArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            // Only unhighlight if we're leaving the drop area itself
-            if (!dropArea.contains(e.relatedTarget)) {
-                unhighlight();
-            }
-        });
-
-        dropArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Drop event triggered');
-            unhighlight();
-            
-            const files = e.dataTransfer.files;
-            console.log('Files dropped:', files ? files.length : 0);
-            if (files && files.length > 0) {
-                handleFiles(files);
-            } else {
-                console.log('No files in drop event or files is null');
-            }
-        });
-    }
+    // Drop area specific events
+    dropArea.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        highlight();
+    });
     
-    function highlight() {
-        dropArea.classList.add('border-blue-500', 'bg-blue-50');
-        const icon = dropArea.querySelector('.fa-cloud-upload-alt');
-        if (icon) {
-            icon.classList.add('text-blue-500', 'animate-bounce');
-            icon.classList.remove('text-gray-400');
+    dropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        highlight();
+    });
+    
+    dropArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!dropArea.contains(e.relatedTarget)) {
+            unhighlight();
         }
+    });
+    
+    dropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        unhighlight();
+        
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            handleFiles(files);
+        }
+    });
+
+    function highlight() {
+        dropArea.classList.add('border-blue-500', 'bg-blue-50', 'dragover');
+        dropArea.classList.remove('border-gray-300');
     }
     
     function unhighlight() {
-        dropArea.classList.remove('border-blue-500', 'bg-blue-50');
-        const icon = dropArea.querySelector('.fa-cloud-upload-alt');
-        if (icon) {
-            icon.classList.remove('text-blue-500', 'animate-bounce');
-            icon.classList.add('text-gray-400');
-        }
+        dropArea.classList.remove('border-blue-500', 'bg-blue-50', 'dragover');
+        dropArea.classList.add('border-gray-300');
     }
-    
-    // Setup drag and drop
-    setupDragAndDrop();
 
     function handleFiles(files) {
         const fileArray = Array.from(files);
@@ -528,34 +518,19 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             selectedFilesInfo.classList.add('hidden');
         }
-        // Update remaining slots info
-        const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
-        const remainingSlots = 6 - currentImageCount - selectedFiles.length;
-        const remainingSlotsElement = document.getElementById('remainingSlots');
-        if (remainingSlotsElement) {
-            remainingSlotsElement.textContent = remainingSlots;
-            // Change color based on remaining slots
-            const remainingSlotsInfo = document.getElementById('remainingSlotsInfo');
-            if (remainingSlots <= 0) {
-                remainingSlotsInfo.className = 'text-red-600 font-medium';
-                // Disable drop area
-                dropArea.classList.add('opacity-50', 'pointer-events-none');
-                browseBtn.disabled = true;
-                browseBtn.textContent = 'Maksimal Gambar Tercapai';
-            } else if (remainingSlots <= 2) {
-                remainingSlotsInfo.className = 'text-yellow-600 font-medium';
-                // Enable drop area
-                dropArea.classList.remove('opacity-50', 'pointer-events-none');
-                browseBtn.disabled = false;
-                browseBtn.innerHTML = '<i class="fas fa-folder-open mr-2"></i>Pilih Gambar';
-            } else {
-                remainingSlotsInfo.className = 'text-blue-800';
-                // Enable drop area
-                dropArea.classList.remove('opacity-50', 'pointer-events-none');
-                browseBtn.disabled = false;
-                browseBtn.innerHTML = '<i class="fas fa-folder-open mr-2"></i>Pilih Gambar';
+    }
+
+    function clearAllFiles() {
+        confirmAction(
+            'Apakah Anda yakin ingin menghapus semua gambar yang dipilih?',
+            function() {
+                selectedFiles = [];
+                updateFileInput();
+                updateSelectedInfo();
+                updatePreview();
+                showAlert('Semua gambar berhasil dihapus', 'success');
             }
-        }
+        );
     }
     function updatePreview() {
         preview.innerHTML = '';
@@ -604,6 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Make removeFile function global
     window.removeFile = removeFile;
+    window.clearAllFiles = clearAllFiles;
     // Initialize on page load
     updateSelectedInfo(); // Update initial state
 });
