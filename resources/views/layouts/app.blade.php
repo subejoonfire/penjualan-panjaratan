@@ -151,10 +151,10 @@
                     <!-- Navigation Links -->
                     <div class="hidden md:flex items-center space-x-8">
                         @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}"
-                            class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
+                                        <a href="{{ route('admin.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Halaman Utama
+                </a>
                         <a href="{{ route('admin.users.index') }}"
                             class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                             <i class="fas fa-users mr-2"></i>Pengguna
@@ -176,10 +176,10 @@
                             <i class="fas fa-credit-card mr-2"></i>Transaksi
                         </a>
                         @elseif(auth()->user()->isSeller())
-                        <a href="{{ route('seller.dashboard') }}"
-                            class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
+                                        <a href="{{ route('seller.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Halaman Utama
+                </a>
                         <a href="{{ route('seller.products.index') }}"
                             class="nav-link {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
                             <i class="fas fa-box mr-2"></i>Produk Saya
@@ -197,10 +197,10 @@
                             <i class="fas fa-credit-card mr-2"></i>Transaksi
                         </a>
                         @elseif(auth()->user()->isCustomer())
-                        <a href="{{ route('customer.dashboard') }}"
-                            class="nav-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                        </a>
+                                        <a href="{{ route('customer.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Halaman Utama
+                </a>
                         <a href="{{ route('products.index') }}"
                             class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
                             <i class="fas fa-shopping-bag mr-2"></i>Belanja

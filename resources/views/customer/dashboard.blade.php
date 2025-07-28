@@ -31,6 +31,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
+                        <a href="{{ route('customer.orders.index') }}"
+                            class="font-medium text-blue-600 hover:text-blue-500">
+                            Lihat pesanan
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Total Spent -->
@@ -50,6 +58,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
+                        <a href="{{ route('customer.orders.index') }}"
+                            class="font-medium text-green-600 hover:text-green-500">
+                            Lihat riwayat
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Pending Orders -->
@@ -67,6 +83,14 @@
                                 <dd class="text-base sm:text-lg font-medium text-gray-900">{{ number_format($pendingOrders) }}</dd>
                             </dl>
                         </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
+                        <a href="{{ route('customer.orders.index') }}"
+                            class="font-medium text-yellow-600 hover:text-yellow-500">
+                            Lacak pesanan
+                        </a>
                     </div>
                 </div>
             </div>
