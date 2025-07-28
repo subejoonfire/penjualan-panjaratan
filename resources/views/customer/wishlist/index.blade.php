@@ -105,7 +105,6 @@
                     <form action="{{ route('customer.cart.add', $product) }}" method="POST"
                         class="flex-1 add-to-cart-form">
                         @csrf
-                        <input type="hidden" name="quantity" value="1">
                         <button type="submit"
                             class="w-full bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
                             <i class="fas fa-shopping-cart text-xs"></i>
@@ -153,26 +152,56 @@
 </div>
 
 <script>
+    // Load cart count function (for customer only)
+    @auth
+    @if(auth()->user()->isCustomer())
+    function loadCartCount() {
+        fetch('{{ route('api.cart.count') }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cart count response not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const cartCounts = document.querySelectorAll('.cart-count');
+                cartCounts.forEach(cartCount => {
+                    cartCount.textContent = data.count || 0;
+                    cartCount.style.display = (data.count && data.count > 0) ? 'inline-flex' : 'none';
+                });
+            })
+            .catch(error => {
+                console.error('Error loading cart count:', error);
+            });
+    }
+    @endif
+    @endauth
+
     function removeFromWishlist(productId) {
     confirmAction('Hapus produk dari wishlist?', function() {
         fetch(`/customer/wishlist/remove/${productId}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
+                'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 location.reload();
             } else {
-                showAlert('Gagal menghapus dari wishlist', 'error');
+                showAlert(data.message || 'Gagal menghapus dari wishlist', 'error');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            showAlert('Terjadi kesalahan', 'error');
+            console.error('Wishlist error:', error);
+            showAlert('Terjadi kesalahan saat menghapus dari wishlist', 'error');
         });
     });
 }
@@ -186,21 +215,32 @@ document.querySelectorAll('.add-to-cart-form').forEach(form => {
         const originalText = button.innerHTML;
         
         button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menambahkan...';
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         
         fetch(this.action, {
             method: 'POST',
             body: new FormData(this),
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                button.innerHTML = '<i class="fas fa-check mr-2"></i>Ditambahkan!';
+                button.innerHTML = '<i class="fas fa-check"></i>';
                 button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 button.classList.add('bg-green-600');
+                
+                // Update cart count if function exists
+                if (typeof loadCartCount === 'function') {
+                    setTimeout(loadCartCount, 500);
+                }
                 
                 setTimeout(() => {
                     button.innerHTML = originalText;
@@ -215,8 +255,8 @@ document.querySelectorAll('.add-to-cart-form').forEach(form => {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            showAlert('Terjadi kesalahan', 'error');
+            console.error('Cart error:', error);
+            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
             button.innerHTML = originalText;
             button.disabled = false;
         });
