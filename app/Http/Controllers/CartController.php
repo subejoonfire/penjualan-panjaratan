@@ -52,66 +52,78 @@ class CartController extends Controller
      */
     public function add(Request $request, Product $product)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->productstock
-        ]);
-
-        // Check if product is active
-        if (!$product->is_active) {
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Produk tidak tersedia']);
-            }
-            return back()->with('error', 'Produk tidak tersedia');
-        }
-
-        // Check stock
-        if ($product->productstock < $request->quantity) {
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
-            }
-            return back()->with('error', 'Stok tidak mencukupi');
-        }
-
-        // Get or create active cart
-        $cart = $user->activeCart;
-        if (!$cart) {
-            $cart = Cart::create([
-                'iduser' => $user->id,
-                'checkoutstatus' => 'active'
+            $request->validate([
+                'quantity' => 'required|integer|min:1|max:' . $product->productstock
             ]);
-        }
 
-        // Check if product already in cart
-        $existingDetail = $cart->cartDetails()
-            ->where('idproduct', $product->id)
-            ->first();
+            // Check if product is active
+            if (!$product->is_active) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Produk tidak tersedia']);
+                }
+                return back()->with('error', 'Produk tidak tersedia');
+            }
 
-        if ($existingDetail) {
-            $newQuantity = $existingDetail->quantity + $request->quantity;
-
-            if ($newQuantity > $product->productstock) {
-                if ($request->expectsJson()) {
+            // Check stock
+            if ($product->productstock < $request->quantity) {
+                if ($request->ajax() || $request->wantsJson()) {
                     return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
                 }
                 return back()->with('error', 'Stok tidak mencukupi');
             }
 
-            $existingDetail->update(['quantity' => $newQuantity]);
-        } else {
-            CartDetail::create([
-                'idcart' => $cart->id,
-                'idproduct' => $product->id,
-                'quantity' => $request->quantity,
-                'productprice' => $product->productprice
-            ]);
-        }
+            // Get or create active cart
+            $cart = $user->activeCart;
+            if (!$cart) {
+                $cart = Cart::create([
+                    'iduser' => $user->id,
+                    'checkoutstatus' => 'active'
+                ]);
+            }
 
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Produk berhasil ditambahkan ke keranjang']);
+            // Check if product already in cart
+            $existingDetail = $cart->cartDetails()
+                ->where('idproduct', $product->id)
+                ->first();
+
+            if ($existingDetail) {
+                $newQuantity = $existingDetail->quantity + $request->quantity;
+
+                if ($newQuantity > $product->productstock) {
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
+                    }
+                    return back()->with('error', 'Stok tidak mencukupi');
+                }
+
+                $existingDetail->update(['quantity' => $newQuantity]);
+            } else {
+                CartDetail::create([
+                    'idcart' => $cart->id,
+                    'idproduct' => $product->id,
+                    'quantity' => $request->quantity,
+                    'productprice' => $product->productprice
+                ]);
+            }
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Produk berhasil ditambahkan ke keranjang',
+                    'cart_count' => $cart->cartDetails()->count()
+                ]);
+            }
+            return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
+            
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
     }
 
     /**
