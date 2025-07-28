@@ -419,11 +419,13 @@ document.addEventListener('DOMContentLoaded', function() {
         e.stopPropagation();
         highlight();
     });
+    
     dropArea.addEventListener('dragover', function(e) {
         e.preventDefault();
         e.stopPropagation();
         highlight();
     });
+    
     dropArea.addEventListener('dragleave', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -431,6 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
             unhighlight();
         }
     });
+    
     dropArea.addEventListener('drop', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -439,6 +442,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (files && files.length > 0) {
             handleFiles(files);
         }
+    });
+
+    // Additional event listeners for better compatibility
+    dropArea.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    
+    dropArea.addEventListener('dragend', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        unhighlight();
     });
 
     function highlight() {

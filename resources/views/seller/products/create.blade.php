@@ -134,7 +134,7 @@
                         class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
                         <div class="text-center">
                             <i class="fas fa-cloud-upload-alt text-gray-400 text-4xl mb-4"></i>
-                            <div class="flex text-sm text-gray-600">
+                            <div class="flex text-sm text-gray-600 justify-center items-center">
                                 <label for="images"
                                     class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Unggah gambar</span>

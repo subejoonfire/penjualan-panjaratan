@@ -233,9 +233,12 @@
                 <!-- Load More Button -->
                 <div id="load-more-container" class="mt-8 text-center hidden">
                     <button id="load-more-btn" onclick="loadMoreProducts()"
-                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-spinner fa-spin mr-2 hidden" id="load-more-spinner"></i>
-                        Muat Lebih Banyak
+                        class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                        <span id="load-more-text">Muat Lebih Banyak</span>
+                        <div id="load-more-spinner" class="hidden">
+                            <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -418,15 +421,18 @@
         if (!hasMorePages || isLoading) return;
         
         const loadMoreBtn = document.getElementById('load-more-btn');
+        const loadMoreText = document.getElementById('load-more-text');
         const loadMoreSpinner = document.getElementById('load-more-spinner');
         
         loadMoreBtn.disabled = true;
+        loadMoreText.textContent = 'Memuat...';
         loadMoreSpinner.classList.remove('hidden');
         
         loadProducts(currentPage + 1, false);
         
         setTimeout(() => {
             loadMoreBtn.disabled = false;
+            loadMoreText.textContent = 'Muat Lebih Banyak';
             loadMoreSpinner.classList.add('hidden');
         }, 1000);
     }
