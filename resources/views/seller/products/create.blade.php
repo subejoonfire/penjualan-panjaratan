@@ -129,6 +129,19 @@
                         pertama akan menjadi gambar utama.</p>
                 </div>
                 <div class="p-6">
+                    <!-- Upload Info -->
+                    <div class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">Info Upload Gambar:</h4>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li>• Maksimal 5 gambar produk</li>
+                            <li>• Format: JPG, PNG, GIF</li>
+                            <li>• Ukuran maksimal: 2MB per gambar</li>
+                            <li>• Gambar pertama akan menjadi gambar utama</li>
+                            <li>• Gambar saat ini: <span id="currentImageCount">0</span></li>
+                            <li>• Sisa slot untuk gambar: <span id="remainingSlots">5</span></li>
+                        </ul>
+                    </div>
+
                     <!-- Upload Area -->
                     <div id="dropArea"
                         class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
@@ -143,9 +156,7 @@
                                 </label>
                                 <p class="pl-1">atau seret dan lepas</p>
                             </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar (maksimal 5 gambar)
-                            </p>
-                            <p id="imageCount" class="text-xs text-blue-600 mt-1 hidden">0/5 gambar dipilih</p>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF maksimal 2MB per gambar</p>
                         </div>
                     </div>
 
@@ -388,6 +399,7 @@
             updateImagePreview();
             updateImageCount();
             updateSelectedInfo();
+            updateRemainingSlots();
         }
         
         function updateFileInput() {
@@ -452,6 +464,23 @@
             imageCount.classList.toggle('hidden', currentFiles.length === 0);
         }
 
+        function updateRemainingSlots() {
+            const currentImageCount = currentFiles.length;
+            const remainingSlots = maxFiles - currentImageCount;
+            document.getElementById('currentImageCount').textContent = currentImageCount;
+            document.getElementById('remainingSlots').textContent = remainingSlots;
+            
+            // Update color based on remaining slots
+            const remainingSlotsElement = document.getElementById('remainingSlots');
+            if (remainingSlots <= 0) {
+                remainingSlotsElement.className = 'text-red-600 font-medium';
+            } else if (remainingSlots <= 2) {
+                remainingSlotsElement.className = 'text-yellow-600 font-medium';
+            } else {
+                remainingSlotsElement.className = 'text-blue-800';
+            }
+        }
+
         function updateSelectedInfo() {
             const selectedFilesInfo = document.getElementById('selectedFilesInfo');
             const selectedCount = document.getElementById('selectedCount');
@@ -473,6 +502,7 @@
                     updateImagePreview();
                     updateImageCount();
                     updateSelectedInfo();
+                    updateRemainingSlots();
                     showAlert('Semua gambar berhasil dihapus', 'success');
                 }
             );
@@ -488,6 +518,7 @@
                      updateImagePreview();
                      updateImageCount();
                      updateSelectedInfo();
+                     updateRemainingSlots();
                      showAlert('Gambar berhasil dihapus', 'success');
                  }
              );
@@ -506,6 +537,9 @@
             }
             e.target.value = value;
         });
+
+        // Initialize on page load
+        updateRemainingSlots(); // Update initial state
     });
 </script>
 
