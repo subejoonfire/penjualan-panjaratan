@@ -523,16 +523,20 @@ class DashboardController extends Controller
      */
     public function deleteImage(ProductImage $image)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if ($image->product->iduserseller !== $user->id) {
-            abort(403, 'Unauthorized');
+            if ($image->product->iduserseller !== $user->id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            Storage::disk('public')->delete($image->image);
+            $image->delete();
+
+            return response()->json(['success' => true, 'message' => 'Gambar berhasil dihapus']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus gambar'], 500);
         }
-
-        Storage::disk('public')->delete($image->image);
-        $image->delete();
-
-        return back()->with('success', 'Image deleted successfully');
     }
 
     /**
@@ -540,18 +544,22 @@ class DashboardController extends Controller
      */
     public function setPrimaryImage(ProductImage $image)
     {
-        $user = Auth::user();
-        if ($image->product->iduserseller !== $user->id) {
-            abort(403, 'Unauthorized');
+        try {
+            $user = Auth::user();
+            if ($image->product->iduserseller !== $user->id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+            
+            // Reset all images for this product to not primary
+            ProductImage::where('idproduct', $image->idproduct)->update(['is_primary' => false]);
+            
+            // Set this image as primary
+            $image->update(['is_primary' => true]);
+            
+            return response()->json(['success' => true, 'message' => 'Gambar utama berhasil diubah']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat mengubah gambar utama'], 500);
         }
-        
-        // Reset all images for this product to not primary
-        ProductImage::where('idproduct', $image->idproduct)->update(['is_primary' => false]);
-        
-        // Set this image as primary
-        $image->update(['is_primary' => true]);
-        
-        return response()->json(['success' => true, 'message' => 'Gambar utama berhasil diubah']);
     }
 
     /**
