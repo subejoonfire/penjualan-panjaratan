@@ -68,30 +68,10 @@
 
 @section('content')
 @php
-    $hasPrimaryImage = $product->images->where('is_primary', true)->count() > 0;
-    $sortedImages = $product->images->sortByDesc('is_primary');
+$hasPrimaryImage = $product->images->where('is_primary', true)->count() > 0;
+$sortedImages = $product->images->sortByDesc('is_primary');
 @endphp
 @include('components.modal-notification')
-
-<!-- Session Messages -->
-@if(session('success'))
-<div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 mt-3 sm:mt-4">
-    <div class="bg-green-100 border border-green-400 text-green-700 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm sm:text-base" role="alert">
-        <strong class="font-bold">Berhasil!</strong>
-        <span class="block sm:inline">{{ session('success') }}</span>
-    </div>
-</div>
-@endif
-
-@if(session('error'))
-<div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 mt-3 sm:mt-4">
-    <div class="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm sm:text-base" role="alert">
-        <strong class="font-bold">Error!</strong>
-        <span class="block sm:inline">{{ session('error') }}</span>
-    </div>
-</div>
-@endif
-
 <div class="py-3 sm:py-6">
     <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
@@ -124,7 +104,8 @@
                     @endif
                 </div>
                 <div class="ml-3 sm:ml-4 min-w-0 flex-1">
-                    <h3 class="text-sm sm:text-base md:text-lg font-medium text-blue-900 truncate">{{ $product->productname }}</h3>
+                    <h3 class="text-sm sm:text-base md:text-lg font-medium text-blue-900 truncate">{{
+                        $product->productname }}</h3>
                     <p class="text-xs sm:text-sm text-blue-700">
                         {{ $product->category->category }} •
                         Dibuat {{ $product->created_at->format('d M Y') }} •
@@ -135,7 +116,8 @@
                             {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
                         </span>
-                        <span class="text-xs sm:text-sm text-blue-600 font-medium">Rp {{ number_format($product->productprice)
+                        <span class="text-xs sm:text-sm text-blue-600 font-medium">Rp {{
+                            number_format($product->productprice)
                             }}</span>
                     </div>
                 </div>
@@ -155,7 +137,8 @@
                 <div class="px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
                     <!-- Product Name -->
                     <div>
-                        <label for="productname" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                        <label for="productname"
+                            class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Nama Produk <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="productname" id="productname"
@@ -168,7 +151,8 @@
 
                     <!-- Category -->
                     <div>
-                        <label for="idcategories" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                        <label for="idcategories"
+                            class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Kategori <span class="text-red-500">*</span>
                         </label>
                         <select name="idcategories" id="idcategories" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
@@ -188,7 +172,8 @@
 
                     <!-- Description -->
                     <div>
-                        <label for="productdescription" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                        <label for="productdescription"
+                            class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                             Deskripsi Produk <span class="text-red-500">*</span>
                         </label>
                         <textarea name="productdescription" id="productdescription" rows="4" required class="w-full text-sm sm:text-base border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500
@@ -210,7 +195,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <!-- Price -->
                         <div>
-                            <label for="productprice" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                            <label for="productprice"
+                                class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Harga (Rp) <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="productprice" id="productprice" min="0" step="any"
@@ -223,7 +209,8 @@
 
                         <!-- Stock -->
                         <div>
-                            <label for="productstock" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                            <label for="productstock"
+                                class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Jumlah Stok <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="productstock" id="productstock" min="0"
@@ -237,15 +224,18 @@
 
                     <!-- Status -->
                     <div>
-                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Status Produk</label>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Status
+                            Produk</label>
                         <div class="flex items-center space-x-4 sm:space-x-6">
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="is_active" value="1" {{ (old('is_active', $product->is_active ? '1' : '0') == '1') ? 'checked' : '' }}
+                                <input type="radio" name="is_active" value="1" {{ (old('is_active', $product->is_active
+                                ? '1' : '0') == '1') ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-xs sm:text-sm text-gray-700">Aktif</span>
                             </label>
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="is_active" value="0" {{ (old('is_active', $product->is_active ? '1' : '0') == '0') ? 'checked' : '' }}
+                                <input type="radio" name="is_active" value="0" {{ (old('is_active', $product->is_active
+                                ? '1' : '0') == '0') ? 'checked' : '' }}
                                 class="border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="ml-2 text-xs sm:text-sm text-gray-700">Tidak Aktif</span>
                             </label>
@@ -262,7 +252,8 @@
             <div class="bg-white shadow rounded-lg">
                 <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
                     <h3 class="text-base sm:text-lg font-medium text-gray-900">Gambar Saat Ini</h3>
-                    <p class="text-xs sm:text-sm text-gray-600">{{ $product->images->count() }} gambar telah diunggah</p>
+                    <p class="text-xs sm:text-sm text-gray-600">{{ $product->images->count() }} gambar telah diunggah
+                    </p>
                 </div>
                 <div class="px-3 sm:px-6 py-4 sm:py-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -331,7 +322,8 @@
                         </label>
 
                         <!-- File Upload Area -->
-                        <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 hover:border-blue-400 transition-colors">
+                        <div id="dropArea"
+                            class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 hover:border-blue-400 transition-colors">
                             <div id="dropContent" class="text-center">
                                 <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
                                 <div class="flex text-xs sm:text-sm text-gray-600 justify-center">
@@ -348,7 +340,8 @@
                         </div>
 
                         <!-- Upload Info Box -->
-                        <div id="selectedFilesInfo" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
+                        <div id="selectedFilesInfo"
+                            class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <i class="fas fa-info-circle text-blue-600 mr-2"></i>
@@ -356,7 +349,7 @@
                                         <span id="selectedCount">0</span> gambar dipilih
                                     </span>
                                 </div>
-                                <button type="button" onclick="clearAllFiles()" 
+                                <button type="button" onclick="clearAllFiles()"
                                     class="text-xs text-blue-600 hover:text-blue-800 font-medium">
                                     Hapus Semua
                                 </button>
@@ -373,7 +366,8 @@
 
                     <!-- Image Preview -->
                     <div id="imagePreview" class="mt-4 sm:mt-6 hidden">
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar Baru (Seret untuk mengurutkan)</h4>
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar Baru (Seret untuk
+                            mengurutkan)</h4>
                         <div id="sortableImages" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                             <!-- Images will be previewed here -->
                         </div>
@@ -385,12 +379,14 @@
             <!-- Form Actions -->
             <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
                 <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-                    <a href="{{ route('products.show', $product) }}" class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm text-center">
+                    <a href="{{ route('products.show', $product) }}"
+                        class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm text-center">
                         <i class="fas fa-eye mr-1"></i>
                         Pratinjau Produk
                     </a>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                <div
+                    class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <a href="{{ route('seller.products.index') }}"
                         class="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 text-center text-sm">
                         Batal
@@ -411,7 +407,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
-// Drag and Drop Upload Implementation
+    // Drag and Drop Upload Implementation
 
 document.addEventListener('DOMContentLoaded', function() {
     // Prevent default drag behaviors on document level
@@ -935,7 +931,7 @@ function deleteImage(imageId) {
     }
 
     /* Smooth transitions for all sortable elements */
-    #sortableImages > * {
+    #sortableImages>* {
         transition: all 0.2s ease;
     }
 
