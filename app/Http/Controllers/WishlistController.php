@@ -101,4 +101,44 @@ class WishlistController extends Controller
             'count' => $count
         ]);
     }
+
+    /**
+     * Get wishlist for API (for JavaScript loading)
+     */
+    public function getWishlist(Request $request)
+    {
+        $wishlists = Wishlist::with(['product.images', 'product.category', 'product.seller', 'product.reviews'])
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $wishlistData = $wishlists->map(function ($wishlist) {
+            $product = $wishlist->product;
+            return [
+                'id' => $wishlist->id,
+                'product_id' => $product->id,
+                'name' => $product->productname,
+                'description' => $product->productdescription,
+                'price' => $product->productprice,
+                'price_formatted' => number_format($product->productprice),
+                'stock' => $product->productstock,
+                'category' => $product->category->category,
+                'seller' => [
+                    'id' => $product->seller->id,
+                    'name' => $product->seller->nickname ?? $product->seller->username,
+                ],
+                'image' => $product->images->count() > 0 
+                    ? asset('storage/' . $product->images->first()->image)
+                    : null,
+                'url' => route('products.show', $product),
+                'created_at' => $wishlist->created_at->diffForHumans(),
+                'avg_rating' => $product->reviews()->avg('rating') ?? 0,
+                'reviews_count' => $product->reviews()->count(),
+            ];
+        });
+
+        return response()->json([
+            'wishlists' => $wishlistData
+        ]);
+    }
 }

@@ -248,93 +248,27 @@
                 <h3 class="text-base sm:text-lg font-medium text-gray-900">Produk yang Pernah Anda Ulas</h3>
             </div>
             <div class="p-4 sm:p-6">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-6">
-                    @foreach($favoriteProducts as $product)
-                    <div class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
-                        <!-- Product Image -->
-                        <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
-                            @if($product->images->count() > 0)
-                            <img src="{{ asset('storage/' . $product->images->first()->image) }}"
-                                alt="{{ $product->productname }}" class="w-full h-32 sm:h-48 object-cover">
-                            @else
-                            <div class="w-full h-32 sm:h-48 flex items-center justify-center">
-                                <i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i>
-                            </div>
-                            @endif
-                            <!-- Stock Status -->
-                            @if($product->productstock <= 0)
-                            <div class="absolute top-1 left-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
-                                Habis
-                            </div>
-                            @elseif($product->productstock <= 10)
-                            <div class="absolute top-1 left-1 bg-yellow-600 text-white text-xs px-1.5 py-0.5 rounded">
-                                Stok Terbatas
-                            </div>
-                            @endif
-                        </div>
-                        <!-- Product Info & Actions -->
-                        <div class="flex flex-col flex-1 justify-between p-2 sm:p-3">
-                            <div>
-                                <h4 class="text-xs sm:text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">{{ $product->productname }}</h4>
-                                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">
-                                    @php
-                                        $desc = strip_tags($product->productdescription);
-                                        $words = explode(' ', $desc);
-                                        if(count($words) > 10) {
-                                            $desc = implode(' ', array_slice($words, 0, 10)) . '...';
-                                        }
-                                    @endphp
-                                    {{ $desc }}
-                                </p>
-                                <div class="mb-2">
-                                    <span class="text-xs sm:text-sm font-bold text-blue-600">Rp {{ number_format($product->productprice) }}</span>
-                                </div>
-                                <!-- Rating and Sales -->
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center">
-                                        @php
-                                        $avgRating = $product->reviews->avg('rating') ?? 0;
-                                        $reviewsCount = $product->reviews->count();
-                                        @endphp
-                                        <div class="flex items-center">
-                                            @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star text-xs {{ $i <= $avgRating ? 'text-yellow-400' : 'text-gray-300' }}"></i>
-                                            @endfor
-                                        </div>
-                                        <span class="ml-1 text-xs text-gray-500">({{ $reviewsCount }})</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        @php
-                                            // Placeholder for sold count - bisa diganti dengan logic database yang sesuai
-                                            $soldCount = rand(0, 100);
-                                        @endphp
-                                        Terjual {{ $soldCount }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1 sm:gap-2 mt-2">
-                                <div class="flex gap-1 sm:gap-2 w-full">
-                                    <button type="button" onclick="window.location.href='{{ route('products.show', $product) }}'"
-                                        class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 flex items-center justify-center">
-                                        Detail
-                                    </button>
-                                    @if($product->productstock > 0)
-                                    <button type="button" onclick="addToCart({{ $product->id }})" 
-                                        class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart text-xs"></i>
-                                    </button>
-                                    @else
-                                    <button disabled 
-                                        class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
-                                        <i class="fas fa-shopping-cart text-xs"></i>
-                                    </button>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+                <div id="favorite-products-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-6">
+                    <!-- Favorite products will be loaded here via JavaScript -->
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="flex justify-center items-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+
+                <!-- No Products Message -->
+                <div id="no-products" class="hidden bg-white shadow rounded-lg">
+                    <div class="px-6 py-12 text-center">
+                        <i class="fas fa-box text-gray-400 text-6xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Belum Ada Produk Favorit</h3>
+                        <p class="text-gray-600 mb-6">Belum ada produk favorit yang tersedia saat ini.</p>
+                        <a href="{{ route('products.index') }}"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>
+                            Lihat Semua Produk
+                        </a>
                     </div>
-                    @endforeach
                 </div>
             </div>
         </div>
@@ -352,6 +286,118 @@
 </style>
 
 <script>
+// Load favorite products function
+function loadFavoriteProducts() {
+    const container = document.getElementById('favorite-products-container');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const noProducts = document.getElementById('no-products');
+    
+    // Show loading spinner
+    loadingSpinner.classList.remove('hidden');
+    noProducts.classList.add('hidden');
+    
+    fetch('{{ route('api.products.recommended') }}')
+        .then(response => response.json())
+        .then(data => {
+            loadingSpinner.classList.add('hidden');
+            
+            if (data.products.length === 0) {
+                noProducts.classList.remove('hidden');
+                return;
+            }
+            
+            // Render products
+            renderFavoriteProducts(data.products);
+        })
+        .catch(error => {
+            console.error('Error loading favorite products:', error);
+            loadingSpinner.classList.add('hidden');
+            noProducts.classList.remove('hidden');
+        });
+}
+
+// Render favorite products function
+function renderFavoriteProducts(products) {
+    const container = document.getElementById('favorite-products-container');
+    
+    products.forEach(product => {
+        const productCard = createFavoriteProductCard(product);
+        container.appendChild(productCard);
+    });
+}
+
+// Create favorite product card function
+function createFavoriteProductCard(product) {
+    const card = document.createElement('div');
+    card.className = 'bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full';
+    
+    // Create stock status badge
+    let stockBadge = '';
+    if (product.stock <= 0) {
+        stockBadge = '<div class="absolute top-1 left-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">Habis</div>';
+    } else if (product.stock <= 10) {
+        stockBadge = '<div class="absolute top-1 left-1 bg-yellow-600 text-white text-xs px-1.5 py-0.5 rounded">Stok Terbatas</div>';
+    }
+    
+    // Create rating stars
+    let ratingStars = '';
+    for (let i = 1; i <= 5; i++) {
+        const starClass = i <= product.avg_rating ? 'text-yellow-400' : 'text-gray-300';
+        ratingStars += `<i class="fas fa-star text-xs ${starClass}"></i>`;
+    }
+    
+    // Create cart button
+    let cartButton = '';
+    const isCustomer = {{ auth()->check() && auth()->user()->isCustomer() ? 'true' : 'false' }};
+    const loginUrl = '{{ route('login') }}';
+    
+    if (isCustomer) {
+        if (product.stock > 0) {
+            cartButton = `<button type="button" onclick="addToCart(${product.id})" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+        } else {
+            cartButton = `<button disabled class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+        }
+    } else {
+        cartButton = `<a href="${loginUrl}" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></a>`;
+    }
+    
+    card.innerHTML = `
+        <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
+            <a href="${product.url}">
+                ${product.image ? `<img src="${product.image}" alt="${product.name}" class="w-full h-32 sm:h-48 object-cover">` : `<div class="w-full h-32 sm:h-48 flex items-center justify-center"><i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i></div>`}
+            </a>
+            ${stockBadge}
+        </div>
+        <div class="flex flex-col flex-1 justify-between p-2 sm:p-3">
+            <div>
+                <h4 class="text-xs sm:text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">${product.name}</h4>
+                <p class="text-xs text-gray-600 mb-1">${product.category}</p>
+                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem]">${product.description}</p>
+                <div class="mb-2">
+                    <span class="text-xs sm:text-sm font-bold text-blue-600">Rp ${product.price_formatted}</span>
+                </div>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center">
+                        <div class="flex items-center">
+                            ${ratingStars}
+                        </div>
+                        <span class="ml-1 text-xs text-gray-500">(${product.reviews_count})</span>
+                    </div>
+                    <div class="text-xs text-gray-500">Terjual ${Math.floor(Math.random() * 100)}</div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 sm:gap-2 mt-2">
+                <div class="flex gap-1 sm:gap-2 w-full">
+                    <button type="button" onclick="window.location.href='${product.url}'" class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 flex items-center justify-center">Detail</button>
+                    ${cartButton}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
 // Add to cart function
 function addToCart(productId) {
     // Find the button that was clicked
@@ -414,5 +460,10 @@ function addToCart(productId) {
         button.disabled = false;
     });
 }
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadFavoriteProducts();
+});
 </script>
 @endsection
