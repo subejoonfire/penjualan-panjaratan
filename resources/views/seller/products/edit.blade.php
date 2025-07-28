@@ -465,10 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileArray = Array.from(files);
         const validFiles = [];
         const errors = [];
-        // Get current image count
-        const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
-        const totalAllowed = 6; // Maximum total images
-        const remainingSlots = totalAllowed - currentImageCount - selectedFiles.length;
+        
         // Validate files
         fileArray.forEach((file, index) => {
             if (!allowedTypes.includes(file.type)) {
@@ -479,30 +476,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 errors.push(`File "${file.name}" terlalu besar (maksimal 2MB)`);
                 return;
             }
-            if (validFiles.length >= remainingSlots) {
-                errors.push(`Tidak bisa menambah lebih banyak gambar. Sisa slot: ${remainingSlots}`);
-                return;
-            }
             if (selectedFiles.length + validFiles.length >= maxFiles) {
                 errors.push(`Maksimal ${maxFiles} gambar baru yang bisa dipilih`);
                 return;
             }
             validFiles.push(file);
         });
+        
         // Show errors if any
         if (errors.length > 0) {
             const uniqueErrors = [...new Set(errors)];
-            showAlert(uniqueErrors, 'error');
+            showAlert(uniqueErrors.join(', '), 'error');
             return;
         }
+        
         // Add valid files
         selectedFiles = [...selectedFiles, ...validFiles];
+        
         // Update file input with selected files
         updateFileInput();
+        
         // Update UI
         updateSelectedInfo();
         updatePreview();
-        if (selectedFiles.length > 0) {
+        
+        if (validFiles.length > 0) {
             showAlert(`${validFiles.length} gambar berhasil ditambahkan`, 'success');
         }
     }
@@ -534,41 +532,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function updatePreview() {
         preview.innerHTML = '';
-        selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const div = document.createElement('div');
-                div.className = 'upload-preview relative group bg-white rounded-lg shadow-md overflow-hidden';
-                div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview ${index + 1}" 
-                         class="w-full h-32 object-cover">
-                    <div class="absolute top-2 right-2">
-                        <span class="bg-green-600 text-white text-xs px-2 py-1 rounded-full shadow">
-                            <i class="fas fa-plus mr-1"></i>Baru
-                        </span>
-                    </div>
-                    <div class="absolute top-2 left-2 file-remove-btn">
-                        <button type="button" onclick="removeFile(${index})" 
-                                class="bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-700 shadow-lg transition-colors">
-                            <i class="fas fa-times text-xs"></i>
-                        </button>
-                    </div>
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-3">
-                        <p class="text-xs truncate font-medium">${file.name}</p>
-                        <p class="text-xs text-gray-300">${formatFileSize(file.size)}</p>
-                    </div>
-                `;
-                preview.appendChild(div);
-            };
-            reader.readAsDataURL(file);
-        });
+        
+        if (selectedFiles.length > 0) {
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'relative group';
+                    imageDiv.innerHTML = `
+                        <div class="relative overflow-hidden rounded-md border-2 border-green-500">
+                            <img src="${e.target.result}" alt="Pratinjau ${index + 1}" 
+                                 class="w-full h-24 object-cover">
+                            
+                            <!-- New Badge -->
+                            <div class="absolute top-1 left-1">
+                                <span class="bg-green-600 text-white text-xs px-2 py-1 rounded shadow">
+                                    <i class="fas fa-plus mr-1"></i>Baru
+                                </span>
+                            </div>
+                            
+                            <!-- Remove Button -->
+                            <button type="button" onclick="removeFile(${index})" 
+                                    class="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full hover:bg-red-700 transition-all duration-200 flex items-center justify-center text-xs opacity-80 hover:opacity-100 z-10">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            
+                            <!-- File Info -->
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-2">
+                                <p class="text-xs truncate font-medium">${file.name}</p>
+                                <p class="text-xs text-gray-300">${formatFileSize(file.size)}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    preview.appendChild(imageDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     }
     function removeFile(index) {
-        selectedFiles.splice(index, 1);
-        updateFileInput();
-        updateSelectedInfo();
-        updatePreview();
-        showAlert('Gambar berhasil dihapus', 'info');
+        confirmAction(
+            'Apakah Anda yakin ingin menghapus gambar ini?',
+            function() {
+                selectedFiles.splice(index, 1);
+                updateFileInput();
+                updateSelectedInfo();
+                updatePreview();
+                showAlert('Gambar berhasil dihapus', 'success');
+            }
+        );
     }
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
@@ -636,4 +649,37 @@ function deleteImage(imageId) {
     });
 }
 </script>
+
+<style>
+    /* Image preview responsive grid */
+    #imagePreview {
+        min-height: 100px;
+    }
+
+    /* Hover effects for image containers */
+    .image-container:hover .drag-handle {
+        opacity: 1;
+    }
+
+    .image-container .remove-btn {
+        opacity: 0.8;
+        transition: all 0.2s ease;
+    }
+
+    .image-container:hover .remove-btn {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    /* Drag area styling */
+    #dropArea.border-blue-500 {
+        background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        #imagePreview {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
 @endsection
