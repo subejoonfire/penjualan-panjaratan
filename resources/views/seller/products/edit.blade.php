@@ -363,7 +363,12 @@
                     </div>
 
                     <!-- Image Preview -->
-                    <div id="imagePreview" class="mt-4 sm:mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"></div>
+                    <div id="imagePreview" class="mt-4 sm:mt-6 hidden">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar Baru</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                            <!-- Images will be previewed here -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -466,6 +471,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const validFiles = [];
         const errors = [];
         
+        // Get current image count and remaining slots
+        const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
+        const remainingSlots = parseInt(document.getElementById('remainingSlots').textContent || '0');
+        
         // Validate files
         fileArray.forEach((file, index) => {
             if (!allowedTypes.includes(file.type)) {
@@ -478,6 +487,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (selectedFiles.length + validFiles.length >= maxFiles) {
                 errors.push(`Maksimal ${maxFiles} gambar baru yang bisa dipilih`);
+                return;
+            }
+            if (selectedFiles.length + validFiles.length >= remainingSlots) {
+                errors.push(`Tidak bisa menambah lebih banyak gambar. Sisa slot: ${remainingSlots}`);
                 return;
             }
             validFiles.push(file);
@@ -499,6 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update UI
         updateSelectedInfo();
         updatePreview();
+        updateRemainingSlots();
         
         if (validFiles.length > 0) {
             showAlert(`${validFiles.length} gambar berhasil ditambahkan`, 'success');
@@ -526,14 +540,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateFileInput();
                 updateSelectedInfo();
                 updatePreview();
+                updateRemainingSlots();
                 showAlert('Semua gambar berhasil dihapus', 'success');
             }
         );
     }
     function updatePreview() {
-        preview.innerHTML = '';
+        const previewContainer = document.getElementById('imagePreview');
+        const previewGrid = previewContainer.querySelector('.grid');
+        previewGrid.innerHTML = '';
         
         if (selectedFiles.length > 0) {
+            previewContainer.classList.remove('hidden');
             selectedFiles.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -565,10 +583,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                     
-                    preview.appendChild(imageDiv);
+                    previewGrid.appendChild(imageDiv);
                 };
                 reader.readAsDataURL(file);
             });
+        } else {
+            previewContainer.classList.add('hidden');
         }
     }
     function removeFile(index) {
@@ -579,9 +599,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateFileInput();
                 updateSelectedInfo();
                 updatePreview();
+                updateRemainingSlots();
                 showAlert('Gambar berhasil dihapus', 'success');
             }
         );
+    }
+
+    function updateRemainingSlots() {
+        const currentImageCount = parseInt(document.getElementById('currentImageCount').textContent || '0');
+        const remainingSlots = 6 - currentImageCount - selectedFiles.length;
+        document.getElementById('remainingSlots').textContent = remainingSlots;
+        
+        // Update color based on remaining slots
+        const remainingSlotsInfo = document.getElementById('remainingSlotsInfo');
+        if (remainingSlots <= 0) {
+            remainingSlotsInfo.className = 'text-red-600 font-medium';
+        } else if (remainingSlots <= 2) {
+            remainingSlotsInfo.className = 'text-yellow-600 font-medium';
+        } else {
+            remainingSlotsInfo.className = 'text-blue-800';
+        }
     }
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
@@ -595,6 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.clearAllFiles = clearAllFiles;
     // Initialize on page load
     updateSelectedInfo(); // Update initial state
+    updateRemainingSlots(); // Update remaining slots
 });
 
 function setPrimaryImage(imageId) {
