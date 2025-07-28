@@ -96,23 +96,23 @@
                 </p>
             </div>
             <div class="flex flex-col gap-1 sm:gap-2 mt-2">
-                <div class="product-action-buttons">
+                <div class="flex gap-1 sm:gap-2 w-full">
                     <a href="{{ route('products.show', $product) }}"
-                        class="bg-gray-100 text-gray-700 hover:bg-gray-200">
+                        class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center flex items-center justify-center">
                         Detail
                     </a>
                     @if($product->productstock > 0)
                     <form action="{{ route('customer.cart.add', $product) }}" method="POST"
-                        class="add-to-cart-form">
+                        class="flex-1 add-to-cart-form">
                         @csrf
                         <button type="submit"
-                            class="bg-blue-600 text-white hover:bg-blue-700">
+                            class="w-full bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
                             <i class="fas fa-shopping-cart text-xs"></i>
                         </button>
                     </form>
                     @else
                     <button disabled
-                        class="bg-gray-400 text-white cursor-not-allowed">
+                        class="w-full bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
                         <i class="fas fa-shopping-cart text-xs"></i>
                     </button>
                     @endif
@@ -273,37 +273,5 @@ document.querySelectorAll('.add-to-cart-form').forEach(form => {
         overflow: hidden;
     }
 
-    /* Ensure consistent button heights */
-    .product-action-buttons {
-        display: flex;
-        gap: 0.25rem;
-        width: 100%;
-    }
 
-    .product-action-buttons a,
-    .product-action-buttons button,
-    .product-action-buttons form {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 2rem;
-        padding: 0.375rem 0.5rem;
-        border-radius: 0.375rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    @media (min-width: 640px) {
-        .product-action-buttons a,
-        .product-action-buttons button,
-        .product-action-buttons form {
-            min-height: 2.25rem;
-            padding: 0.5rem 0.75rem;
-        }
-    }
 </style>
