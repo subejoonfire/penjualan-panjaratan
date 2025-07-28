@@ -279,28 +279,25 @@
                             </div>
                             <div class="flex flex-col gap-1 sm:gap-2 mt-2">
                                 <div class="flex gap-1 sm:gap-2 w-full">
-                                    <a href="{{ route('products.show', $product) }}"
-                                        class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center flex items-center justify-center">
+                                    <button type="button" onclick="window.location.href='{{ route('products.show', $product) }}'"
+                                        class="flex-1 bg-gray-100 text-gray-700 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-gray-200 flex items-center justify-center">
                                         Detail
-                                    </a>
+                                    </button>
                                     @auth
                                     @if(auth()->user()->isCustomer() && $product->productstock > 0)
-                                    <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-1 add-to-cart-form">
-                                        @csrf
-                                        <button type="submit" 
-                                            class="w-full bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
-                                            <i class="fas fa-shopping-cart text-xs"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="addToCart({{ $product->id }})" 
+                                        class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
+                                        <i class="fas fa-shopping-cart text-xs"></i>
+                                    </button>
                                     @else
                                     <button disabled 
-                                        class="w-full bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
+                                        class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center">
                                         <i class="fas fa-shopping-cart text-xs"></i>
                                     </button>
                                     @endif
                                     @else
                                     <a href="{{ route('login') }}"
-                                        class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 text-center flex items-center justify-center">
+                                        class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center">
                                         <i class="fas fa-shopping-cart text-xs"></i>
                                     </a>
                                     @endauth
@@ -350,6 +347,44 @@
         const url = new URL(window.location);
         url.searchParams.set('sort', sortValue);
         window.location.href = url.toString();
+    }
+
+    // Add to cart function
+    function addToCart(productId) {
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        formData.append('quantity', 1);
+
+        fetch(`/customer/cart/add/${productId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Cart response:', data);
+            if (data.success) {
+                showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
+                if (typeof loadCartCount === 'function') {
+                    setTimeout(loadCartCount, 500);
+                }
+            } else {
+                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+        });
     }
 
     // Load cart count function (for customer only)
