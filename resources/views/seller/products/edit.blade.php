@@ -397,6 +397,9 @@
     </div>
 </div>
 
+<!-- Include Modal Notification Component -->
+@include('components.modal-notification')
+
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 // Drag and Drop Upload Implementation
@@ -431,24 +434,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         sortable = Sortable.create(sortableImages, {
-            animation: 150,
+            animation: 300,
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
             dragClass: 'sortable-drag',
-            swapThreshold: 0.65,
+            swapThreshold: 0.3,
             direction: 'horizontal',
             forceFallback: false,
             fallbackClass: 'sortable-fallback',
             fallbackOnBody: true,
             scroll: true,
-            scrollSensitivity: 30,
-            scrollSpeed: 10,
-            invertSwap: true,
+            scrollSensitivity: 50,
+            scrollSpeed: 20,
+            invertSwap: false,
             swap: true,
             multiDrag: false,
             selectedClass: 'sortable-selected',
             filter: 'button',
             preventOnFilter: false,
+            setData: function(dataTransfer, dragEl) {
+                dataTransfer.setData('Text', dragEl.outerHTML);
+            },
             onStart: function(evt) {
                 // Add visual feedback when dragging starts
                 evt.item.style.transform = 'rotate(5deg) scale(1.05)';
@@ -477,7 +483,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     updatePreview();
                     
                     // Show success message
-                    showAlert('Urutan gambar berhasil diubah', 'success');
+                    showModalNotification({
+                        type: 'success',
+                        title: 'Berhasil',
+                        message: 'Urutan gambar berhasil diubah',
+                        confirmText: 'OK',
+                        showCancel: false
+                    });
                 }
             }
         });
@@ -563,7 +575,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show errors if any
         if (errors.length > 0) {
             const uniqueErrors = [...new Set(errors)];
-            showAlert(uniqueErrors.join(', '), 'error');
+            showModalNotification({
+                type: 'error',
+                title: 'Error',
+                message: uniqueErrors.join(', '),
+                confirmText: 'OK',
+                showCancel: false
+            });
             return;
         }
         
@@ -579,7 +597,13 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemainingSlots();
         
         if (validFiles.length > 0) {
-            showAlert(`${validFiles.length} gambar berhasil ditambahkan`, 'success');
+            showModalNotification({
+                type: 'success',
+                title: 'Berhasil',
+                message: `${validFiles.length} gambar berhasil ditambahkan`,
+                confirmText: 'OK',
+                showCancel: false
+            });
         }
     }
     function updateFileInput() {
@@ -605,7 +629,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateSelectedInfo();
                 updatePreview();
                 updateRemainingSlots();
-                showAlert('Semua gambar berhasil dihapus', 'success');
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil',
+                    message: 'Semua gambar berhasil dihapus',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
             }
         );
     }
@@ -674,7 +704,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateSelectedInfo();
                 updatePreview();
                 updateRemainingSlots();
-                showAlert('Gambar berhasil dihapus', 'success');
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil',
+                    message: 'Gambar berhasil dihapus',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
             }
         );
     }
@@ -728,17 +764,37 @@ function setPrimaryImage(imageId) {
         })
         .then(data => {
             if (data.success) {
-                showAlert(data.message || 'Gambar utama berhasil diubah', 'success');
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil',
+                    message: data.message || 'Gambar utama berhasil diubah',
+                    confirmText: 'OK',
+                    showCancel: false,
+                    onConfirm: () => {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    }
+                });
             } else {
-                showAlert(data.message || 'Gagal mengubah gambar utama', 'error');
+                showModalNotification({
+                    type: 'error',
+                    title: 'Error',
+                    message: data.message || 'Gagal mengubah gambar utama',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showAlert('Terjadi kesalahan saat mengubah gambar utama', 'error');
+            showModalNotification({
+                type: 'error',
+                title: 'Error',
+                message: 'Terjadi kesalahan saat mengubah gambar utama',
+                confirmText: 'OK',
+                showCancel: false
+            });
         });
     });
 }
@@ -761,17 +817,37 @@ function deleteImage(imageId) {
         })
         .then(data => {
             if (data.success) {
-                showAlert(data.message || 'Gambar berhasil dihapus', 'success');
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil',
+                    message: data.message || 'Gambar berhasil dihapus',
+                    confirmText: 'OK',
+                    showCancel: false,
+                    onConfirm: () => {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    }
+                });
             } else {
-                showAlert(data.message || 'Gagal menghapus gambar', 'error');
+                showModalNotification({
+                    type: 'error',
+                    title: 'Error',
+                    message: data.message || 'Gagal menghapus gambar',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showAlert('Terjadi kesalahan saat menghapus gambar', 'error');
+            showModalNotification({
+                type: 'error',
+                title: 'Error',
+                message: 'Terjadi kesalahan saat menghapus gambar',
+                confirmText: 'OK',
+                showCancel: false
+            });
         });
     });
 }
@@ -779,30 +855,47 @@ function deleteImage(imageId) {
 
 <style>
     .sortable-ghost {
-        opacity: 0.4;
-        transform: rotate(5deg);
+        opacity: 0.3;
+        transform: rotate(3deg) scale(0.95);
+        border: 2px dashed #3B82F6 !important;
+        background-color: rgba(59, 130, 246, 0.1) !important;
     }
 
     .sortable-chosen {
-        background-color: rgba(59, 130, 246, 0.1);
-        border-color: #3B82F6;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        background-color: rgba(59, 130, 246, 0.15);
+        border-color: #3B82F6 !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        transform: scale(1.02);
     }
 
     .sortable-drag {
-        transform: rotate(5deg) scale(1.05);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        transform: rotate(5deg) scale(1.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         z-index: 9999;
+        opacity: 0.9;
     }
 
     .sortable-fallback {
-        transform: rotate(5deg) scale(1.05);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        transform: rotate(5deg) scale(1.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        opacity: 0.9;
     }
 
     .sortable-selected {
         background-color: rgba(59, 130, 246, 0.2);
         border-color: #3B82F6;
+    }
+
+    /* Drop zone indicator */
+    .sortable-drop-zone {
+        background-color: rgba(34, 197, 94, 0.1);
+        border: 2px dashed #22C55E;
+        border-radius: 0.5rem;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
     }
 
     /* Hover effects for image containers */
