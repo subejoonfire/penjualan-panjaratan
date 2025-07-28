@@ -149,6 +149,22 @@
                         </div>
                     </div>
 
+                    <!-- Upload Info Box -->
+                    <div id="selectedFilesInfo" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                                <span class="text-sm text-blue-800">
+                                    <span id="selectedCount">0</span> gambar dipilih
+                                </span>
+                            </div>
+                            <button type="button" onclick="clearAllFiles()" 
+                                class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                Hapus Semua
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Image Preview with Drag and Drop Reordering -->
                     <div id="imagePreview" class="mt-4 hidden">
                         <h4 class="text-sm font-medium text-gray-700 mb-3">Pratinjau Gambar (Seret untuk mengurutkan)
@@ -371,6 +387,7 @@
             updateFileInput();
             updateImagePreview();
             updateImageCount();
+            updateSelectedInfo();
         }
         
         function updateFileInput() {
@@ -434,9 +451,35 @@
             imageCount.textContent = `${currentFiles.length}/${maxFiles} gambar dipilih`;
             imageCount.classList.toggle('hidden', currentFiles.length === 0);
         }
-        
-                 // Make removeImage function global
-         window.removeImage = function(index) {
+
+        function updateSelectedInfo() {
+            const selectedFilesInfo = document.getElementById('selectedFilesInfo');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (currentFiles.length > 0) {
+                selectedFilesInfo.classList.remove('hidden');
+                selectedCount.textContent = currentFiles.length;
+            } else {
+                selectedFilesInfo.classList.add('hidden');
+            }
+        }
+
+        function clearAllFiles() {
+            confirmAction(
+                'Apakah Anda yakin ingin menghapus semua gambar?',
+                function() {
+                    currentFiles = [];
+                    updateFileInput();
+                    updateImagePreview();
+                    updateImageCount();
+                    updateSelectedInfo();
+                    showAlert('Semua gambar berhasil dihapus', 'success');
+                }
+            );
+        }
+
+        // Make removeImage function global
+        window.removeImage = function(index) {
              confirmAction(
                  'Apakah Anda yakin ingin menghapus gambar ini?',
                  function() {
@@ -444,6 +487,7 @@
                      updateFileInput();
                      updateImagePreview();
                      updateImageCount();
+                     updateSelectedInfo();
                      showAlert('Gambar berhasil dihapus', 'success');
                  }
              );

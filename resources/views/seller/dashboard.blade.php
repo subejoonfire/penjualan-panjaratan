@@ -81,6 +81,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
+                        <a href="{{ route('seller.orders.index') }}"
+                            class="font-medium text-yellow-600 hover:text-yellow-500">
+                            Lihat laporan
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Monthly Revenue -->
@@ -101,6 +109,14 @@
                                 </dd>
                             </dl>
                         </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-3 sm:px-5 py-2 sm:py-3">
+                    <div class="text-xs sm:text-sm">
+                        <a href="{{ route('seller.orders.index') }}"
+                            class="font-medium text-purple-600 hover:text-purple-500">
+                            Lihat detail
+                        </a>
                     </div>
                 </div>
             </div>

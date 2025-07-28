@@ -379,19 +379,8 @@
 // Drag and Drop Upload Implementation
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Prevent default drag behaviors on document level
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        document.addEventListener(eventName, function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }, false);
-    });
-
     const dropArea = document.getElementById('dropArea');
-    const dropContent = document.getElementById('dropContent');
-    const uploadProgress = document.getElementById('uploadProgress');
     const fileInput = document.getElementById('images');
-    const browseBtn = document.getElementById('browseBtn');
     const preview = document.getElementById('imagePreview');
     const selectedFilesInfo = document.getElementById('selectedFilesInfo');
     const selectedCount = document.getElementById('selectedCount');
@@ -401,69 +390,86 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxFileSize = 2 * 1024 * 1024; // 2MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
-    // Browse button click
-    if (browseBtn) {
-        browseBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-    }
-    
     // File input change
     fileInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
     });
 
-    // Drop area specific events
-    dropArea.addEventListener('dragenter', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        highlight();
-    });
-    
-    dropArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        highlight();
-    });
-    
-    dropArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!dropArea.contains(e.relatedTarget)) {
+    // Drag and drop functionality
+    function setupDragAndDrop() {
+        // Prevent default drag behaviors on document level
+        ['dragenter', 'dragover'].forEach(eventName => {
+            document.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['drop'].forEach(eventName => {
+            document.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Drop area specific events
+        dropArea.addEventListener('dragenter', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            highlight();
+        });
+
+        dropArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            highlight();
+        });
+
+        dropArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Only unhighlight if we're leaving the drop area itself
+            if (!dropArea.contains(e.relatedTarget)) {
+                unhighlight();
+            }
+        });
+
+        dropArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Drop event triggered');
             unhighlight();
-        }
-    });
+            
+            const files = e.dataTransfer.files;
+            console.log('Files dropped:', files ? files.length : 0);
+            if (files && files.length > 0) {
+                handleFiles(files);
+            } else {
+                console.log('No files in drop event or files is null');
+            }
+        });
+    }
     
-    dropArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        unhighlight();
-        const files = e.dataTransfer.files;
-        if (files && files.length > 0) {
-            handleFiles(files);
-        }
-    });
-
-    // Additional event listeners for better compatibility
-    dropArea.addEventListener('dragstart', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
-    
-    dropArea.addEventListener('dragend', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        unhighlight();
-    });
-
     function highlight() {
-        dropArea.classList.add('border-blue-500', 'bg-blue-50', 'dragover');
-        dropArea.classList.remove('border-gray-300');
+        dropArea.classList.add('border-blue-500', 'bg-blue-50');
+        const icon = dropArea.querySelector('.fa-cloud-upload-alt');
+        if (icon) {
+            icon.classList.add('text-blue-500', 'animate-bounce');
+            icon.classList.remove('text-gray-400');
+        }
     }
+    
     function unhighlight() {
-        dropArea.classList.remove('border-blue-500', 'bg-blue-50', 'dragover');
-        dropArea.classList.add('border-gray-300');
+        dropArea.classList.remove('border-blue-500', 'bg-blue-50');
+        const icon = dropArea.querySelector('.fa-cloud-upload-alt');
+        if (icon) {
+            icon.classList.remove('text-blue-500', 'animate-bounce');
+            icon.classList.add('text-gray-400');
+        }
     }
+    
+    // Setup drag and drop
+    setupDragAndDrop();
 
     function handleFiles(files) {
         const fileArray = Array.from(files);
