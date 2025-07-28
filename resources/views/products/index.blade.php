@@ -361,16 +361,18 @@
         
         // Create cart button
         let cartButton = '';
-        @auth
-        @if(auth()->user()->isCustomer())
-        if (product.stock > 0) {
-            cartButton = `<button type="button" onclick="addToCart(${product.id})" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+        const isCustomer = {{ auth()->check() && auth()->user()->isCustomer() ? 'true' : 'false' }};
+        const loginUrl = '{{ route('login') }}';
+        
+        if (isCustomer) {
+            if (product.stock > 0) {
+                cartButton = `<button type="button" onclick="addToCart(${product.id})" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+            } else {
+                cartButton = `<button disabled class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+            }
         } else {
-            cartButton = `<button disabled class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+            cartButton = `<a href="${loginUrl}" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></a>`;
         }
-        @else
-        cartButton = `<a href="{{ route('login') }}" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></a>`;
-        @endauth
         
         card.innerHTML = `
             <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
@@ -565,8 +567,7 @@
     }
 
     // Load cart count function (for customer only)
-    @auth
-    @if(auth()->user()->isCustomer())
+    @if(auth()->check() && auth()->user()->isCustomer())
     function loadCartCount() {
         console.log('Loading cart count...');
         fetch('{{ route('api.cart.count') }}')
@@ -591,7 +592,6 @@
             });
     }
     @endif
-    @endauth
 
     // Mobile filter toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
