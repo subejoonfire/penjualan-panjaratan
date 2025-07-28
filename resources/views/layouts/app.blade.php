@@ -220,7 +220,7 @@
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open; if(open) { console.log('Dropdown opened, loading notifications...'); loadNotifications(); }"
+                            <button @click="open = !open; if(open) loadDesktopNotifications()"
                                 class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
                                 <span
@@ -369,237 +369,208 @@
     <!-- Load Cart Count for Customers and Notifications for All Users -->
     @auth
     <script>
-        // Load notification count for all users
-            function loadNotificationCount() {
-                console.log('Loading notification count...');
-                fetch('{{ route('api.notifications.unread') }}')
-                    .then(response => {
-                        console.log('Count response status:', response.status);
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Count data:', data);
-                        const notificationCount = document.querySelector('.notification-count');
-                        if (notificationCount) {
-                            notificationCount.textContent = data.count || 0;
-                            notificationCount.style.display = (data.count && data.count > 0) ? 'flex' : 'none';
-                            console.log('Notification count updated:', data.count);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading notification count:', error);
-                        const notificationCount = document.querySelector('.notification-count');
-                        if (notificationCount) {
-                            notificationCount.style.display = 'none';
-                        }
-                    });
-            }
+        // ===== DESKTOP FUNCTIONS =====
+        
+        // Desktop: Load notification count
+        function loadDesktopNotificationCount() {
+            fetch('{{ route('api.notifications.unread') }}')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationCount = document.querySelector('.desktop-nav .notification-count');
+                    if (notificationCount) {
+                        notificationCount.textContent = data.count;
+                        notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                    }
+                })
+                .catch(error => console.error('Error loading desktop notification count:', error));
+        }
 
-            // Load notifications when dropdown is opened
-            function loadNotifications() {
-                console.log('Loading notifications...');
-                const notificationList = document.getElementById('notificationList');
-                if (notificationList) {
-                    notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Memuat notifikasi...</div>';
-                }
-                
-                fetch('{{ route('api.notifications.unread') }}')
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Notification data:', data);
-                        const notificationList = document.getElementById('notificationList');
-                        if (notificationList) {
-                            if (data.notifications && data.notifications.length > 0) {
-                                notificationList.innerHTML = data.notifications.map(notification => {
-                                    // Get notification icon based on type
-                                    let icon = 'fas fa-bell';
-                                    let iconColor = 'text-blue-500';
-                                    
-                                    switch(notification.type) {
-                                        case 'order':
-                                            icon = 'fas fa-shopping-cart';
-                                            iconColor = 'text-green-500';
-                                            break;
-                                        case 'payment':
-                                            icon = 'fas fa-credit-card';
-                                            iconColor = 'text-yellow-500';
-                                            break;
-                                        case 'product':
-                                            icon = 'fas fa-box';
-                                            iconColor = 'text-purple-500';
-                                            break;
-                                        case 'promotion':
-                                            icon = 'fas fa-percentage';
-                                            iconColor = 'text-red-500';
-                                            break;
-                                        case 'system':
-                                            icon = 'fas fa-cog';
-                                            iconColor = 'text-gray-500';
-                                            break;
-                                        case 'review':
-                                            icon = 'fas fa-star';
-                                            iconColor = 'text-orange-500';
-                                            break;
-                                        default:
-                                            icon = 'fas fa-bell';
-                                            iconColor = 'text-blue-500';
-                                    }
-                                    
-                                    // Truncate notification text
-                                    const maxLength = 60;
-                                    let displayText = notification.notification;
-                                    let showMore = '';
-                                    
-                                    if (displayText && displayText.length > maxLength) {
-                                        displayText = displayText.substring(0, maxLength) + '...';
-                                        showMore = '<span class="text-blue-600 hover:text-blue-800 text-xs cursor-pointer ml-1">lihat</span>';
-                                    }
-                                    
-                                    return `
-                                        <div class="notification-item px-4 py-3 border-b border-gray-100 cursor-pointer ${!notification.readstatus ? 'unread' : ''}" onclick="viewNotificationDetail(${notification.id})">
-                                            <div class="flex items-start space-x-3">
-                                                <div class="flex-shrink-0">
-                                                    <i class="${icon} ${iconColor} text-sm"></i>
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title || 'Notifikasi'}</p>
-                                                    <p class="text-sm text-gray-600">${displayText || 'Tidak ada pesan'}${showMore}</p>
-                                                    <div class="flex items-center justify-between mt-1">
-                                                        <p class="text-xs text-gray-500">${notification.created_at || 'Baru saja'}</p>
-                                                        ${!notification.readstatus ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Baru</span>' : ''}
-                                                    </div>
-                                                </div>
-                                                <div class="flex-shrink-0">
-                                                    <button onclick="event.stopPropagation(); markNotificationAsRead(${notification.id})" class="text-gray-400 hover:text-gray-600">
-                                                        <i class="fas fa-chevron-right text-xs"></i>
-                                                    </button>
+        // Desktop: Load notifications for dropdown
+        function loadDesktopNotifications() {
+            const notificationList = document.getElementById('notificationList');
+            if (notificationList) {
+                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Memuat notifikasi...</div>';
+            }
+            
+            fetch('{{ route('api.notifications.unread') }}')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notificationList');
+                    if (notificationList) {
+                        if (data.notifications && data.notifications.length > 0) {
+                            notificationList.innerHTML = data.notifications.map(notification => {
+                                // Get notification icon based on type
+                                let icon = 'fas fa-bell';
+                                let iconColor = 'text-blue-500';
+                                
+                                switch(notification.type) {
+                                    case 'order':
+                                        icon = 'fas fa-shopping-cart';
+                                        iconColor = 'text-green-500';
+                                        break;
+                                    case 'payment':
+                                        icon = 'fas fa-credit-card';
+                                        iconColor = 'text-yellow-500';
+                                        break;
+                                    case 'product':
+                                        icon = 'fas fa-box';
+                                        iconColor = 'text-purple-500';
+                                        break;
+                                    case 'promotion':
+                                        icon = 'fas fa-percentage';
+                                        iconColor = 'text-red-500';
+                                        break;
+                                    case 'system':
+                                        icon = 'fas fa-cog';
+                                        iconColor = 'text-gray-500';
+                                        break;
+                                    case 'review':
+                                        icon = 'fas fa-star';
+                                        iconColor = 'text-orange-500';
+                                        break;
+                                    default:
+                                        icon = 'fas fa-bell';
+                                        iconColor = 'text-blue-500';
+                                }
+                                
+                                // Truncate notification text
+                                const maxLength = 60;
+                                let displayText = notification.notification;
+                                let showMore = '';
+                                
+                                if (displayText && displayText.length > maxLength) {
+                                    displayText = displayText.substring(0, maxLength) + '...';
+                                    showMore = '<span class="text-blue-600 hover:text-blue-800 text-xs cursor-pointer ml-1">lihat</span>';
+                                }
+                                
+                                return `
+                                    <div class="notification-item px-4 py-3 border-b border-gray-100 cursor-pointer ${!notification.readstatus ? 'unread' : ''}" onclick="viewNotificationDetail(${notification.id})">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="${icon} ${iconColor} text-sm"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 ${notification.readstatus ? '' : 'font-bold'}">${notification.title || 'Notifikasi'}</p>
+                                                <p class="text-sm text-gray-600">${displayText || 'Tidak ada pesan'}${showMore}</p>
+                                                <div class="flex items-center justify-between mt-1">
+                                                    <p class="text-xs text-gray-500">${notification.created_at || 'Baru saja'}</p>
+                                                    ${!notification.readstatus ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Baru</span>' : ''}
                                                 </div>
                                             </div>
+                                            <div class="flex-shrink-0">
+                                                <button onclick="event.stopPropagation(); markNotificationAsRead(${notification.id})" class="text-gray-400 hover:text-gray-600">
+                                                    <i class="fas fa-chevron-right text-xs"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    `;
-                                }).join('');
-                            } else {
-                                notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
-                            }
+                                    </div>
+                                `;
+                            }).join('');
                         } else {
-                            console.error('Notification list element not found');
+                            notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
                         }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading notifications:', error);
-                        const notificationList = document.getElementById('notificationList');
-                        if (notificationList) {
-                            notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
-                        }
-                    });
-            }
-
-            // View notification detail
-            function viewNotificationDetail(notificationId) {
-                // Mark as read and redirect to detail page
-                fetch(`/api/notifications/${notificationId}/read`, {
-                    method: 'PUT',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Redirect to appropriate notification detail page based on user role
-                        const userRole = '{{ auth()->user()->role }}';
-                        window.location.href = `/${userRole}/notifications/${notificationId}`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error viewing notification:', error);
-                    // Still redirect even if marking as read fails
+                    console.error('Error loading desktop notifications:', error);
+                    const notificationList = document.getElementById('notificationList');
+                    if (notificationList) {
+                        notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
+                    }
+                });
+        }
+
+        // ===== MOBILE FUNCTIONS =====
+        
+        // Mobile: Load notification count
+        function loadMobileNotificationCount() {
+            fetch('{{ route('api.notifications.unread') }}')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationCount = document.querySelector('.mobile-nav-bar .notification-count');
+                    if (notificationCount) {
+                        notificationCount.textContent = data.count;
+                        notificationCount.style.display = data.count > 0 ? 'flex' : 'none';
+                    }
+                })
+                .catch(error => console.error('Error loading mobile notification count:', error));
+        }
+
+        // ===== SHARED FUNCTIONS =====
+        
+        // View notification detail (works for both mobile and desktop)
+        function viewNotificationDetail(notificationId) {
+            fetch(`/api/notifications/${notificationId}/read`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     const userRole = '{{ auth()->user()->role }}';
                     window.location.href = `/${userRole}/notifications/${notificationId}`;
-                });
-            }
+                }
+            })
+            .catch(error => {
+                console.error('Error viewing notification:', error);
+                const userRole = '{{ auth()->user()->role }}';
+                window.location.href = `/${userRole}/notifications/${notificationId}`;
+            });
+        }
 
-            // Mark notification as read
-            function markNotificationAsRead(notificationId) {
-                fetch(`/api/notifications/${notificationId}/read`, {
-                    method: 'PUT',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+        // Mark notification as read (works for both mobile and desktop)
+        function markNotificationAsRead(notificationId) {
+            fetch(`/api/notifications/${notificationId}/read`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh both mobile and desktop counts
+                    loadMobileNotificationCount();
+                    loadDesktopNotificationCount();
+                    // Refresh desktop notifications if dropdown is open
+                    loadDesktopNotifications();
+                }
+            })
+            .catch(error => console.error('Error marking notification as read:', error));
+        }
+
+        // ===== CART FUNCTIONS =====
+        
+        @if(auth()->user()->isCustomer())
+        // Load cart count for customers (works for both mobile and desktop)
+        function loadCartCount() {
+            fetch('{{ route('api.cart.count') }}')
+                .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        loadNotificationCount(); // Refresh count
-                        loadNotifications(); // Refresh list
-                    }
-                })
-                .catch(error => {
-                    console.error('Error marking notification as read:', error);
-                    // Still refresh the list even if marking as read fails
-                    loadNotificationCount();
-                    loadNotifications();
-                });
-            }
-
-            // Load notification count on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                loadNotificationCount();
-            });
-
-            @if(auth()->user()->isCustomer())
-            // Load cart count for customers only
-            function loadCartCount() {
-                fetch('{{ route('api.cart.count') }}')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount) {
-                            cartCount.textContent = data.count || 0;
-                            cartCount.style.display = (data.count && data.count > 0) ? 'inline-flex' : 'none';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading cart count:', error);
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount) {
-                            cartCount.style.display = 'none';
-                        }
+                    const cartCounts = document.querySelectorAll('.cart-count');
+                    cartCounts.forEach(cartCount => {
+                        cartCount.textContent = data.count;
+                        cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
                     });
-            }
+                })
+                .catch(error => console.error('Error loading cart count:', error));
+        }
+        @endif
 
-            // Load cart count on page load for customers
-            document.addEventListener('DOMContentLoaded', function() {
-                loadCartCount();
-            });
+        // ===== INITIALIZATION =====
+        
+        // Load everything on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMobileNotificationCount();
+            loadDesktopNotificationCount();
+            @if(auth()->user()->isCustomer())
+            loadCartCount();
             @endif
+        });
     </script>
     @endauth
 
