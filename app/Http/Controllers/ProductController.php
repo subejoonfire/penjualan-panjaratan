@@ -410,4 +410,45 @@ class ProductController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Get recommended products for dashboard
+     */
+    public function getRecommendedProducts(Request $request)
+    {
+        $query = Product::with(['category', 'images', 'seller'])
+            ->where('is_active', true)
+            ->where('productstock', '>', 0)
+            ->orderBy('created_at', 'desc')
+            ->limit(6);
+
+        $products = $query->get();
+
+        $productsData = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->productname,
+                'description' => $product->productdescription,
+                'price' => $product->productprice,
+                'price_formatted' => number_format($product->productprice),
+                'stock' => $product->productstock,
+                'category' => $product->category->category,
+                'seller' => [
+                    'id' => $product->seller->id,
+                    'name' => $product->seller->nickname ?? $product->seller->username,
+                ],
+                'image' => $product->images->count() > 0 
+                    ? asset('storage/' . $product->images->first()->image)
+                    : null,
+                'url' => route('products.show', $product),
+                'created_at' => $product->created_at->diffForHumans(),
+                'avg_rating' => $product->reviews()->avg('rating') ?? 0,
+                'reviews_count' => $product->reviews()->count(),
+            ];
+        });
+
+        return response()->json([
+            'products' => $productsData
+        ]);
+    }
 }

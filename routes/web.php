@@ -123,6 +123,8 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
     Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
     Route::get('/products', [ProductController::class, 'getProducts'])->name('products.list');
+    Route::get('/products/recommended', [ProductController::class, 'getRecommendedProducts'])->name('products.recommended');
+    Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'getWishlist'])->name('wishlist.list');
     Route::get('/notifications/unread', function () {
         $user = auth()->user();
         
