@@ -351,6 +351,14 @@
 
     // Add to cart function
     function addToCart(productId) {
+        // Find the button that was clicked
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        
+        // Disable button and show loading animation
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
         const formData = new FormData();
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         formData.append('quantity', 1);
@@ -373,17 +381,34 @@
         .then(data => {
             console.log('Cart response:', data);
             if (data.success) {
-                showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
+                // Show success animation
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                button.classList.add('bg-green-600');
+                
+                // Update cart count
                 if (typeof loadCartCount === 'function') {
                     setTimeout(loadCartCount, 500);
                 }
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('bg-green-600');
+                    button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    button.disabled = false;
+                }, 2000);
             } else {
                 showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
             }
         })
         .catch(error => {
             console.error('Cart error:', error);
             showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            button.innerHTML = originalText;
+            button.disabled = false;
         });
     }
 
