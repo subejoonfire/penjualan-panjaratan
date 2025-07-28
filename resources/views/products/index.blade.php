@@ -357,16 +357,27 @@
     @auth
     @if(auth()->user()->isCustomer())
     function loadCartCount() {
+        console.log('Loading cart count...');
         fetch('{{ route('api.cart.count') }}')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cart count response not ok');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Cart count data:', data);
                 const cartCounts = document.querySelectorAll('.cart-count');
-                cartCounts.forEach(cartCount => {
-                    cartCount.textContent = data.count;
-                    cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                console.log('Found cart count elements:', cartCounts.length);
+                cartCounts.forEach((cartCount, index) => {
+                    console.log(`Updating cart count ${index}:`, data.count);
+                    cartCount.textContent = data.count || 0;
+                    cartCount.style.display = (data.count && data.count > 0) ? 'inline-flex' : 'none';
                 });
             })
-            .catch(error => console.error('Error loading cart count:', error));
+            .catch(error => {
+                console.error('Error loading cart count:', error);
+            });
     }
     @endif
     @endauth
@@ -398,7 +409,6 @@
                 body: new FormData(this),
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
@@ -409,14 +419,15 @@
                 return response.json();
             })
             .then(data => {
+                console.log('Cart response:', data);
                 if (data.success) {
                     button.innerHTML = '<i class="fas fa-check"></i>';
                     button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                     button.classList.add('bg-green-600');
                     
-                    // Update cart count if function exists
+                    // Update cart count
                     if (typeof loadCartCount === 'function') {
-                        loadCartCount();
+                        setTimeout(loadCartCount, 500); // Small delay to ensure database is updated
                     }
                     
                     setTimeout(() => {
@@ -432,7 +443,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Cart error:', error);
                 showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
                 button.innerHTML = originalText;
                 button.disabled = false;
