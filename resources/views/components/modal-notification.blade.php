@@ -19,7 +19,7 @@
                 </div>
                 
                 <!-- Buttons -->
-                <div class="items-center px-2 py-2 sm:px-4 sm:py-3 space-y-2 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row" id="modalButtons">
+                <div class="flex flex-col sm:flex-row sm:justify-center items-center px-2 py-2 sm:px-4 sm:py-3 space-y-2 sm:space-y-0 sm:space-x-2" id="modalButtons">
                     <button id="modalCancelBtn" class="w-full sm:w-24 px-3 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
                         Batal
                     </button>

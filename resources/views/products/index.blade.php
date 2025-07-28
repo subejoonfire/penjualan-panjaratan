@@ -353,6 +353,24 @@
         window.location.href = url.toString();
     }
 
+    // Load cart count function (for customer only)
+    @auth
+    @if(auth()->user()->isCustomer())
+    function loadCartCount() {
+        fetch('{{ route('api.cart.count') }}')
+            .then(response => response.json())
+            .then(data => {
+                const cartCounts = document.querySelectorAll('.cart-count');
+                cartCounts.forEach(cartCount => {
+                    cartCount.textContent = data.count;
+                    cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                });
+            })
+            .catch(error => console.error('Error loading cart count:', error));
+    }
+    @endif
+    @endauth
+
     // Mobile filter toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
         // Mobile filter functionality can be added here if needed
@@ -379,15 +397,27 @@
                 method: 'POST',
                 body: new FormData(this),
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     button.innerHTML = '<i class="fas fa-check"></i>';
                     button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                     button.classList.add('bg-green-600');
+                    
+                    // Update cart count if function exists
+                    if (typeof loadCartCount === 'function') {
+                        loadCartCount();
+                    }
                     
                     setTimeout(() => {
                         button.innerHTML = originalText;
@@ -403,7 +433,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('Terjadi kesalahan', 'error');
+                showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
                 button.innerHTML = originalText;
                 button.disabled = false;
             });
