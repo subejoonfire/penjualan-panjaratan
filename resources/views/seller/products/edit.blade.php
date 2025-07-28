@@ -435,16 +435,33 @@ document.addEventListener('DOMContentLoaded', function() {
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
             dragClass: 'sortable-drag',
-            handle: '.group', // Allow dragging from the entire container
-            filter: 'button', // Prevent dragging when clicking on buttons
-            preventOnFilter: false, // Allow button clicks to work
+            swapThreshold: 0.65,
+            direction: 'horizontal',
+            forceFallback: false,
+            fallbackClass: 'sortable-fallback',
+            fallbackOnBody: true,
+            scroll: true,
+            scrollSensitivity: 30,
+            scrollSpeed: 10,
+            invertSwap: true,
+            swap: true,
+            multiDrag: false,
+            selectedClass: 'sortable-selected',
+            filter: 'button',
+            preventOnFilter: false,
             onStart: function(evt) {
                 // Add visual feedback when dragging starts
                 evt.item.style.transform = 'rotate(5deg) scale(1.05)';
+                evt.item.style.zIndex = '9999';
+            },
+            onMove: function(evt) {
+                // Allow all moves
+                return true;
             },
             onEnd: function (evt) {
                 // Reset transform
                 evt.item.style.transform = '';
+                evt.item.style.zIndex = '';
                 
                 // Reorder files array
                 const oldIndex = evt.oldIndex;
@@ -624,15 +641,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                     
-                    // Make the entire div draggable, but prevent drag when clicking remove button
-                    imageDiv.draggable = true;
-                    imageDiv.addEventListener('dragstart', function(e) {
-                        // Prevent drag if clicking on remove button
-                        if (e.target.closest('button')) {
-                            e.preventDefault();
-                            return false;
-                        }
-                    });
+                    // Add data attribute for sortable
+                    imageDiv.setAttribute('data-index', index);
+                    
+                    // Prevent drag when clicking remove button
+                    const removeButton = imageDiv.querySelector('button');
+                    if (removeButton) {
+                        removeButton.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                        });
+                    }
                     
                     sortableImages.appendChild(imageDiv);
                 };
@@ -768,6 +786,23 @@ function deleteImage(imageId) {
     .sortable-chosen {
         background-color: rgba(59, 130, 246, 0.1);
         border-color: #3B82F6;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .sortable-drag {
+        transform: rotate(5deg) scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+    }
+
+    .sortable-fallback {
+        transform: rotate(5deg) scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .sortable-selected {
+        background-color: rgba(59, 130, 246, 0.2);
+        border-color: #3B82F6;
     }
 
     /* Hover effects for image containers */
@@ -793,6 +828,17 @@ function deleteImage(imageId) {
     /* Image preview responsive grid */
     #sortableImages {
         min-height: 100px;
+        gap: 1rem;
+    }
+
+    /* Smooth transitions for all sortable elements */
+    #sortableImages > * {
+        transition: all 0.2s ease;
+    }
+
+    /* Better drag handle visibility */
+    .group:hover .absolute.bottom-1.left-1 {
+        opacity: 1 !important;
     }
 
     @media (max-width: 768px) {
