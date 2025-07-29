@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\SendVerificationEmailJob;
+use App\Jobs\SendVerificationWaJob;
 
 class AuthController extends Controller
 {
@@ -132,7 +134,11 @@ class AuthController extends Controller
         if ($user->isEmailVerified()) {
             return redirect()->route('verification.wa.notice');
         }
-        return view('auth.verify-email', compact('user'));
+        // Strict: hanya bisa akses halaman ini jika belum email verified
+        if (!$user->isEmailVerified() && !$user->isWaVerified()) {
+            return view('auth.verify-email', compact('user'));
+        }
+        return redirect()->route('verification.wa.notice');
     }
 
     public function sendEmailVerification()
@@ -144,14 +150,7 @@ class AuthController extends Controller
 
     private function sendEmailVerificationInternal($user)
     {
-        $token = $user->verification_token;
-        $email = $user->email;
-        $name = $user->username;
-        try {
-            Mail::to($email)->send(new \App\Mail\VerifyEmailCode($name, $token));
-        } catch (\Exception $e) {
-            Log::error('Gagal mengirim email verifikasi: ' . $e->getMessage());
-        }
+        SendVerificationEmailJob::dispatch($user->id);
     }
 
     public function checkEmailVerification(Request $request)
@@ -177,22 +176,17 @@ class AuthController extends Controller
         if ($user->isWaVerified()) {
             return $this->redirectToDashboard();
         }
-        return view('auth.verify-wa', compact('user'));
+        // Strict: hanya bisa akses halaman ini jika sudah email verified dan belum wa verified
+        if ($user->isEmailVerified() && !$user->isWaVerified()) {
+            return view('auth.verify-wa', compact('user'));
+        }
+        return $this->redirectToDashboard();
     }
 
     public function sendWaVerification()
     {
         $user = Auth::user();
-        $token = $user->phone_verification_token;
-        $phone = $user->phone;
-        $message = "Kode verifikasi WhatsApp Anda: $token\nPenjualan Panjaratan";
-        $fonnteToken = env('FONNTE_TOKEN');
-        $response = Http::withHeaders([
-            'Authorization' => $fonnteToken,
-        ])->asForm()->post('https://api.fonnte.com/send', [
-            'target' => $phone,
-            'message' => $message,
-        ]);
+        SendVerificationWaJob::dispatch($user->id);
         return back()->with('success', 'Kode verifikasi WhatsApp telah dikirim ulang.');
     }
 
