@@ -23,14 +23,33 @@
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700">
-                        Nama Pengguna
+                        Nama Pengguna <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
                         <input id="username" name="username" type="text" autocomplete="username" required
                                value="{{ old('username') }}"
-                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('username') border-red-300 @enderror">
+                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('username') border-red-300 @enderror"
+                               placeholder="contoh: usernameku">
                     </div>
+                    <p class="mt-1 text-xs text-gray-500">Username tidak boleh mengandung spasi dan akan digunakan untuk login.</p>
                     @error('username')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Nickname -->
+                <div>
+                    <label for="nickname" class="block text-sm font-medium text-gray-700">
+                        Nama Panggilan
+                    </label>
+                    <div class="mt-1">
+                        <input id="nickname" name="nickname" type="text" autocomplete="nickname"
+                               value="{{ old('nickname') }}"
+                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('nickname') border-red-300 @enderror"
+                               placeholder="contoh: John Doe">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Nama panggilan boleh mengandung spasi dan akan ditampilkan di profil Anda.</p>
+                    @error('nickname')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

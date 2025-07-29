@@ -83,7 +83,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:50|unique:users,username',
+            'username' => 'required|string|max:50|unique:users,username|regex:/^[a-zA-Z0-9_-]+$/',
             'email' => 'required|string|email|max:255|unique:users,email',
             'phone' => 'required|string|max:20',
             'nickname' => 'nullable|string|max:100',
@@ -92,6 +92,7 @@ class AuthController extends Controller
         ], [
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
+            'username.regex' => 'Username hanya boleh mengandung huruf, angka, underscore (_), dan dash (-). Tidak boleh mengandung spasi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
@@ -255,7 +256,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
+            'username' => 'required|string|max:50|unique:users,username,' . $user->id . '|regex:/^[a-zA-Z0-9_-]+$/',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'nickname' => 'nullable|string|max:100',
@@ -263,6 +264,7 @@ class AuthController extends Controller
         ], [
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
+            'username.regex' => 'Username hanya boleh mengandung huruf, angka, underscore (_), dan dash (-). Tidak boleh mengandung spasi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
