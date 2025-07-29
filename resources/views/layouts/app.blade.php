@@ -37,18 +37,18 @@
                     <div class="flex items-center">
                         <a href="/" class="flex flex-col items-center group">
                             <i class="fas fa-store text-2xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Beranda</span>
+                            <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Beranda</span>
                         </a>
                     </div>
                     <!-- Auth Buttons -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-8">
                         <a href="{{ route('login') }}" class="flex flex-col items-center group">
                             <i class="fas fa-sign-in-alt text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Masuk</span>
+                            <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Masuk</span>
                         </a>
                         <a href="{{ route('register') }}" class="flex flex-col items-center group">
                             <i class="fas fa-user-plus text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Daftar</span>
+                            <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Daftar</span>
                         </a>
                     </div>
                 </div>
