@@ -32,25 +32,21 @@
         <!-- Guest Navigation Bar (Desktop & Mobile) -->
         <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
             <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
-                <div class="flex justify-between h-16 items-center">
+                <div class="flex justify-center h-16 items-center gap-16">
                     <!-- Logo & Brand -->
-                    <div class="flex items-center">
-                        <a href="/" class="flex flex-col items-center group">
-                            <i class="fas fa-store text-2xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Beranda</span>
-                        </a>
-                    </div>
+                    <a href="/" class="flex flex-col items-center group">
+                        <i class="fas fa-store text-2xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                        <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Beranda</span>
+                    </a>
                     <!-- Auth Buttons -->
-                    <div class="flex items-center space-x-8">
-                        <a href="{{ route('login') }}" class="flex flex-col items-center group">
-                            <i class="fas fa-sign-in-alt text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Masuk</span>
-                        </a>
-                        <a href="{{ route('register') }}" class="flex flex-col items-center group">
-                            <i class="fas fa-user-plus text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Daftar</span>
-                        </a>
-                    </div>
+                    <a href="{{ route('login') }}" class="flex flex-col items-center group">
+                        <i class="fas fa-sign-in-alt text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                        <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Masuk</span>
+                    </a>
+                    <a href="{{ route('register') }}" class="flex flex-col items-center group">
+                        <i class="fas fa-user-plus text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                        <span class="text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Daftar</span>
+                    </a>
                 </div>
             </div>
         </nav>
