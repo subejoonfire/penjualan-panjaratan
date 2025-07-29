@@ -89,12 +89,18 @@
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Rentang Harga</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Min"
-                                min="0" max="{{ $priceRange->max_price }}"
-                                class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
-                            <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Maks"
-                                min="0" max="{{ $priceRange->max_price }}"
-                                class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
+                            <div class="relative">
+                                <span class="absolute left-2 top-1.5 text-xs text-gray-500">Rp</span>
+                                <input type="text" name="min_price" id="min_price_mobile" value="{{ request('min_price') ? number_format(request('min_price'), 0, ',', '.') : '' }}" placeholder="Min"
+                                    min="0" max="{{ $priceRange->max_price }}"
+                                    class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 pl-7 pr-2 h-8">
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-2 top-1.5 text-xs text-gray-500">Rp</span>
+                                <input type="text" name="max_price" id="max_price_mobile" value="{{ request('max_price') ? number_format(request('max_price'), 0, ',', '.') : '' }}" placeholder="Maks"
+                                    min="0" max="{{ $priceRange->max_price }}"
+                                    class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 pl-7 pr-2 h-8">
+                            </div>
                         </div>
                         <div class="mt-1 text-xs text-gray-500">
                             Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price)
@@ -119,7 +125,7 @@
             </div>
         </div>
 
-        <div class="lg:grid lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 lg:gap-6">
+        <div class="lg:grid lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 lg:gap-6">
             <!-- Filters Sidebar -->
             <div class="hidden lg:block">
                 <div class="bg-white shadow rounded-lg sticky top-6" x-data="{ filterOpen: true }">
@@ -160,15 +166,15 @@
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Rentang Harga</label>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <input type="number" name="min_price" value="{{ request('min_price') }}"
-                                            placeholder="Min" min="0" max="{{ $priceRange->max_price }}"
-                                            class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
+                                    <div class="relative">
+                                        <span class="absolute left-2 top-1.5 text-xs text-gray-500">Rp</span>
+                                        <input type="text" name="min_price" id="min_price" value="{{ request('min_price') ? number_format(request('min_price'), 0, ',', '.') : '' }}" placeholder="Min" min="0" max="{{ $priceRange->max_price }}"
+                                            class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 pl-7 pr-2 h-8">
                                     </div>
-                                    <div>
-                                        <input type="number" name="max_price" value="{{ request('max_price') }}"
-                                            placeholder="Maks" min="0" max="{{ $priceRange->max_price }}"
-                                            class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
+                                    <div class="relative">
+                                        <span class="absolute left-2 top-1.5 text-xs text-gray-500">Rp</span>
+                                        <input type="text" name="max_price" id="max_price" value="{{ request('max_price') ? number_format(request('max_price'), 0, ',', '.') : '' }}" placeholder="Maks" min="0" max="{{ $priceRange->max_price }}"
+                                            class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 pl-7 pr-2 h-8">
                                     </div>
                                 </div>
                                 <div class="mt-1 text-xs text-gray-500">
@@ -227,7 +233,7 @@
 
                 <!-- Products Grid -->
                 <div id="products-container"
-                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3 sm:gap-6">
+                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6 gap-3 sm:gap-6">
                     <!-- Products will be loaded here via JavaScript -->
                 </div>
 
@@ -630,6 +636,36 @@
         if (filterButton) {
             // Filter functionality is handled by Alpine.js x-data="{ filterOpen: true }"
         }
+    });
+
+    function formatRupiah(angka) {
+        let number_string = angka.replace(/[^\d]/g, ''),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/g);
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+        rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah;
+    }
+
+    function setRupiahInput(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        input.addEventListener('input', function(e) {
+            let value = formatRupiah(this.value);
+            this.value = value;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setRupiahInput('min_price');
+        setRupiahInput('max_price');
+        setRupiahInput('min_price_mobile');
+        setRupiahInput('max_price_mobile');
     });
 
 
