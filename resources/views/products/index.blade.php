@@ -127,7 +127,7 @@
 
         <div class="lg:grid lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 lg:gap-6">
             <!-- Filters Sidebar -->
-            <div class="hidden lg:block">
+            <div class="hidden lg:block lg:col-span-1 xl:col-span-1 2xl:col-span-1">
                 <div class="bg-white shadow rounded-lg sticky top-6" x-data="{ filterOpen: true }">
                     <!-- Filter Header with Toggle -->
                     <div class="p-3 border-b border-gray-200 flex items-center justify-between">
@@ -202,7 +202,7 @@
             </div>
 
             <!-- Products Content -->
-            <div class="lg:col-span-4 xl:col-span-5 2xl:col-span-6">
+            <div class="lg:col-span-4 xl:col-span-5 2xl:col-span-5">
                 <!-- Sort & View Options -->
                 <div class="bg-white shadow rounded-lg p-4 mb-6">
                     <div class="flex items-center justify-between">
