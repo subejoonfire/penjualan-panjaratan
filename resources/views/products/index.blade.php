@@ -64,7 +64,7 @@
 
             <!-- Mobile Filter Content -->
             <div x-show="mobileFilterOpen" x-transition class="mt-2 bg-white shadow rounded-lg p-4">
-                <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
+                <form id="mobile-filter" method="GET" action="{{ route('products.index') }}" class="space-y-4">
                     <!-- Preserve search -->
                     <input type="hidden" name="search" value="{{ request('search') }}">
 
@@ -141,7 +141,7 @@
 
                     <!-- Filter Content -->
                     <div x-show="filterOpen" x-transition class="p-4">
-                        <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
+                        <form id="desktop-filter" method="GET" action="{{ route('products.index') }}" class="space-y-4">
                             <!-- Preserve search -->
                             <input type="hidden" name="search" value="{{ request('search') }}">
 
@@ -661,11 +661,30 @@
         });
     }
 
+    function cleanRupiahInput(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = input.value.replace(/\./g, '');
+        }
+    }
+
+    function setupFilterFormClean(formSelector, minId, maxId) {
+        const form = document.querySelector(formSelector);
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                cleanRupiahInput(minId);
+                cleanRupiahInput(maxId);
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         setRupiahInput('min_price');
         setRupiahInput('max_price');
         setRupiahInput('min_price_mobile');
         setRupiahInput('max_price_mobile');
+        setupFilterFormClean('form[action="{{ route('products.index') }}"]#desktop-filter', 'min_price', 'max_price');
+        setupFilterFormClean('form[action="{{ route('products.index') }}"]#mobile-filter', 'min_price_mobile', 'max_price_mobile');
     });
 
 
