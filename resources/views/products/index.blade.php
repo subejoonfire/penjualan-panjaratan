@@ -84,10 +84,10 @@
                         <div class="grid grid-cols-2 gap-2">
                             <input type="number" name="min_price" value="{{ request('min_price') }}"
                                 placeholder="Min" min="0" max="{{ $priceRange->max_price }}"
-                                class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
                             <input type="number" name="max_price" value="{{ request('max_price') }}"
                                 placeholder="Maks" min="0" max="{{ $priceRange->max_price }}"
-                                class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
                         </div>
                         <div class="mt-1 text-xs text-gray-500">
                             Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price) }}
@@ -153,12 +153,12 @@
                                     <div>
                                         <input type="number" name="min_price" value="{{ request('min_price') }}"
                                             placeholder="Min" min="0" max="{{ $priceRange->max_price }}"
-                                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
                                     </div>
                                     <div>
                                         <input type="number" name="max_price" value="{{ request('max_price') }}"
                                             placeholder="Maks" min="0" max="{{ $priceRange->max_price }}"
-                                            class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            class="w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 py-1 px-2 h-8">
                                     </div>
                                 </div>
                                 <div class="mt-1 text-xs text-gray-500">

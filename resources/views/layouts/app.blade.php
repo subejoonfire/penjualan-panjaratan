@@ -35,29 +35,38 @@
                 <div class="flex justify-between h-16 items-center">
                     <!-- Logo & Brand -->
                     <div class="flex items-center">
-                        <a href="/" class="flex items-center">
-                            <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
-                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
+                        <a href="/" class="flex flex-col items-center group">
+                            <i class="fas fa-store text-2xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                            <span class="text-xs mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Beranda</span>
                         </a>
                     </div>
                     <!-- Auth Buttons -->
                     <div class="flex items-center space-x-4">
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Masuk</a>
-                        <a href="{{ route('register') }}" class="px-4 py-2 rounded-md bg-white border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition">Daftar</a>
+                        <a href="{{ route('login') }}" class="flex flex-col items-center group">
+                            <i class="fas fa-sign-in-alt text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                            <span class="text-xs mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Masuk</span>
+                        </a>
+                        <a href="{{ route('register') }}" class="flex flex-col items-center group">
+                            <i class="fas fa-user-plus text-xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                            <span class="text-xs mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Daftar</span>
+                        </a>
                     </div>
                 </div>
             </div>
         </nav>
         <!-- Mobile Guest Nav Bar -->
         <nav class="mobile-nav-bar" style="display:none">
-            <a href="/" class="mobile-nav-item">
-                <i class="fas fa-store"></i>
+            <a href="/" class="mobile-nav-item group">
+                <i class="fas fa-store text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                <span class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 text-xs mt-1">Beranda</span>
             </a>
-            <a href="{{ route('login') }}" class="mobile-nav-item">
-                <i class="fas fa-sign-in-alt"></i>
+            <a href="{{ route('login') }}" class="mobile-nav-item group">
+                <i class="fas fa-sign-in-alt text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                <span class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 text-xs mt-1">Masuk</span>
             </a>
-            <a href="{{ route('register') }}" class="mobile-nav-item">
-                <i class="fas fa-user-plus"></i>
+            <a href="{{ route('register') }}" class="mobile-nav-item group">
+                <i class="fas fa-user-plus text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                <span class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 text-xs mt-1">Daftar</span>
             </a>
         </nav>
         @endguest
@@ -866,8 +875,8 @@
             }
         }
 
-        .notification-count {
-            display: flex !important;
+        .notification-count, .cart-count {
+            display: none !important;
         }
     </style>
 </body>
