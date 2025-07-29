@@ -15,12 +15,16 @@ return new class extends Migration
             $table->id();
             $table->string('username', 50)->unique(); // Username unik
             $table->string('email')->unique(); // Email unik
-            $table->string('phone', 20)->nullable(); // Nomor telepon
+            $table->string('phone', 20); // Nomor telepon WA wajib
             $table->string('nickname', 100)->nullable(); // Nama panggilan
             $table->string('password'); // Password
             $table->enum('role', ['admin', 'seller', 'customer'])->default('customer'); // Role pengguna
             $table->timestamp('email_verified_at')->nullable(); // Verifikasi email
             $table->timestamp('phone_verified_at')->nullable(); // Verifikasi telepon
+            $table->string('verification_token', 100)->nullable(); // Token verifikasi email
+            $table->string('phone_verification_token', 100)->nullable(); // Token verifikasi WA
+            $table->boolean('status_verifikasi_email')->default(false); // Status verifikasi email
+            $table->boolean('status_verifikasi_wa')->default(false); // Status verifikasi WA
             $table->rememberToken();
             $table->timestamps();
         });
