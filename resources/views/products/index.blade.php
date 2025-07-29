@@ -30,7 +30,7 @@
                 <div class="mt-4 lg:mt-0 lg:ml-6">
                     <form method="GET" action="{{ route('products.index') }}" class="flex items-center space-x-2">
                         <div class="relative">
-                            <input type="text" name="search" value="{{ request('search') }}"
+                            <input type="text" name="search" id="search" value="{{ request('search') }}"
                                 placeholder="Cari produk..."
                                 class="w-full lg:w-80 pl-10 pr-4 py-2 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
@@ -38,10 +38,10 @@
                             </div>
                         </div>
                         <!-- Hidden inputs to preserve other filters -->
-                        <input type="hidden" name="category" value="{{ request('category') }}">
-                        <input type="hidden" name="min_price" value="{{ request('min_price') }}">
-                        <input type="hidden" name="max_price" value="{{ request('max_price') }}">
-                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                        <input type="hidden" name="category" id="category" value="{{ request('category') }}">
+                        <input type="hidden" name="min_price" id="min_price_hidden" value="{{ request('min_price') }}">
+                        <input type="hidden" name="max_price" id="max_price_hidden" value="{{ request('max_price') }}">
+                        <input type="hidden" name="sort" id="sort" value="{{ request('sort') }}">
                         <button type="submit"
                             class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-search"></i>
@@ -311,12 +311,12 @@
             params.append('category', categorySelect.value);
         }
         
-        const minPriceInput = document.getElementById('min_price');
+        const minPriceInput = document.getElementById('min_price_hidden'); // Changed to hidden input
         if (minPriceInput && minPriceInput.value) {
             params.append('min_price', minPriceInput.value);
         }
         
-        const maxPriceInput = document.getElementById('max_price');
+        const maxPriceInput = document.getElementById('max_price_hidden'); // Changed to hidden input
         if (maxPriceInput && maxPriceInput.value) {
             params.append('max_price', maxPriceInput.value);
         }
@@ -469,8 +469,8 @@
     function resetFilters() {
         const searchInput = document.getElementById('search');
         const categorySelect = document.getElementById('category');
-        const minPriceInput = document.getElementById('min_price');
-        const maxPriceInput = document.getElementById('max_price');
+        const minPriceInput = document.getElementById('min_price_hidden'); // Changed to hidden input
+        const maxPriceInput = document.getElementById('max_price_hidden'); // Changed to hidden input
         const sortSelect = document.getElementById('sort');
         
         if (searchInput) searchInput.value = '';
@@ -498,8 +498,8 @@
         // Add event listeners for filters
         const searchInput = document.getElementById('search');
         const categorySelect = document.getElementById('category');
-        const minPriceInput = document.getElementById('min_price');
-        const maxPriceInput = document.getElementById('max_price');
+        const minPriceInput = document.getElementById('min_price_hidden'); // Changed to hidden input
+        const maxPriceInput = document.getElementById('max_price_hidden'); // Changed to hidden input
         const sortSelect = document.getElementById('sort');
         
         if (searchInput) {
