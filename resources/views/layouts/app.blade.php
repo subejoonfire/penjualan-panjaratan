@@ -214,67 +214,67 @@
                                         <a href="{{ route('admin.dashboard') }}"
                     class="group flex flex-col items-center {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-gray-600' }}">
                     <i class="fas fa-tachometer-alt text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                    <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Halaman Utama</span>
+                    <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Halaman Utama</span>
                 </a>
                         <a href="{{ route('admin.users.index') }}" class="group flex flex-col items-center {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-users text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Pengguna</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Pengguna</span>
                         </a>
                         <a href="{{ route('admin.products.index') }}" class="group flex flex-col items-center {{ request()->routeIs('admin.products.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-box text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Produk</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Produk</span>
                         </a>
                         <a href="{{ route('admin.categories.index') }}" class="group flex flex-col items-center {{ request()->routeIs('admin.categories.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-list text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Kategori</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Kategori</span>
                         </a>
                         <a href="{{ route('admin.orders.index') }}" class="group flex flex-col items-center {{ request()->routeIs('admin.orders.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-shopping-cart text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
                         </a>
                         <a href="{{ route('admin.transactions.index') }}" class="group flex flex-col items-center {{ request()->routeIs('admin.transactions.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-credit-card text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Transaksi</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Transaksi</span>
                         </a>
                         @elseif(auth()->user()->isSeller())
                                         <a href="{{ route('seller.dashboard') }}"
                     class="group flex flex-col items-center {{ request()->routeIs('seller.dashboard') ? 'text-blue-600' : 'text-gray-600' }}">
                     <i class="fas fa-tachometer-alt text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                    <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Halaman Utama</span>
+                    <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Halaman Utama</span>
                 </a>
                         <a href="{{ route('seller.products.index') }}" class="group flex flex-col items-center {{ request()->routeIs('seller.products.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-box text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Produk Saya</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Produk Saya</span>
                         </a>
                         <a href="{{ route('seller.orders.index') }}" class="group flex flex-col items-center {{ request()->routeIs('seller.orders.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-shopping-cart text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
                         </a>
                         <a href="{{ route('seller.sales') }}" class="group flex flex-col items-center {{ request()->routeIs('seller.sales') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-chart-line text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Penjualan</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Penjualan</span>
                         </a>
                         <a href="{{ route('seller.transactions.index') }}" class="group flex flex-col items-center {{ request()->routeIs('seller.transactions.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-credit-card text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Transaksi</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Transaksi</span>
                         </a>
                         @elseif(auth()->user()->isCustomer())
                                         <a href="{{ route('customer.dashboard') }}"
                     class="group flex flex-col items-center {{ request()->routeIs('customer.dashboard') ? 'text-blue-600' : 'text-gray-600' }}">
                     <i class="fas fa-tachometer-alt text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                    <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Halaman Utama</span>
+                    <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Halaman Utama</span>
                 </a>
                         <a href="{{ route('products.index') }}" class="group flex flex-col items-center {{ request()->routeIs('products.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-shopping-bag text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Belanja</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Belanja</span>
                         </a>
                         <a href="{{ route('customer.wishlist.index') }}" class="group flex flex-col items-center {{ request()->routeIs('customer.wishlist.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-heart text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Wishlist</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Wishlist</span>
                         </a>
                         <a href="{{ route('customer.orders.index') }}" class="group flex flex-col items-center {{ request()->routeIs('customer.orders.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             <i class="fas fa-list-alt text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
-                            <span class="text-xs font-semibold mt-1 group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
+                            <span class="text-xs font-semibold mt-0.5 group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
                         </a>
                         @endif
                     </div>
