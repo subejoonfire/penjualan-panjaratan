@@ -35,8 +35,4 @@ return [
         ],
     ],
 
-    'fonnte' => [
-        'token' => env('FONNTE_TOKEN', '3berEwsqKgCL728A6xEv'),
-    ],
-
 ];

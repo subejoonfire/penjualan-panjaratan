@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -146,10 +147,11 @@ class AuthController extends Controller
         $token = $user->verification_token;
         $email = $user->email;
         $name = $user->username;
-        Mail::raw("Halo $name,\n\nKode verifikasi email Anda: $token\n\nMasukkan kode ini di halaman verifikasi email.", function ($message) use ($email) {
-            $message->to($email)
-                ->subject('Verifikasi Email - Penjualan Panjaratan');
-        });
+        try {
+            Mail::to($email)->send(new \App\Mail\VerifyEmailCode($name, $token));
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email verifikasi: ' . $e->getMessage());
+        }
     }
 
     public function checkEmailVerification(Request $request)
@@ -184,7 +186,7 @@ class AuthController extends Controller
         $token = $user->phone_verification_token;
         $phone = $user->phone;
         $message = "Kode verifikasi WhatsApp Anda: $token\nPenjualan Panjaratan";
-        $fonnteToken = config('services.fonnte.token');
+        $fonnteToken = env('FONNTE_TOKEN');
         $response = Http::withHeaders([
             'Authorization' => $fonnteToken,
         ])->asForm()->post('https://api.fonnte.com/send', [
