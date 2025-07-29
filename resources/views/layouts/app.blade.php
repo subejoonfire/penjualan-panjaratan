@@ -71,94 +71,103 @@
         </nav>
         @endguest
         @auth
-        <!-- Mobile Nav Bar -->
+        @php $notVerified = auth()->user()->role === 'customer' && (!auth()->user()->isEmailVerified() || !auth()->user()->isWaVerified()); @endphp
         <nav class="mobile-nav-bar" style="display:none">
-            @if(auth()->user()->isAdmin())
-            <a href="{{ route('admin.dashboard') }}"
-                class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt"></i>
-            </a>
-            <a href="{{ route('admin.users.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-            </a>
-            <a href="{{ route('admin.products.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                <i class="fas fa-box"></i>
-            </a>
-            <a href="{{ route('admin.categories.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                <i class="fas fa-list"></i>
-            </a>
-            <a href="{{ route('admin.orders.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                <i class="fas fa-shopping-cart"></i>
-            </a>
-            <a href="{{ route('admin.transactions.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
-                <i class="fas fa-credit-card"></i>
-            </a>
-            @elseif(auth()->user()->isSeller())
-            <a href="{{ route('seller.dashboard') }}"
-                class="mobile-nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt"></i>
-            </a>
-            <a href="{{ route('seller.products.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
-                <i class="fas fa-box"></i>
-            </a>
-            <a href="{{ route('seller.orders.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('seller.orders.*') ? 'active' : '' }}">
-                <i class="fas fa-shopping-cart"></i>
-            </a>
-            <a href="{{ route('seller.sales') }}"
-                class="mobile-nav-item {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
-                <i class="fas fa-chart-line"></i>
-            </a>
-            <a href="{{ route('seller.transactions.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}">
-                <i class="fas fa-credit-card"></i>
-            </a>
-            @elseif(auth()->user()->isCustomer())
-            <a href="{{ route('customer.dashboard') }}"
-                class="mobile-nav-item {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt"></i>
-            </a>
-            <a href="{{ route('products.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                <i class="fas fa-shopping-bag"></i>
-            </a>
-            <a href="{{ route('customer.wishlist.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
-                <i class="fas fa-heart"></i>
-            </a>
-            <a href="{{ route('customer.orders.index') }}"
-                class="mobile-nav-item {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
-                <i class="fas fa-list-alt"></i>
-            </a>
+            @if($notVerified)
+                <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                    <i class="fas fa-user"></i>
+                </a>
+                <button onclick="openMobileProfileModal()" class="mobile-nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            @else
+                @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}"
+                    class="mobile-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <a href="{{ route('admin.users.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                </a>
+                <a href="{{ route('admin.products.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i>
+                </a>
+                <a href="{{ route('admin.categories.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                    <i class="fas fa-list"></i>
+                </a>
+                <a href="{{ route('admin.orders.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="{{ route('admin.transactions.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
+                    <i class="fas fa-credit-card"></i>
+                </a>
+                @elseif(auth()->user()->isSeller())
+                <a href="{{ route('seller.dashboard') }}"
+                    class="mobile-nav-item {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <a href="{{ route('seller.products.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('seller.products.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i>
+                </a>
+                <a href="{{ route('seller.orders.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('seller.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="{{ route('seller.sales') }}"
+                    class="mobile-nav-item {{ request()->routeIs('seller.sales') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line"></i>
+                </a>
+                <a href="{{ route('seller.transactions.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('seller.transactions.*') ? 'active' : '' }}">
+                    <i class="fas fa-credit-card"></i>
+                </a>
+                @elseif(auth()->user()->isCustomer())
+                <a href="{{ route('customer.dashboard') }}"
+                    class="mobile-nav-item {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+                <a href="{{ route('products.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-bag"></i>
+                </a>
+                <a href="{{ route('customer.wishlist.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('customer.wishlist.*') ? 'active' : '' }}">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="{{ route('customer.orders.index') }}"
+                    class="mobile-nav-item {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-list-alt"></i>
+                </a>
+                @endif
+                <!-- Notifikasi & Cart -->
+                <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}"
+                    class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
+                    <i class="fas fa-bell"></i>
+                    <span id="notification-count-mobile"
+                        class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
+                        style="display: none;">0</span>
+                </a>
+                @if(auth()->user()->isCustomer())
+                <a href="{{ route('customer.cart.index') }}"
+                    class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count-mobile"
+                        class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
+                        style="display: none;">0</span>
+                </a>
+                @endif
+                <!-- Profile Button -->
+                <button onclick="openMobileProfileModal()"
+                    class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                    <i class="fas fa-user"></i>
+                </button>
             @endif
-            <!-- Notifikasi & Cart -->
-            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}"
-                class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
-                <i class="fas fa-bell"></i>
-                <span id="notification-count-mobile"
-                    class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
-                    style="display: none;">0</span>
-            </a>
-            @if(auth()->user()->isCustomer())
-            <a href="{{ route('customer.cart.index') }}"
-                class="mobile-nav-item relative {{ request()->routeIs('customer.cart.*') ? 'active' : '' }}">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="cart-count-mobile"
-                    class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
-                    style="display: none;">0</span>
-            </a>
-            @endif
-            <!-- Profile Button -->
-            <button onclick="openMobileProfileModal()"
-                class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
-                <i class="fas fa-user"></i>
-            </button>
         </nav>
 
         <!-- Mobile Profile Modal -->
@@ -208,13 +217,43 @@
                 <div class="flex justify-between h-16">
                     <!-- Logo & Brand -->
                     <div class="flex items-center">
-                        <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="flex items-center">
+                        <a href="{{ route('profile') }}" class="flex items-center">
                             <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
                             <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
                         </a>
                     </div>
-
-                    <!-- Navigation Links -->
+                    @if($notVerified)
+                    <!-- Navigation Links kosong -->
+                    <div></div>
+                    <!-- User Menu hanya profil & logout -->
+                    <div class="flex items-center space-x-4">
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open"
+                                class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-medium">{{ substr(auth()->user()->nickname ?? auth()->user()->username, 0, 1) }}</span>
+                                </div>
+                                <span class="hidden md:block text-sm font-medium">{{ auth()->user()->nickname ?? auth()->user()->username }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div x-show="open" @click.away="open = false" x-transition x-cloak
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="{{ route('profile') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profil
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}" class="block">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Keluar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <!-- Navigation Links dan User Menu normal -->
                     <div class="hidden md:flex items-center gap-10">
                         @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}"
@@ -327,8 +366,6 @@
                         </a>
                         @endif
                     </div>
-
-                    <!-- User Menu -->
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
