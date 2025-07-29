@@ -31,20 +31,20 @@
         @guest
         <!-- Guest Navigation Bar (Desktop & Mobile) -->
         <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
-            <div class="w-full flex justify-center items-center py-2">
-                <div class="flex gap-10">
-                    <a href="/" class="group flex flex-col items-center">
-                        <i class="fas fa-store text-3xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                        <span class="text-base font-semibold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Beranda</span>
-                    </a>
-                    <a href="{{ route('login') }}" class="group flex flex-col items-center">
-                        <i class="fas fa-sign-in-alt text-2xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                        <span class="text-base font-semibold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Masuk</span>
-                    </a>
-                    <a href="{{ route('register') }}" class="group flex flex-col items-center">
-                        <i class="fas fa-user-plus text-2xl text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
-                        <span class="text-base font-semibold mt-1 opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300">Daftar</span>
-                    </a>
+            <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <!-- Logo & Brand -->
+                    <div class="flex items-center">
+                        <a href="/" class="flex items-center">
+                            <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
+                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
+                        </a>
+                    </div>
+                    <!-- Auth Buttons -->
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Masuk</a>
+                        <a href="{{ route('register') }}" class="px-4 py-2 rounded-md bg-white border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition">Daftar</a>
+                    </div>
                 </div>
             </div>
         </nav>
