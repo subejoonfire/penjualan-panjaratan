@@ -28,6 +28,10 @@ class User extends Authenticatable
         'role',
         'email_verified_at',
         'phone_verified_at',
+        'verification_token',
+        'phone_verification_token',
+        'status_verifikasi_email',
+        'status_verifikasi_wa',
     ];
 
     /**
@@ -157,5 +161,21 @@ class User extends Authenticatable
     public function defaultAddress()
     {
         return $this->addresses()->where('is_default', true)->first();
+    }
+
+    // Helper untuk status verifikasi email
+    public function isEmailVerified()
+    {
+        return $this->status_verifikasi_email || !empty($this->email_verified_at);
+    }
+    // Helper untuk status verifikasi WA
+    public function isWaVerified()
+    {
+        return $this->status_verifikasi_wa || !empty($this->phone_verified_at);
+    }
+    // Helper untuk status verifikasi lengkap
+    public function isFullyVerified()
+    {
+        return $this->isEmailVerified() && $this->isWaVerified();
     }
 }

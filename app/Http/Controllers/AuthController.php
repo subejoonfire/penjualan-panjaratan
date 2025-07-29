@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -79,16 +82,17 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:50|unique:users,username',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'nickname' => 'nullable|string|max:100',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:customer,seller',
+            'role' => 'required|in:customer',
         ], [
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
+            'phone.required' => 'Nomor WhatsApp wajib diisi.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -100,6 +104,9 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        $verification_token = Str::random(6);
+        $phone_verification_token = rand(100000, 999999);
+
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
@@ -107,12 +114,98 @@ class AuthController extends Controller
             'nickname' => $request->nickname,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'verification_token' => $verification_token,
+            'phone_verification_token' => $phone_verification_token,
+            'status_verifikasi_email' => false,
+            'status_verifikasi_wa' => false,
         ]);
 
-        // Auto login setelah registrasi
         Auth::login($user);
+        $this->sendEmailVerificationInternal($user);
+        return redirect()->route('verification.email.notice');
+    }
 
-        return $this->redirectToDashboard();
+    public function showEmailVerificationNotice()
+    {
+        $user = Auth::user();
+        if ($user->isEmailVerified()) {
+            return redirect()->route('verification.wa.notice');
+        }
+        return view('auth.verify-email', compact('user'));
+    }
+
+    public function sendEmailVerification()
+    {
+        $user = Auth::user();
+        $this->sendEmailVerificationInternal($user);
+        return back()->with('success', 'Kode verifikasi email telah dikirim ulang.');
+    }
+
+    private function sendEmailVerificationInternal($user)
+    {
+        $token = $user->verification_token;
+        $email = $user->email;
+        $name = $user->username;
+        Mail::raw("Halo $name,\n\nKode verifikasi email Anda: $token\n\nMasukkan kode ini di halaman verifikasi email.", function ($message) use ($email) {
+            $message->to($email)
+                ->subject('Verifikasi Email - Penjualan Panjaratan');
+        });
+    }
+
+    public function checkEmailVerification(Request $request)
+    {
+        $request->validate(['token' => 'required|string']);
+        $user = Auth::user();
+        if ($request->token === $user->verification_token) {
+            $user->update([
+                'status_verifikasi_email' => true,
+                'email_verified_at' => now(),
+            ]);
+            return redirect()->route('verification.wa.notice')->with('success', 'Email berhasil diverifikasi.');
+        }
+        return back()->withErrors(['token' => 'Kode verifikasi salah.']);
+    }
+
+    public function showWaVerificationNotice()
+    {
+        $user = Auth::user();
+        if (!$user->isEmailVerified()) {
+            return redirect()->route('verification.email.notice');
+        }
+        if ($user->isWaVerified()) {
+            return $this->redirectToDashboard();
+        }
+        return view('auth.verify-wa', compact('user'));
+    }
+
+    public function sendWaVerification()
+    {
+        $user = Auth::user();
+        $token = $user->phone_verification_token;
+        $phone = $user->phone;
+        $message = "Kode verifikasi WhatsApp Anda: $token\nPenjualan Panjaratan";
+        $fonnteToken = config('services.fonnte.token');
+        $response = Http::withHeaders([
+            'Authorization' => $fonnteToken,
+        ])->asForm()->post('https://api.fonnte.com/send', [
+            'target' => $phone,
+            'message' => $message,
+        ]);
+        return back()->with('success', 'Kode verifikasi WhatsApp telah dikirim ulang.');
+    }
+
+    public function checkWaVerification(Request $request)
+    {
+        $request->validate(['token' => 'required|string']);
+        $user = Auth::user();
+        if ($request->token == $user->phone_verification_token) {
+            $user->update([
+                'status_verifikasi_wa' => true,
+                'phone_verified_at' => now(),
+            ]);
+            return $this->redirectToDashboard();
+        }
+        return back()->withErrors(['token' => 'Kode verifikasi salah.']);
     }
 
     /**

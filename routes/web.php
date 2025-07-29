@@ -114,6 +114,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
 
+// Verifikasi Email & WA
+Route::middleware('auth')->group(function () {
+    Route::get('/verify/email', [AuthController::class, 'showEmailVerificationNotice'])->name('verification.email.notice');
+    Route::post('/verify/email/send', [AuthController::class, 'sendEmailVerification'])->name('verification.email.send');
+    Route::post('/verify/email/check', [AuthController::class, 'checkEmailVerification'])->name('verification.email.check');
+
+    Route::get('/verify/wa', [AuthController::class, 'showWaVerificationNotice'])->name('verification.wa.notice');
+    Route::post('/verify/wa/send', [AuthController::class, 'sendWaVerification'])->name('verification.wa.send');
+    Route::post('/verify/wa/check', [AuthController::class, 'checkWaVerification'])->name('verification.wa.check');
+});
+
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/categories/{category}', [ProductController::class, 'byCategory'])->name('products.category');

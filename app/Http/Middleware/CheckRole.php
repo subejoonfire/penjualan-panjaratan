@@ -39,6 +39,16 @@ class CheckRole
             }
         }
 
+        // Tambahan: Cek verifikasi untuk customer
+        if ($user->role === 'customer') {
+            if (!$user->isEmailVerified()) {
+                return redirect()->route('verification.email.notice');
+            }
+            if (!$user->isWaVerified()) {
+                return redirect()->route('verification.wa.notice');
+            }
+        }
+
         return $next($request);
     }
 }
