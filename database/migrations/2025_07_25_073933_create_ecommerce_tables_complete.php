@@ -233,6 +233,7 @@ return new class extends Migration
         Schema::dropIfExists('products');
         Schema::dropIfExists('user_addresses');
         Schema::dropIfExists('categories');
+        Schema::dropIfExists('users');
         
         Schema::table('wishlists', function (Blueprint $table) {
             $table->dropSoftDeletes();
