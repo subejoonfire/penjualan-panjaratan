@@ -202,9 +202,9 @@
                 <div class="flex justify-between h-16">
                     <!-- Logo & Brand -->
                     <div class="flex items-center">
-                        <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="group flex flex-col items-center justify-center h-16 relative">
-                            <i class="fas fa-store text-xl text-blue-600 transition-transform duration-300 group-hover:-translate-y-2"></i>
-                            <span class="absolute left-1/2 -translate-x-1/2 top-10 opacity-0 group-hover:opacity-100 group-hover:translate-y-2 transition-all duration-300 text-base font-bold text-blue-600 pointer-events-none select-none">Penjualan Panjaratan</span>
+                        <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="flex items-center">
+                            <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
+                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
                         </a>
                     </div>
 
