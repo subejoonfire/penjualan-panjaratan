@@ -97,12 +97,12 @@ class EcommerceSeeder extends Seeder
                 'verification_token' => null,
                 'phone_verification_token' => null,
                 'status_verifikasi_email' => true,
-                'status_verifikasi_wa' => $faker->boolean(80),
+                'status_verifikasi_wa' => true,
                 'nickname' => $faker->name,
                 'password' => Hash::make('seller123'),
                 'role' => 'seller',
                 'email_verified_at' => now(),
-                'phone_verified_at' => $faker->boolean(80) ? now() : null,
+                'phone_verified_at' => now(),
             ]);
         }
 
@@ -114,13 +114,13 @@ class EcommerceSeeder extends Seeder
                 'phone' => $faker->phoneNumber,
                 'verification_token' => null,
                 'phone_verification_token' => null,
-                'status_verifikasi_email' => $faker->boolean(70),
-                'status_verifikasi_wa' => $faker->boolean(60),
+                'status_verifikasi_email' => true,
+                'status_verifikasi_wa' => true,
                 'nickname' => $faker->name,
                 'password' => Hash::make('customer123'),
                 'role' => 'customer',
-                'email_verified_at' => $faker->boolean(70) ? now() : null,
-                'phone_verified_at' => $faker->boolean(60) ? now() : null,
+                'email_verified_at' => now(),
+                'phone_verified_at' => now(),
             ]);
         }
     }
