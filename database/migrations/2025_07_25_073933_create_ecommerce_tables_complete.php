@@ -136,6 +136,11 @@ return new class extends Migration
         });
 
         Schema::table('users', function (Blueprint $table) {
+            $table->string('phone', 20)->nullable(false)->change();
+            $table->string('verification_token', 100)->nullable();
+            $table->string('phone_verification_token', 100)->nullable();
+            $table->boolean('status_verifikasi_email')->default(false);
+            $table->boolean('status_verifikasi_wa')->default(false);
             $table->softDeletes();
         });
 

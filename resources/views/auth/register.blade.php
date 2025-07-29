@@ -95,17 +95,18 @@
                     </div>
                 </div>
 
-                <!-- Phone (Optional) -->
+                <!-- Phone (WA) Required -->
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">
-                        Nomor Telepon <span class="text-gray-400">(Opsional)</span>
+                        Nomor WhatsApp <span class="text-red-500">*</span>
                     </label>
                     <div class="mt-1">
-                        <input id="phone" name="phone" type="tel" autocomplete="tel"
+                        <input id="phone" name="phone" type="tel" autocomplete="tel" required
                                value="{{ old('phone') }}"
                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('phone') border-red-300 @enderror"
-                               placeholder="08123456789">
+                               placeholder="08xxxxxxxxxx">
                     </div>
+                    <p class="mt-1 text-xs text-gray-500">Nomor WhatsApp akan digunakan untuk verifikasi akun.</p>
                     @error('phone')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
