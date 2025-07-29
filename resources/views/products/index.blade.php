@@ -11,17 +11,21 @@
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Produk</h1>
                     <p class="mt-2 text-gray-600">Temukan produk menarik dari penjual kami</p>
-                    @guest
-                    <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm">
-                        <span class="text-blue-700 font-semibold text-sm sm:text-base">Belum punya akun? Daftar atau login untuk pengalaman belanja lebih lengkap!</span>
+                    {{-- @guest
+                    <div
+                        class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm">
+                        <span class="text-blue-700 font-semibold text-sm sm:text-base">Belum punya akun? Daftar atau
+                            login untuk pengalaman belanja lebih lengkap!</span>
                         <div class="flex gap-2 mt-2 sm:mt-0">
-                            <a href="{{ route('login') }}" class="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition text-sm">Masuk</a>
-                            <a href="{{ route('register') }}" class="px-4 py-2 rounded-md bg-white border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition text-sm">Daftar</a>
+                            <a href="{{ route('login') }}"
+                                class="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition text-sm">Masuk</a>
+                            <a href="{{ route('register') }}"
+                                class="px-4 py-2 rounded-md bg-white border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition text-sm">Daftar</a>
                         </div>
                     </div>
-                    @endguest
+                    @endguest --}}
                 </div>
-                
+
                 <!-- Search Bar (Always Visible) -->
                 <div class="mt-4 lg:mt-0 lg:ml-6">
                     <form method="GET" action="{{ route('products.index') }}" class="flex items-center space-x-2">
@@ -38,7 +42,8 @@
                         <input type="hidden" name="min_price" value="{{ request('min_price') }}">
                         <input type="hidden" name="max_price" value="{{ request('max_price') }}">
                         <input type="hidden" name="sort" value="{{ request('sort') }}">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-search"></i>
                         </button>
                     </form>
@@ -49,28 +54,30 @@
         <!-- Mobile Filter Toggle -->
         <div class="lg:hidden mb-4" x-data="{ mobileFilterOpen: false }">
             <button type="button" @click="mobileFilterOpen = !mobileFilterOpen"
-                    class="w-full bg-white shadow rounded-lg p-3 flex items-center justify-between">
+                class="w-full bg-white shadow rounded-lg p-3 flex items-center justify-between">
                 <span class="text-sm font-medium text-gray-900">
                     <i class="fas fa-filter mr-2"></i>Filter & Kategori
                 </span>
-                <i class="fas fa-chevron-down transition-transform duration-200" 
-                   :class="mobileFilterOpen ? 'rotate-180' : ''"></i>
+                <i class="fas fa-chevron-down transition-transform duration-200"
+                    :class="mobileFilterOpen ? 'rotate-180' : ''"></i>
             </button>
-            
+
             <!-- Mobile Filter Content -->
             <div x-show="mobileFilterOpen" x-transition class="mt-2 bg-white shadow rounded-lg p-4">
                 <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
                     <!-- Preserve search -->
                     <input type="hidden" name="search" value="{{ request('search') }}">
-                    
+
                     <!-- Categories -->
                     <div>
-                        <label for="mobile-category" class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
+                        <label for="mobile-category"
+                            class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
                         <select name="category" id="mobile-category"
                             class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua Kategori</option>
                             @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category')==$category->id ? 'selected' : '' }}>
+                            <option value="{{ $category->id }}" {{ request('category')==$category->id ? 'selected' : ''
+                                }}>
                                 {{ $category->category }} ({{ $category->products_count }})
                             </option>
                             @endforeach
@@ -82,15 +89,16 @@
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Rentang Harga</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number" name="min_price" value="{{ request('min_price') }}"
-                                placeholder="Min" min="0" max="{{ $priceRange->max_price }}"
+                            <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Min"
+                                min="0" max="{{ $priceRange->max_price }}"
                                 class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <input type="number" name="max_price" value="{{ request('max_price') }}"
-                                placeholder="Maks" min="0" max="{{ $priceRange->max_price }}"
+                            <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Maks"
+                                min="0" max="{{ $priceRange->max_price }}"
                                 class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <div class="mt-1 text-xs text-gray-500">
-                            Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price) }}
+                            Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price)
+                            }}
                         </div>
                     </div>
                     @endif
@@ -118,10 +126,10 @@
                     <!-- Filter Header with Toggle -->
                     <div class="p-3 border-b border-gray-200 flex items-center justify-between">
                         <h3 class="text-base font-medium text-gray-900">Filter</h3>
-                        <button @click="filterOpen = !filterOpen" type="button" 
-                                class="text-gray-400 hover:text-gray-600 p-1 rounded">
-                            <i class="fas fa-chevron-down transition-transform duration-200" 
-                               :class="filterOpen ? 'rotate-180' : ''"></i>
+                        <button @click="filterOpen = !filterOpen" type="button"
+                            class="text-gray-400 hover:text-gray-600 p-1 rounded">
+                            <i class="fas fa-chevron-down transition-transform duration-200"
+                                :class="filterOpen ? 'rotate-180' : ''"></i>
                         </button>
                     </div>
 
@@ -130,15 +138,17 @@
                         <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
                             <!-- Preserve search -->
                             <input type="hidden" name="search" value="{{ request('search') }}">
-                            
+
                             <!-- Categories -->
                             <div>
-                                <label for="category" class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
+                                <label for="category"
+                                    class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
                                 <select name="category" id="category"
                                     class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <option value="">Semua Kategori</option>
                                     @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ request('category')==$category->id ? 'selected' : '' }}>
+                                    <option value="{{ $category->id }}" {{ request('category')==$category->id ?
+                                        'selected' : '' }}>
                                         {{ $category->category }} ({{ $category->products_count }})
                                     </option>
                                     @endforeach
@@ -162,7 +172,8 @@
                                     </div>
                                 </div>
                                 <div class="mt-1 text-xs text-gray-500">
-                                    Rp {{ number_format($priceRange->min_price) }} - Rp {{ number_format($priceRange->max_price) }}
+                                    Rp {{ number_format($priceRange->min_price) }} - Rp {{
+                                    number_format($priceRange->max_price) }}
                                 </div>
                             </div>
                             @endif
@@ -206,7 +217,8 @@
                                 <option value="latest" {{ $sortBy==='latest' ? 'selected' : '' }}>Terbaru</option>
                                 <option value="popular" {{ $sortBy==='popular' ? 'selected' : '' }}>Populer</option>
                                 <option value="price_low" {{ $sortBy==='price_low' ? 'selected' : '' }}>Harga ↑</option>
-                                <option value="price_high" {{ $sortBy==='price_high' ? 'selected' : '' }}>Harga ↓</option>
+                                <option value="price_high" {{ $sortBy==='price_high' ? 'selected' : '' }}>Harga ↓
+                                </option>
                                 <option value="name" {{ $sortBy==='name' ? 'selected' : '' }}>Nama A-Z</option>
                             </select>
                         </div>
@@ -214,7 +226,8 @@
                 </div>
 
                 <!-- Products Grid -->
-                <div id="products-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3 sm:gap-6">
+                <div id="products-container"
+                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3 sm:gap-6">
                     <!-- Products will be loaded here via JavaScript -->
                 </div>
 
@@ -624,12 +637,10 @@
 @endsection
 
 <style>
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
