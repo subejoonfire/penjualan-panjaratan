@@ -11,6 +11,15 @@
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Produk</h1>
                     <p class="mt-2 text-gray-600">Temukan produk menarik dari penjual kami</p>
+                    @guest
+                    <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm">
+                        <span class="text-blue-700 font-semibold text-sm sm:text-base">Belum punya akun? Daftar atau login untuk pengalaman belanja lebih lengkap!</span>
+                        <div class="flex gap-2 mt-2 sm:mt-0">
+                            <a href="{{ route('login') }}" class="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition text-sm">Masuk</a>
+                            <a href="{{ route('register') }}" class="px-4 py-2 rounded-md bg-white border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition text-sm">Daftar</a>
+                        </div>
+                    </div>
+                    @endguest
                 </div>
                 
                 <!-- Search Bar (Always Visible) -->
