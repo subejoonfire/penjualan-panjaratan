@@ -61,8 +61,8 @@ class PasswordResetController extends Controller
                 return back()->withErrors(['identifier' => 'Format nomor WhatsApp tidak valid. Gunakan 10-13 digit angka.'])->withInput();
             }
             
-            // Check if it's a valid Indonesian mobile number (more flexible)
-            $validPrefixes = ['62', '08', '8', '0'];
+            // Check if it's a valid Indonesian mobile number
+            $validPrefixes = ['62', '08', '8'];
             $isValidPrefix = false;
             
             foreach ($validPrefixes as $prefix) {
@@ -73,10 +73,10 @@ class PasswordResetController extends Controller
             }
             
             if (!$isValidPrefix) {
-                return back()->withErrors(['identifier' => 'Format nomor WhatsApp tidak valid. Gunakan format 08xxx, 8xxx, atau 62xxx.'])->withInput();
+                return back()->withErrors(['identifier' => 'Format nomor WhatsApp tidak valid. Gunakan format 08xxx atau 62xxx.'])->withInput();
             }
             
-            // Normalize phone number to 62xxx format
+            // Pastikan format 62xxx
             if (substr($phone, 0, 1) === '0') {
                 $phone = '62' . substr($phone, 1);
             } elseif (substr($phone, 0, 2) !== '62') {
@@ -84,44 +84,35 @@ class PasswordResetController extends Controller
             }
             
             $identifier = $phone;
-            
-            // Log the normalized phone number for debugging
-            Log::info('Phone number normalized', [
-                'original' => $request->identifier,
-                'normalized' => $identifier
-            ]);
         }
 
-        // Cari user berdasarkan email atau phone dengan multiple format checking
+        // Cari user berdasarkan email atau phone dengan cache untuk performance
         $user = null;
         if ($method === 'email') {
-            $user = User::where('email', $identifier)->first();
+            $user = cache()->remember("user_email_{$identifier}", 300, function () use ($identifier) {
+                return User::where('email', $identifier)->first();
+            });
             if (!$user) {
                 return back()->withErrors(['identifier' => 'Email tidak ditemukan dalam sistem.'])->withInput();
             }
         } else {
-            // Use helper method from User model
-            $user = User::findByPhone($identifier);
+            // Cari user dengan multiple format untuk kompatibilitas
+            $user = null;
+            $phoneFormats = [
+                $identifier, // Format yang sudah dinormalisasi (62xxx)
+                substr($identifier, 2), // Format tanpa 62 (8xxx)
+                '0' . substr($identifier, 2), // Format dengan 0 (08xxx)
+            ];
             
-            // Log for debugging
-            Log::info('Searching for phone number', [
-                'original' => $identifier,
-                'normalized' => User::normalizePhone($identifier)
-            ]);
+            foreach ($phoneFormats as $phoneFormat) {
+                $user = User::where('phone', $phoneFormat)->first();
+                if ($user) {
+                    break;
+                }
+            }
             
-            if ($user) {
-                Log::info('User found with phone', [
-                    'user_id' => $user->id,
-                    'phone' => $user->phone
-                ]);
-            } else {
-                // Log all users with phone numbers for debugging
-                $allUsers = User::whereNotNull('phone')->get(['id', 'phone', 'email']);
-                Log::info('All users with phone numbers', [
-                    'users' => $allUsers->toArray()
-                ]);
-                
-                return back()->withErrors(['identifier' => 'Nomor WhatsApp tidak ditemukan dalam sistem. Silakan cek format nomor Anda.'])->withInput();
+            if (!$user) {
+                return back()->withErrors(['identifier' => 'Nomor WhatsApp tidak ditemukan dalam sistem.'])->withInput();
             }
         }
 
@@ -151,25 +142,28 @@ class PasswordResetController extends Controller
                 return back()->withErrors(['identifier' => 'Gagal mengirim email. Silakan coba lagi atau gunakan metode WhatsApp.'])->withInput();
             }
         } else {
-            // Simpan token untuk phone
+            // Simpan token untuk phone - gunakan identifier yang sudah dinormalisasi
             DB::table('phone_password_reset_tokens')->updateOrInsert(
-                ['phone' => $user->phone],
+                ['phone' => $identifier],
                 [
                     'token' => Hash::make($token),
                     'created_at' => now()
                 ]
             );
 
+
+
             // Kirim WhatsApp
             try {
-                $result = $this->sendWhatsAppResetCode($user->phone, $token);
+                $result = $this->sendWhatsAppResetCode($identifier, $token);
                 $message = 'Kode reset password telah dikirim ke WhatsApp Anda. Silakan cek pesan masuk.';
-                Log::info('WhatsApp sent successfully', [
-                    'phone' => $user->phone
+                Log::info('Password reset WhatsApp sent successfully', [
+                    'phone' => $identifier,
+                    'result' => $result
                 ]);
             } catch (\Exception $e) {
-                Log::error('Failed to send WhatsApp', [
-                    'phone' => $user->phone,
+                Log::error('Failed to send password reset WhatsApp', [
+                    'phone' => $identifier,
                     'error' => $e->getMessage()
                 ]);
                 return back()->withErrors(['identifier' => 'Gagal mengirim WhatsApp. Silakan coba lagi atau gunakan metode email.'])->withInput();
@@ -242,6 +236,8 @@ class PasswordResetController extends Controller
         $method = $resetData['method'];
         $token = strtoupper(trim($request->token));
 
+
+
         // Verifikasi token
         $isValidToken = false;
         if ($method === 'email') {
@@ -263,6 +259,8 @@ class PasswordResetController extends Controller
                 $isValidToken = true;
             }
         }
+
+
 
         if (!$isValidToken) {
             return back()->withErrors(['token' => 'Kode verifikasi salah atau sudah expired. Silakan coba lagi.'])->withInput();
@@ -327,13 +325,24 @@ class PasswordResetController extends Controller
         $identifier = $resetData['identifier'];
         $method = $resetData['method'];
 
-        // Cari user dengan multiple format checking
+        // Cari user
         $user = null;
         if ($method === 'email') {
             $user = User::where('email', $identifier)->first();
         } else {
-            // Use helper method from User model
-            $user = User::findByPhone($identifier);
+            // Cari user dengan multiple format untuk kompatibilitas
+            $phoneFormats = [
+                $identifier, // Format yang sudah dinormalisasi (62xxx)
+                substr($identifier, 2), // Format tanpa 62 (8xxx)
+                '0' . substr($identifier, 2), // Format dengan 0 (08xxx)
+            ];
+            
+            foreach ($phoneFormats as $phoneFormat) {
+                $user = User::where('phone', $phoneFormat)->first();
+                if ($user) {
+                    break;
+                }
+            }
         }
 
         if (!$user) {
@@ -371,9 +380,7 @@ class PasswordResetController extends Controller
             'user_agent' => request()->userAgent()
         ]);
 
-        // Clear cache for this user
-        cache()->forget("user_email_{$identifier}");
-        cache()->forget("user_phone_{$identifier}");
+
 
         return redirect()->route('login')->with('success', 'Password berhasil diubah! Silakan login dengan password baru Anda.');
     }
@@ -383,27 +390,38 @@ class PasswordResetController extends Controller
      */
     private function sendWhatsAppResetCode($phone, $token)
     {
-        $message = "Kode verifikasi WhatsApp Anda: $token\nPenjualan Panjaratan";
-        
+        $message = "🔐 *KODE RESET PASSWORD*\n\n";
+        $message .= "Kode reset password Anda: *{$token}*\n\n";
+        $message .= "Gunakan kode ini untuk mereset password akun Penjualan Panjaratan Anda.\n";
+        $message .= "⏰ Kode berlaku selama 15 menit.\n\n";
+        $message .= "⚠️ Jangan bagikan kode ini kepada siapa pun.\n";
+        $message .= "🔒 Jika Anda tidak meminta reset password, abaikan pesan ini.";
+
         $fonnteToken = env('FONNTE_TOKEN');
 
-        if (!$fonnteToken || $fonnteToken === 'isi_token_fonnte_anda_disini') {
-            Log::info('WhatsApp sent successfully (testing mode)', [
-                'phone' => $phone,
-                'token' => $token
-            ]);
-            return ['status' => true];
+        if (!$fonnteToken) {
+            throw new \Exception('Fonnte token not configured');
         }
 
         try {
-            Http::withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => $fonnteToken,
             ])->asForm()->post('https://api.fonnte.com/send', [
                 'target' => $phone,
                 'message' => $message,
             ]);
 
-            return ['status' => true];
+            if (!$response->successful()) {
+                throw new \Exception('Fonnte API error: ' . $response->status());
+            }
+
+            $result = $response->json();
+            
+            if (isset($result['status']) && $result['status'] === false) {
+                throw new \Exception('WhatsApp API error: ' . ($result['message'] ?? 'Unknown error'));
+            }
+
+            return $result;
 
         } catch (\Exception $e) {
             Log::error('Failed to send WhatsApp', [

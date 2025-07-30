@@ -177,44 +177,5 @@ class User extends Authenticatable
         return $this->isEmailVerified() && $this->isWaVerified();
     }
     
-    // Helper untuk menormalisasi nomor telepon
-    public static function normalizePhone($phone)
-    {
-        // Remove all non-numeric characters
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-        
-        // Normalize to 62xxx format
-        if (substr($phone, 0, 1) === '0') {
-            $phone = '62' . substr($phone, 1);
-        } elseif (substr($phone, 0, 2) !== '62') {
-            $phone = '62' . $phone;
-        }
-        
-        return $phone;
-    }
-    
-    // Helper untuk mencari user berdasarkan nomor telepon dengan multiple format
-    public static function findByPhone($phone)
-    {
-        $normalizedPhone = self::normalizePhone($phone);
-        
-        // Try multiple phone formats
-        $phoneFormats = [
-            $normalizedPhone, // 62xxx
-            substr($normalizedPhone, 2), // 8xxx
-            '0' . substr($normalizedPhone, 2), // 08xxx
-        ];
-        
-        // Remove duplicates
-        $phoneFormats = array_unique($phoneFormats);
-        
-        foreach ($phoneFormats as $phoneFormat) {
-            $user = self::where('phone', $phoneFormat)->first();
-            if ($user) {
-                return $user;
-            }
-        }
-        
-        return null;
-    }
+
 }
