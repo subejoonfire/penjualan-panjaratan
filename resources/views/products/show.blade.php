@@ -167,28 +167,31 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons Grid -->
-                        <div class="grid grid-cols-1 gap-3">
+                        <!-- Action Buttons Row -->
+                        <div class="grid grid-cols-3 gap-2">
                             <!-- Add to Cart Button -->
                             <button type="button" onclick="addToCart({{ $product->id }}, event)"
-                                class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
-                                <i class="fas fa-shopping-cart mr-2"></i>
-                                Tambah ke Keranjang
+                                class="bg-blue-600 text-white py-3 px-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm">
+                                <i class="fas fa-shopping-cart mr-1"></i>
+                                <span class="hidden sm:inline">Tambah ke Keranjang</span>
+                                <span class="sm:hidden">Keranjang</span>
                             </button>
 
                             <!-- Buy Now Button -->
                             <button type="button" onclick="buyNow({{ $product->id }}, event)"
-                                class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium">
-                                <i class="fas fa-credit-card mr-2"></i>
-                                Beli Sekarang
+                                class="bg-green-600 text-white py-3 px-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-sm">
+                                <i class="fas fa-credit-card mr-1"></i>
+                                <span class="hidden sm:inline">Beli Sekarang</span>
+                                <span class="sm:hidden">Beli</span>
                             </button>
 
                             <!-- Wishlist Button -->
                             <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
-                                class="w-full {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-3 px-4 rounded-md transition-colors font-medium">
-                                <i class="fas fa-heart mr-2"></i>
-                                <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Produk Disukai' : 'Tambah ke Produk Disukai'
+                                class="{{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-3 px-2 rounded-md transition-colors font-medium text-sm">
+                                <i class="fas fa-heart mr-1"></i>
+                                <span class="hidden sm:inline" id="wishlistText">{{ $isInWishlist ? 'Hapus dari Produk Disukai' : 'Tambah ke Produk Disukai'
                                     }}</span>
+                                <span class="sm:hidden" id="wishlistTextMobile">{{ $isInWishlist ? 'Hapus' : 'Sukai' }}</span>
                             </button>
                         </div>
                         @else
@@ -526,16 +529,19 @@
     function toggleWishlist(productId) {
         const btn = document.getElementById('wishlistBtn');
         const text = document.getElementById('wishlistText');
-        const originalText = text.textContent;
+        const textMobile = document.getElementById('wishlistTextMobile');
+        const originalText = text ? text.textContent : '';
+        const originalTextMobile = textMobile ? textMobile.textContent : '';
         
         btn.disabled = true;
-        text.textContent = 'Memproses...';
+        if (text) text.textContent = 'Memproses...';
+        if (textMobile) textMobile.textContent = 'Memproses...';
         
-        fetch(`/customer/wishlist/toggle/${productId}`, {
+        fetch(`${window.location.origin}/customer/wishlist/toggle/${productId}`, {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
         })
         .then(response => response.json())
@@ -544,27 +550,30 @@
                 if (data.action === 'added') {
                     btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
                     btn.classList.add('bg-red-600', 'hover:bg-red-700');
-                    text.textContent = 'Hapus dari Produk Disukai';
+                    if (text) text.textContent = 'Hapus dari Produk Disukai';
+                    if (textMobile) textMobile.textContent = 'Hapus';
                 } else {
                     btn.classList.remove('bg-red-600', 'hover:bg-red-700');
                     btn.classList.add('bg-gray-600', 'hover:bg-gray-700');
-                    text.textContent = 'Tambah ke Produk Disukai';
+                    if (text) text.textContent = 'Tambah ke Produk Disukai';
+                    if (textMobile) textMobile.textContent = 'Sukai';
                 }
                 
                 // Show toast notification
                 showModalNotification({
                     type: 'success',
                     title: 'Berhasil!',
-                    message: data.message || 'Berhasil menambahkan ke keranjang',
+                    message: data.message || 'Berhasil mengubah status wishlist',
                     confirmText: 'OK',
                     showCancel: false
                 });
             } else {
-                text.textContent = originalText;
+                if (text) text.textContent = originalText;
+                if (textMobile) textMobile.textContent = originalTextMobile;
                 showModalNotification({
                     type: 'error',
                     title: 'Gagal!',
-                    message: data.message || 'Gagal menambahkan ke keranjang',
+                    message: data.message || 'Gagal mengubah status wishlist',
                     confirmText: 'OK',
                     showCancel: false
                 });
@@ -573,12 +582,13 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            text.textContent = originalText;
+            if (text) text.textContent = originalText;
+            if (textMobile) textMobile.textContent = originalTextMobile;
             btn.disabled = false;
             showModalNotification({
                 type: 'error',
                 title: 'Error!',
-                message: 'Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message,
+                message: 'Terjadi kesalahan saat mengubah status wishlist: ' + error.message,
                 confirmText: 'OK',
                 showCancel: false
             });
