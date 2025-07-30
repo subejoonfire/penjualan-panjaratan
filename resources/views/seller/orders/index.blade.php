@@ -552,40 +552,66 @@
                                                 <i class="fas fa-eye mr-1"></i>
                                                 Detail
                                             </button>
-
-                                            <!-- Status Action Buttons -->
+                                            <!-- Status Action Buttons: Selalu tampil, disable jika tidak valid -->
                                             <div class="flex items-center space-x-2">
-                                                @if($order->status === 'pending' && $order->canBeUpdated())
-                                                <button onclick="updateOrderStatus('{{ $order->id }}', 'processing')"
-                                                    class="status-button confirm relative" title="Konfirmasi Pesanan">
-                                                    <i class="fas fa-check"></i>
-                                                    <span class="status-tooltip">Konfirmasi</span>
-                                                </button>
-                                                <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')"
-                                                    class="status-button cancel relative" title="Batalkan Pesanan">
-                                                    <i class="fas fa-times"></i>
-                                                    <span class="status-tooltip">Batalkan</span>
-                                                </button>
-                                                @elseif($order->status === 'processing' && $order->canBeUpdated())
-                                                <button onclick="updateOrderStatus('{{ $order->id }}', 'shipped')"
-                                                    class="status-button ship relative" title="Kirim Pesanan">
-                                                    <i class="fas fa-truck"></i>
-                                                    <span class="status-tooltip">Kirim</span>
-                                                </button>
-                                                <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')"
-                                                    class="status-button cancel relative" title="Batalkan Pesanan">
-                                                    <i class="fas fa-times"></i>
-                                                    <span class="status-tooltip">Batalkan</span>
-                                                </button>
-                                                @elseif($order->status === 'shipped' && $order->canBeUpdated())
-                                                <button onclick="updateOrderStatus('{{ $order->id }}', 'delivered')"
-                                                    class="status-button complete relative" title="Selesai">
-                                                    <i class="fas fa-check-double"></i>
-                                                    <span class="status-tooltip">Selesai</span>
-                                                </button>
-                                                @else
-                                                <span class="text-sm text-gray-500">Tidak dapat diupdate</span>
-                                                @endif
+                                                @php
+                                                $statusList = [
+                                                'processing' => [
+                                                'icon' => 'fa-check',
+                                                'class' => 'confirm',
+                                                'label' => 'Proses',
+                                                'tooltip' => 'Proses',
+                                                ],
+                                                'shipped' => [
+                                                'icon' => 'fa-truck',
+                                                'class' => 'ship',
+                                                'label' => 'Kirim',
+                                                'tooltip' => 'Kirim',
+                                                ],
+                                                'delivered' => [
+                                                'icon' => 'fa-check-double',
+                                                'class' => 'complete',
+                                                'label' => 'Selesai',
+                                                'tooltip' => 'Selesai',
+                                                ],
+                                                'cancelled' => [
+                                                'icon' => 'fa-times',
+                                                'class' => 'cancel',
+                                                'label' => 'Batalkan',
+                                                'tooltip' => 'Batalkan',
+                                                ],
+                                                ];
+                                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                                $currentIdx = array_search($order->status, $statusOrder);
+                                                $canUpdate = $order->canBeUpdated();
+                                                $canBack = false;
+                                                $now = now();
+                                                $updatedAt = $order->updated_at;
+                                                $diffHours = $updatedAt->diffInHours($now);
+                                                @endphp
+                                                @foreach($statusList as $status => $info)
+                                                @php
+                                                // Disable jika:
+                                                // 1. Status sudah delivered/cancelled
+                                                // 2. Status ingin mundur (idx status baru < idx status sekarang) // 3.
+                                                    Sudah lebih dari 3 jam sejak update terakhir (kecuali ke depan)
+                                                    $targetIdx=array_search($status, $statusOrder); $disabled=false; if
+                                                    (in_array($order->status, ['delivered', 'cancelled'])) {
+                                                    $disabled = true;
+                                                    } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
+                                                        ($diffHours>= 3 && $targetIdx > $currentIdx) {
+                                                        $disabled = true;
+                                                        }
+                                                        @endphp
+                                                        <button
+                                                            onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                                            class="status-button {{ $info['class'] }} relative"
+                                                            title="{{ $info['tooltip'] }}" @if($disabled) disabled
+                                                            @endif>
+                                                            <i class="fas {{ $info['icon'] }}"></i>
+                                                            <span class="status-tooltip">{{ $info['label'] }}</span>
+                                                        </button>
+                                                        @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -731,6 +757,25 @@
     function closeOrderModal() {
         document.getElementById('orderModal').classList.add('hidden');
         currentOrderId = null;
+    }
+
+    function confirmUpdateStatus(orderId, newStatus) {
+        let statusLabel = {
+            'processing': 'Proses',
+            'shipped': 'Kirim',
+            'delivered': 'Selesai',
+            'cancelled': 'Batalkan',
+        };
+        showModalNotification({
+            type: 'confirm',
+            title: 'Konfirmasi Update Status',
+            message: `Apakah Anda yakin ingin mengubah status pesanan ini menjadi "${statusLabel[newStatus] || newStatus}"?`,
+            confirmText: 'Ya',
+            cancelText: 'Batal',
+            onConfirm: function() {
+                updateOrderStatus(orderId, newStatus);
+            }
+        });
     }
 </script>
 @endsection
