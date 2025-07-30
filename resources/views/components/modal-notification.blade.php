@@ -1,5 +1,5 @@
 <!-- Modal Notification Component -->
-<div id="modalNotification" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50 p-2 sm:p-4">
+<div id="modalNotification" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-50 p-2 sm:p-4" style="display: none !important;">
     <div class="relative mx-auto p-3 sm:p-5 border w-full max-w-sm sm:max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
         <div class="mt-2 sm:mt-3">
             <!-- Icon -->
@@ -112,13 +112,24 @@ function showModalNotification(options = {}) {
     };
     
     // Show modal
+    modal.style.display = 'flex';
     modal.classList.remove('hidden');
 }
 
 function hideModalNotification() {
     const modal = document.getElementById('modalNotification');
+    modal.style.display = 'none';
     modal.classList.add('hidden');
 }
+
+// Ensure modal is hidden on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modalNotification');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
+});
 
 // Close modal when clicking outside
 document.getElementById('modalNotification').addEventListener('click', function(e) {

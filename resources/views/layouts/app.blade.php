@@ -51,7 +51,7 @@
             </div>
         </nav>
         <!-- Mobile Guest Nav Bar -->
-        <nav class="mobile-nav-bar">
+        <nav class="mobile-nav-bar" style="display: none;">
             <a href="/" class="mobile-nav-item group">
                 <i class="fas fa-store text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
                 <span
@@ -72,7 +72,7 @@
         @endguest
         @auth
         @php $notVerified = auth()->user()->role === 'customer' && (!auth()->user()->isEmailVerified() || !auth()->user()->isWaVerified()); @endphp
-        <nav class="mobile-nav-bar">
+        <nav class="mobile-nav-bar" style="display: none;">
             @if($notVerified)
                 <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i>
@@ -870,7 +870,7 @@
         /* Mobile nav bar */
         @media (max-width: 768px) {
             .mobile-nav-bar {
-                display: flex;
+                display: flex !important;
                 flex-direction: row;
                 justify-content: center;
                 overflow-x: auto;
@@ -915,10 +915,6 @@
             .desktop-nav {
                 display: none !important;
             }
-
-            .mobile-nav-bar {
-                display: flex !important;
-            }
         }
 
         @media (min-width: 769px) {
@@ -935,9 +931,133 @@
 
         .notification-count,
         .cart-count {
-            display: none !important;
+            display: none;
+        }
+
+        .notification-count.show,
+        .cart-count.show {
+            display: flex !important;
         }
     </style>
+
+    <script>
+        // Ensure mobile nav bar is hidden on page load and only show on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNavBars = document.querySelectorAll('.mobile-nav-bar');
+            const isMobile = window.innerWidth <= 768;
+            
+            mobileNavBars.forEach(nav => {
+                if (isMobile) {
+                    nav.style.display = 'flex';
+                } else {
+                    nav.style.display = 'none';
+                }
+            });
+
+            // Load notification and cart counts
+            loadNotificationCount();
+            if (document.querySelector('#cart-count-mobile') || document.querySelector('#cart-count-desktop')) {
+                loadCartCount();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileNavBars = document.querySelectorAll('.mobile-nav-bar');
+            const isMobile = window.innerWidth <= 768;
+            
+            mobileNavBars.forEach(nav => {
+                if (isMobile) {
+                    nav.style.display = 'flex';
+                } else {
+                    nav.style.display = 'none';
+                }
+            });
+        });
+
+        // Load notification count
+        function loadNotificationCount() {
+            fetch('/api/notifications/count')
+                .then(response => response.json())
+                .then(data => {
+                    const mobileCount = document.getElementById('notification-count-mobile');
+                    const desktopCount = document.getElementById('notification-count-desktop');
+                    
+                    if (data.count > 0) {
+                        if (mobileCount) {
+                            mobileCount.textContent = data.count;
+                            mobileCount.classList.add('show');
+                        }
+                        if (desktopCount) {
+                            desktopCount.textContent = data.count;
+                            desktopCount.classList.add('show');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading notification count:', error));
+        }
+
+        // Load desktop notifications
+        function loadDesktopNotifications() {
+            fetch('/api/notifications/unread')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notificationList');
+                    if (data.notifications && data.notifications.length > 0) {
+                        notificationList.innerHTML = data.notifications.map(notification => `
+                            <div class="px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-bell text-blue-500 text-sm"></i>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm font-medium text-gray-900">${notification.title}</p>
+                                        <p class="text-sm text-gray-500">${notification.notification}</p>
+                                        <p class="text-xs text-gray-400 mt-1">${notification.created_at}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Tidak ada notifikasi baru</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading notifications:', error);
+                    document.getElementById('notificationList').innerHTML = '<div class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat notifikasi</div>';
+                });
+        }
+
+        // Load cart count (for customers only)
+        function loadCartCount() {
+            fetch('/api/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    const mobileCount = document.getElementById('cart-count-mobile');
+                    const desktopCount = document.getElementById('cart-count-desktop');
+                    
+                    if (data.count > 0) {
+                        if (mobileCount) {
+                            mobileCount.textContent = data.count;
+                            mobileCount.classList.add('show');
+                        }
+                        if (desktopCount) {
+                            desktopCount.textContent = data.count;
+                            desktopCount.classList.add('show');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading cart count:', error));
+        }
+
+        // Refresh counts every 30 seconds
+        setInterval(function() {
+            loadNotificationCount();
+            if (document.querySelector('#cart-count-mobile') || document.querySelector('#cart-count-desktop')) {
+                loadCartCount();
+            }
+        }, 30000);
+    </script>
 </body>
 
 </html>
