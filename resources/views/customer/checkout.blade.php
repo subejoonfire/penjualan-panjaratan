@@ -116,77 +116,8 @@
                         <h3 class="text-base sm:text-lg font-medium text-gray-900">Metode Pembayaran</h3>
                     </div>
                     <div class="p-3 sm:p-6">
-                        <div class="space-y-3 sm:space-y-4">
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="VC" class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
-                                <div class="flex items-center">
-                                    <i class="fas fa-university text-blue-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Virtual Account (Bank Transfer)</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">BCA, BNI, BRI, Mandiri, Permata, dll</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="QRIS" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <div class="flex items-center">
-                                    <i class="fas fa-qrcode text-purple-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">QRIS</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">Scan QR semua e-wallet/bank</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="SP" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <div class="flex items-center">
-                                    <i class="fab fa-cc-visa text-yellow-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">Kartu Kredit/Debit</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">Visa, Mastercard, JCB</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="OVO" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <div class="flex items-center">
-                                    <i class="fab fa-cc-amex text-purple-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">OVO</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">E-wallet OVO</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="DANA" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <div class="flex items-center">
-                                    <i class="fab fa-cc-diners-club text-blue-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">DANA</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">E-wallet DANA</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="LINKAJA" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <div class="flex items-center">
-                                    <i class="fab fa-cc-discover text-red-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">LinkAja</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">E-wallet LinkAja</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
-                                <input type="radio" name="payment_method" value="SHOPEEPAY" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <div class="flex items-center">
-                                    <i class="fab fa-cc-jcb text-orange-600 text-base sm:text-lg mr-2 sm:mr-3"></i>
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900">ShopeePay</div>
-                                        <div class="text-xs sm:text-sm text-gray-600">E-wallet ShopeePay</div>
-                                    </div>
-                                </div>
-                            </label>
+                        <div id="payment-methods-list" class="space-y-3 sm:space-y-4">
+                            <div class="text-gray-500 text-sm">Memuat metode pembayaran...</div>
                         </div>
                         @error('payment_method')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -299,6 +230,40 @@
         
         // Initial state
         toggleManualAddress();
+
+        // Fetch payment methods from Duitku
+        fetch('/customer/payment-methods')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('payment-methods-list');
+                container.innerHTML = '';
+                if (data.paymentFee) {
+                    data.paymentFee.forEach(method => {
+                        const label = document.createElement('label');
+                        label.className = 'flex items-center space-x-2 sm:space-x-3 cursor-pointer';
+                        label.innerHTML = `
+                            <input type="radio" name="payment_method" value="${method.paymentMethod}" class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <div class="flex items-center">
+                                <img src="${method.paymentImage}" alt="${method.paymentName}" class="w-8 h-8 mr-2">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">${method.paymentName}</div>
+                                    <div class="text-xs sm:text-sm text-gray-600">${method.paymentMethod}</div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(label);
+                    });
+                    // Select first by default
+                    const firstRadio = container.querySelector('input[type=radio]');
+                    if (firstRadio) firstRadio.checked = true;
+                } else {
+                    container.innerHTML = '<div class="text-red-500 text-sm">Gagal memuat metode pembayaran</div>';
+                }
+            })
+            .catch(() => {
+                const container = document.getElementById('payment-methods-list');
+                container.innerHTML = '<div class="text-red-500 text-sm">Gagal memuat metode pembayaran</div>';
+            });
     });
 
     function processCheckout() {

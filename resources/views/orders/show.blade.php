@@ -118,7 +118,9 @@
                     <div class="space-y-2">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Metode Pembayaran</span>
-                            <span class="text-gray-900 capitalize">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}</span>
+                            <span class="text-gray-900 capitalize">
+                                {{ $order->transaction ? ($order->transaction->getPaymentMethodLabelAttribute() ?? ucfirst(str_replace('_', ' ', $order->transaction->payment_method))) : '-' }}
+                            </span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Status Pembayaran</span>

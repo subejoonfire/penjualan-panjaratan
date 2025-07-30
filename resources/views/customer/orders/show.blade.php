@@ -198,7 +198,9 @@
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Metode Pembayaran</dt>
-                                <dd class="text-sm text-gray-900">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}</dd>
+                                <dd class="text-sm text-gray-900">
+                                    {{ $order->transaction ? ($order->transaction->getPaymentMethodLabelAttribute() ?? ucfirst(str_replace('_', ' ', $order->transaction->payment_method))) : '-' }}
+                                </dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Status Pembayaran</dt>
