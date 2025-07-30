@@ -20,6 +20,9 @@ class PasswordResetController extends Controller
      */
     public function showForgotPasswordForm()
     {
+        // Clear any existing session data untuk fresh start
+        session()->forget(['reset_data', 'verified_reset_data']);
+        
         return view('auth.forgot-password');
     }
 
@@ -96,12 +99,17 @@ class PasswordResetController extends Controller
             }
         }
 
-        return redirect()->route('password.reset.verify.form')
-            ->with('success', $message)
-            ->with('reset_data', [
+        // Simpan data reset di session untuk step berikutnya
+        session([
+            'reset_data' => [
                 'identifier' => $identifier,
-                'method' => $method
-            ]);
+                'method' => $method,
+                'created_at' => now()->timestamp // Track waktu untuk debugging
+            ]
+        ]);
+
+        return redirect()->route('password.reset.verify.form')
+            ->with('success', $message);
     }
 
     /**
@@ -109,8 +117,16 @@ class PasswordResetController extends Controller
      */
     public function showVerifyResetCodeForm()
     {
-        if (!session('reset_data')) {
-            return redirect()->route('password.request')->withErrors(['error' => 'Session expired. Silakan ulangi proses reset password.']);
+        $resetData = session('reset_data');
+        
+        if (!$resetData) {
+            return redirect()->route('password.request')->withErrors(['error' => 'Session tidak ditemukan. Silakan mulai ulang proses reset password.']);
+        }
+
+        // Check session timeout (30 menit)
+        if (isset($resetData['created_at']) && (now()->timestamp - $resetData['created_at']) > 1800) {
+            session()->forget(['reset_data', 'verified_reset_data']);
+            return redirect()->route('password.request')->withErrors(['error' => 'Session sudah expired (30 menit). Silakan mulai ulang proses reset password.']);
         }
 
         return view('auth.verify-reset-code');
@@ -133,7 +149,13 @@ class PasswordResetController extends Controller
 
         $resetData = session('reset_data');
         if (!$resetData) {
-            return redirect()->route('password.request')->withErrors(['error' => 'Session expired. Silakan ulangi proses reset password.']);
+            return redirect()->route('password.request')->withErrors(['error' => 'Session tidak ditemukan. Silakan mulai ulang proses reset password.']);
+        }
+
+        // Check session timeout (30 menit)
+        if (isset($resetData['created_at']) && (now()->timestamp - $resetData['created_at']) > 1800) {
+            session()->forget(['reset_data', 'verified_reset_data']);
+            return redirect()->route('password.request')->withErrors(['error' => 'Session sudah expired (30 menit). Silakan mulai ulang proses reset password.']);
         }
 
         $identifier = $resetData['identifier'];
@@ -167,7 +189,9 @@ class PasswordResetController extends Controller
         }
 
         // Simpan verified token di session untuk form reset password
-        session(['verified_reset_data' => $resetData]);
+        session(['verified_reset_data' => array_merge($resetData, [
+            'verified_at' => now()->timestamp // Track waktu verifikasi
+        ])]);
 
         return redirect()->route('password.reset.form')->with('success', 'Kode verifikasi berhasil. Silakan masukkan password baru Anda.');
     }
@@ -177,8 +201,16 @@ class PasswordResetController extends Controller
      */
     public function showResetPasswordForm()
     {
-        if (!session('verified_reset_data')) {
-            return redirect()->route('password.request')->withErrors(['error' => 'Session expired. Silakan ulangi proses reset password.']);
+        $verifiedResetData = session('verified_reset_data');
+        
+        if (!$verifiedResetData) {
+            return redirect()->route('password.request')->withErrors(['error' => 'Session verifikasi tidak ditemukan. Silakan mulai ulang proses reset password.']);
+        }
+
+        // Check session timeout (30 menit dari created_at)
+        if (isset($verifiedResetData['created_at']) && (now()->timestamp - $verifiedResetData['created_at']) > 1800) {
+            session()->forget(['reset_data', 'verified_reset_data']);
+            return redirect()->route('password.request')->withErrors(['error' => 'Session sudah expired (30 menit). Silakan mulai ulang proses reset password.']);
         }
 
         return view('auth.reset-password');
@@ -203,7 +235,13 @@ class PasswordResetController extends Controller
 
         $resetData = session('verified_reset_data');
         if (!$resetData) {
-            return redirect()->route('password.request')->withErrors(['error' => 'Session expired. Silakan ulangi proses reset password.']);
+            return redirect()->route('password.request')->withErrors(['error' => 'Session verifikasi tidak ditemukan. Silakan mulai ulang proses reset password.']);
+        }
+
+        // Check session timeout (30 menit dari created_at)
+        if (isset($resetData['created_at']) && (now()->timestamp - $resetData['created_at']) > 1800) {
+            session()->forget(['reset_data', 'verified_reset_data']);
+            return redirect()->route('password.request')->withErrors(['error' => 'Session sudah expired (30 menit). Silakan mulai ulang proses reset password.']);
         }
 
         $identifier = $resetData['identifier'];
@@ -218,7 +256,8 @@ class PasswordResetController extends Controller
         }
 
         if (!$user) {
-            return redirect()->route('password.request')->withErrors(['error' => 'User tidak ditemukan.']);
+            session()->forget(['reset_data', 'verified_reset_data']);
+            return redirect()->route('password.request')->withErrors(['error' => 'User tidak ditemukan. Silakan mulai ulang proses reset password.']);
         }
 
         // Update password
