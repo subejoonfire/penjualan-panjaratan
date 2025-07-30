@@ -402,7 +402,7 @@
                                                 $disabled = true;
                                             } elseif ($targetIdx < $currentIdx) {
                                                 $disabled = true;
-                                            } elseif ($diffHours >= 3 && $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !== 'cancelled' && $order->status !== 'delivered' && $order->created_at->diffInMinutes($order->updated_at) > 0 && $order->status !== 'pending') {
+                                            } elseif ($diffHours >= 3 && $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !== 'cancelled' && $order->status !== 'delivered') {
                                                 $disabled = true;
                                             }
                                         @endphp
@@ -558,7 +558,7 @@
                                                                 $disabled = true;
                                                             } elseif ($targetIdx < $currentIdx) {
                                                                 $disabled = true;
-                                                            } elseif ($diffHours >= 3 && $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !== 'cancelled' && $order->status !== 'delivered' && $order->created_at->diffInMinutes($order->updated_at) > 0) {
+                                                            } elseif ($diffHours >= 3 && $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !== 'cancelled' && $order->status !== 'delivered') {
                                                                 $disabled = true;
                                                             }
                                                         @endphp
