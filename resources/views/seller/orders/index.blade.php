@@ -469,42 +469,17 @@
                                 'tooltip' => 'Batalkan',
                                 ],
                                 ];
-                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
-                                $currentIdx = array_search($order->status, $statusOrder);
-                                if ($currentIdx === false) { $currentIdx = -1; }
-                                $now = now();
-                                $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
-                                $diffHours = $statusUpdatedAt->diffInHours($now);
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
-                                $targetIdx = array_search($status, $statusOrder);
-                                if ($targetIdx === false) { $targetIdx = -1; }
-                                $disabled = false;
-
-                                if (in_array($order->status, ['delivered', 'cancelled'])) {
-                                $disabled = true;
-                                }
-                                elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
-                                    $targetIdx == $currentIdx) {
-                                    $disabled = true;
-                                    }
-                                    @endphp
-                                    @php
-                                    $tooltipText = $info['tooltip'];
-                                    if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
-                                    $remainingMinutes = 180 - ($diffHours * 60);
-                                    $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " .
-                                    ($remainingMinutes % 60) . "m lagi)";
-                                    }
-                                    @endphp
-                                    <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                        class="status-button {{ $info['class'] }} relative" title="{{ $tooltipText }}"
-                                        @if($disabled) disabled @endif>
-                                        <i class="fas {{ $info['icon'] }}"></i>
-                                        <span class="status-tooltip">{{ $info['label'] }}</span>
-                                    </button>
-                                    @endforeach
+                                $disabled = $order->status === $status;
+                                @endphp
+                                <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                    class="status-button {{ $info['class'] }} relative" title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
+                                    <i class="fas {{ $info['icon'] }}"></i>
+                                    <span class="status-tooltip">{{ $info['label'] }}</span>
+                                </button>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -623,71 +598,46 @@
                                             </button>
 
                                             <div class="flex items-center space-x-2">
-                                                @php
-                                                $statusList = [
-                                                'processing' => [
-                                                'icon' => 'fa-check',
-                                                'class' => 'confirm',
-                                                'label' => 'Proses',
-                                                'tooltip' => 'Proses',
-                                                ],
-                                                'shipped' => [
-                                                'icon' => 'fa-truck',
-                                                'class' => 'ship',
-                                                'label' => 'Kirim',
-                                                'tooltip' => 'Kirim',
-                                                ],
-                                                'delivered' => [
-                                                'icon' => 'fa-check-double',
-                                                'class' => 'complete',
-                                                'label' => 'Selesai',
-                                                'tooltip' => 'Selesai',
-                                                ],
-                                                'cancelled' => [
-                                                'icon' => 'fa-times',
-                                                'class' => 'cancel',
-                                                'label' => 'Batalkan',
-                                                'tooltip' => 'Batalkan',
-                                                ],
-                                                ];
-                                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
-                                                $currentIdx = array_search($order->status, $statusOrder);
-                                                if ($currentIdx === false) { $currentIdx = -1; }
-                                                $now = now();
-                                                $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
-                                                $diffHours = $statusUpdatedAt->diffInHours($now);
-                                                @endphp
-                                                @foreach($statusList as $status => $info)
-                                                @php
-                                                $targetIdx = array_search($status, $statusOrder);
-                                                if ($targetIdx === false) { $targetIdx = -1; }
-                                                $disabled = false;
-
-                                                if (in_array($order->status, ['delivered', 'cancelled'])) {
-                                                $disabled = true;
-                                                }
-                                                elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
-                                                    ($diffHours>= 3 && $targetIdx == $currentIdx) {
-                                                    $disabled = true;
-                                                    }
-                                                    @endphp
-                                                    @php
-                                                    $tooltipText = $info['tooltip'];
-                                                    if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
-                                                    $remainingMinutes = 180 - ($diffHours * 60);
-                                                    $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j
-                                                    " .
-                                                    ($remainingMinutes % 60) . "m lagi)";
-                                                    }
-                                                    @endphp
-                                                    <button
-                                                        onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                                        class="status-button {{ $info['class'] }} relative"
-                                                        title="{{ $tooltipText }}" @if($disabled) disabled @endif>
-                                                        <i class="fas {{ $info['icon'] }}"></i>
-                                                        <span class="status-tooltip">{{ $info['label'] }}</span>
-                                                    </button>
-                                                    @endforeach
+                                @php
+                                $statusList = [
+                                'processing' => [
+                                'icon' => 'fa-check',
+                                'class' => 'confirm',
+                                'label' => 'Proses',
+                                'tooltip' => 'Proses',
+                                ],
+                                'shipped' => [
+                                'icon' => 'fa-truck',
+                                'class' => 'ship',
+                                'label' => 'Kirim',
+                                'tooltip' => 'Kirim',
+                                ],
+                                'delivered' => [
+                                'icon' => 'fa-check-double',
+                                'class' => 'complete',
+                                'label' => 'Selesai',
+                                'tooltip' => 'Selesai',
+                                ],
+                                'cancelled' => [
+                                'icon' => 'fa-times',
+                                'class' => 'cancel',
+                                'label' => 'Batalkan',
+                                'tooltip' => 'Batalkan',
+                                ],
+                                ];
+                                @endphp
+                                @foreach($statusList as $status => $info)
+                                @php
+                                $disabled = $order->status === $status;
+                                @endphp
+                                <button
+                                    onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                    class="status-button {{ $info['class'] }} relative"
+                                    title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
+                                    <i class="fas {{ $info['icon'] }}"></i>
+                                    <span class="status-tooltip">{{ $info['label'] }}</span>
+                                </button>
+                                @endforeach
                                             </div>
                                         </div>
                                     </div>
