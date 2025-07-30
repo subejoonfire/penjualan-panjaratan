@@ -388,25 +388,15 @@
                                         ];
                                         $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                         $currentIdx = array_search($order->status, $statusOrder);
-                                        if ($currentIdx === false) {
-                                            $currentIdx = -1; // Jika status tidak ditemukan
-                                        }
-                                        $canUpdate = $order->canBeUpdated();
-                                        $canBack = false;
+                                        if ($currentIdx === false) { $currentIdx = -1; }
                                         $now = now();
                                         $updatedAt = $order->updated_at;
                                         $diffHours = $updatedAt->diffInHours($now);
                                     @endphp
                                     @foreach($statusList as $status => $info)
                                         @php
-                                            // Disable if:
-                                            // 1. Status already delivered/cancelled
-                                            // 2. Status want to go back (new status idx < current status idx)
-                                            // 3. More than 3 hours since last update (except forward)
                                             $targetIdx = array_search($status, $statusOrder);
-                                            if ($targetIdx === false) {
-                                                $targetIdx = -1; // Jika status tidak ditemukan
-                                            }
+                                            if ($targetIdx === false) { $targetIdx = -1; }
                                             $disabled = false;
                                             if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                 $disabled = true;
@@ -554,25 +544,15 @@
                                                         ];
                                                         $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                                         $currentIdx = array_search($order->status, $statusOrder);
-                                                        if ($currentIdx === false) {
-                                                            $currentIdx = -1; // Jika status tidak ditemukan
-                                                        }
-                                                        $canUpdate = $order->canBeUpdated();
-                                                        $canBack = false;
+                                                        if ($currentIdx === false) { $currentIdx = -1; }
                                                         $now = now();
                                                         $updatedAt = $order->updated_at;
                                                         $diffHours = $updatedAt->diffInHours($now);
                                                     @endphp
                                                     @foreach($statusList as $status => $info)
                                                         @php
-                                                            // Disable if:
-                                                            // 1. Status already delivered/cancelled
-                                                            // 2. Status want to go back (new status idx < current status idx)
-                                                            // 3. More than 3 hours since last update (except forward)
                                                             $targetIdx = array_search($status, $statusOrder);
-                                                            if ($targetIdx === false) {
-                                                                $targetIdx = -1; // Jika status tidak ditemukan
-                                                            }
+                                                            if ($targetIdx === false) { $targetIdx = -1; }
                                                             $disabled = false;
                                                             if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                                 $disabled = true;
