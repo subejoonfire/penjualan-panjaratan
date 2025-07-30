@@ -320,7 +320,7 @@ function loadFavoriteProducts() {
     loadingSpinner.classList.remove('hidden');
     noProducts.classList.add('hidden');
     
-    fetch('{{ route('api.products.recommended') }}')
+    fetch(`${window.location.origin}/api/products/recommended`)
         .then(response => response.json())
         .then(data => {
             loadingSpinner.classList.add('hidden');
@@ -436,7 +436,7 @@ function addToCart(productId) {
     formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
     formData.append('quantity', 1);
 
-    fetch(`/customer/cart/add/${productId}`, {
+    fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
         method: 'POST',
         body: formData,
         headers: {

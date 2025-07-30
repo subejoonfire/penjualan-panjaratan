@@ -500,7 +500,7 @@
         
         // Desktop: Load notification count
         function loadDesktopNotificationCount() {
-            fetch('{{ route('api.notifications.unread') }}')
+            fetch(`${window.location.origin}/api/notifications/unread`)
                 .then(response => response.json())
                 .then(data => {
                     const notificationCount = document.querySelector('.desktop-nav .notification-count');
@@ -519,7 +519,7 @@
                 notificationList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 text-center">Memuat notifikasi...</div>';
             }
             
-            fetch('{{ route('api.notifications.unread') }}')
+            fetch(`${window.location.origin}/api/notifications/unread`)
                 .then(response => response.json())
                 .then(data => {
                     const notificationList = document.getElementById('notificationList');
@@ -627,7 +627,7 @@
         
         // View notification detail (works for both mobile and desktop)
         function viewNotificationDetail(notificationId) {
-            fetch(`/api/notifications/${notificationId}/read`, {
+            fetch(`${window.location.origin}/api/notifications/${notificationId}/read`, {
                 method: 'PUT',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -650,7 +650,7 @@
 
         // Mark notification as read (works for both mobile and desktop)
         function markNotificationAsRead(notificationId) {
-            fetch(`/api/notifications/${notificationId}/read`, {
+            fetch(`${window.location.origin}/api/notifications/${notificationId}/read`, {
                 method: 'PUT',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -675,7 +675,7 @@
         @if(auth()->user()->isCustomer())
         // Load cart count for customers (works for both mobile and desktop)
         function loadCartCount() {
-            fetch('{{ route('api.cart.count') }}')
+            fetch(`${window.location.origin}/api/cart/count`)
                 .then(response => response.json())
                 .then(data => {
                     const cartCounts = document.querySelectorAll('.cart-count');
@@ -977,7 +977,7 @@
 
         // Load notification count
         function loadNotificationCount() {
-            fetch('/api/notifications/count')
+            fetch(`${window.location.origin}/api/notifications/count`)
                 .then(response => response.json())
                 .then(data => {
                     const mobileCount = document.getElementById('notification-count-mobile');
@@ -999,7 +999,7 @@
 
         // Load desktop notifications
         function loadDesktopNotifications() {
-            fetch('/api/notifications/unread')
+            fetch(`${window.location.origin}/api/notifications/unread`)
                 .then(response => response.json())
                 .then(data => {
                     const notificationList = document.getElementById('notificationList');
@@ -1030,7 +1030,7 @@
 
         // Load cart count (for customers only)
         function loadCartCount() {
-            fetch('/api/cart/count')
+            fetch(`${window.location.origin}/api/cart/count`)
                 .then(response => response.json())
                 .then(data => {
                     const mobileCount = document.getElementById('cart-count-mobile');

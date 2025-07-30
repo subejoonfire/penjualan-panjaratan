@@ -568,7 +568,7 @@
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         formData.append('quantity', 1);
 
-        fetch(`/customer/cart/add/${productId}`, {
+        fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
             method: 'POST',
             body: formData,
             headers: {
@@ -621,7 +621,7 @@
     @if(auth()->check() && auth()->user()->isCustomer())
     function loadCartCount() {
         console.log('Loading cart count...');
-        fetch('{{ route('api.cart.count') }}')
+        fetch(`${window.location.origin}/api/cart/count`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Cart count response not ok');

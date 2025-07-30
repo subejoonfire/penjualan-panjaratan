@@ -296,7 +296,7 @@ function decreaseQuantity(button) {
 
 // Refresh cart count after any cart action
 function refreshCartCount() {
-    fetch('{{ route('api.cart.count') }}')
+    fetch(`${window.location.origin}/api/cart/count`)
         .then(response => response.json())
         .then(data => {
             const cartCount = document.querySelector('.cart-count');
