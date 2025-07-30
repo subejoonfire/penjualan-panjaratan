@@ -476,7 +476,7 @@ class CartController extends Controller
         $date = now()->format('Ymd');
         $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
         $order = \App\Models\Order::create([
-            'idcart' => null,
+            'idcart' => null, // pastikan null, bukan string kosong
             'order_number' => $orderNumber,
             'grandtotal' => $total,
             'shipping_address' => $user->defaultAddress()?->address ?? '',
