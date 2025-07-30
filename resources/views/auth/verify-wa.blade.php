@@ -68,11 +68,11 @@
                     <div>
                         <label for="token" class="block text-sm font-medium text-gray-700">Kode Verifikasi</label>
                         <div class="mt-1 relative">
-                            <input id="token" name="token" type="text" maxlength="6" required autofocus
-                                   class="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm text-center text-lg font-mono tracking-widest" 
-                                   placeholder="000000"
+                            <input id="token" name="token" type="text" maxlength="10" required autofocus
+                                   class="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-center text-lg font-mono tracking-widest" 
+                                   placeholder="ABC123"
                                    autocomplete="off">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                 <i class="fab fa-whatsapp text-gray-400"></i>
                             </div>
                         </div>
@@ -122,17 +122,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         const tokenInput = document.getElementById('token');
         
-        // Auto format input untuk kode verifikasi
-        tokenInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-            if (value.length > 6) {
-                value = value.substring(0, 6);
-            }
-            e.target.value = value;
-        });
-        
         // Auto focus
         tokenInput.focus();
+        
+        // Convert to uppercase for better readability
+        tokenInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
     });
     </script>
 </body>

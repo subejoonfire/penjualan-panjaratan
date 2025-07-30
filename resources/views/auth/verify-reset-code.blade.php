@@ -45,11 +45,11 @@
                 <div>
                     <label for="token" class="block text-sm font-medium text-gray-700">Kode Verifikasi</label>
                     <div class="mt-1 relative">
-                        <input id="token" name="token" type="text" required maxlength="6"
-                               class="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm text-center text-lg font-mono tracking-widest @error('token') border-red-500 @enderror" 
-                               placeholder="000000"
+                        <input id="token" name="token" type="text" required maxlength="10"
+                               class="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-center text-lg font-mono tracking-widest @error('token') border-red-500 @enderror" 
+                               placeholder="ABC123"
                                autocomplete="off">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                             <i class="fas fa-key text-gray-400"></i>
                         </div>
                     </div>
@@ -135,24 +135,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         const tokenInput = document.getElementById('token');
         
-        // Auto format input untuk kode verifikasi
-        tokenInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-            if (value.length > 6) {
-                value = value.substring(0, 6);
-            }
-            e.target.value = value;
-        });
-        
         // Auto focus
         tokenInput.focus();
         
-        // Auto submit when 6 digits entered
+        // Convert to uppercase for better readability
         tokenInput.addEventListener('input', function(e) {
-            if (e.target.value.length === 6) {
-                // Optional: Auto submit form when 6 digits are entered
-                // e.target.form.submit();
-            }
+            e.target.value = e.target.value.toUpperCase();
         });
     });
     </script>
