@@ -123,30 +123,47 @@ class DashboardController extends Controller
      */
     public function cancelOrder(Order $order)
     {
-        $user = Auth::user();
-        
-        // Check if order belongs to user
-        if ($order->cart->iduser !== $user->id) {
-            abort(403, 'Unauthorized');
+        try {
+            $user = Auth::user();
+            
+            // Check if order belongs to user
+            if ($order->cart->iduser !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+            
+            // Check if order can be cancelled
+            if (!in_array($order->status, ['pending', 'processing'])) {
+                if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Order cannot be cancelled']);
+                }
+                return back()->with('error', 'Order cannot be cancelled');
+            }
+            
+            $order->update(['status' => 'cancelled']);
+            
+            // Create notification
+            Notification::create([
+                'iduser' => $user->id,
+                'title' => 'Order Cancelled',
+                'notification' => 'Your order #' . $order->order_number . ' has been cancelled',
+                'type' => 'order',
+                'readstatus' => false
+            ]);
+            
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pesanan berhasil dibatalkan'
+                ]);
+            }
+            return back()->with('success', 'Pesanan berhasil dibatalkan');
+            
+        } catch (\Exception $e) {
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        
-        // Check if order can be cancelled
-        if (!in_array($order->status, ['pending', 'processing'])) {
-            return back()->with('error', 'Order cannot be cancelled');
-        }
-        
-        $order->update(['status' => 'cancelled']);
-        
-        // Create notification
-        Notification::create([
-            'iduser' => $user->id,
-            'title' => 'Order Cancelled',
-            'notification' => 'Your order #' . $order->order_number . ' has been cancelled',
-            'type' => 'order',
-            'readstatus' => false
-        ]);
-        
-        return back()->with('success', 'Pesanan berhasil dibatalkan');
     }
     
     /**
@@ -234,19 +251,27 @@ class DashboardController extends Controller
      */
     public function markAsRead(Notification $notification)
     {
-        $user = Auth::user();
-        
-        if ($notification->iduser !== $user->id) {
-            abort(403, 'Unauthorized');
+        try {
+            $user = Auth::user();
+            
+            if ($notification->iduser !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+            
+            $notification->update(['readstatus' => true]);
+            
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Notifikasi ditandai sebagai telah dibaca']);
+            }
+            
+            return back()->with('success', 'Notifikasi ditandai sebagai telah dibaca');
+            
+        } catch (\Exception $e) {
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        
-        $notification->update(['readstatus' => true]);
-        
-        if (request()->expectsJson()) {
-            return response()->json(['success' => true]);
-        }
-        
-        return back()->with('success', 'Notifikasi ditandai sebagai telah dibaca');
     }
     
     /**
@@ -254,14 +279,22 @@ class DashboardController extends Controller
      */
     public function markAllAsRead()
     {
-        $user = Auth::user();
-        
-        $user->unreadNotifications()->update(['readstatus' => true]);
-        
-        if (request()->expectsJson()) {
-            return response()->json(['success' => true]);
+        try {
+            $user = Auth::user();
+            
+            $user->unreadNotifications()->update(['readstatus' => true]);
+            
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Semua notifikasi ditandai sebagai telah dibaca']);
+            }
+            
+            return back()->with('success', 'Semua notifikasi ditandai sebagai telah dibaca');
+            
+        } catch (\Exception $e) {
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        
-        return back()->with('success', 'Semua notifikasi ditandai sebagai telah dibaca');
     }
 }
