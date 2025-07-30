@@ -23,14 +23,9 @@
                             </h3>
                             <div>
                                 <button type="button" class="text-xs sm:text-sm text-red-600 hover:text-red-500"
-                                    onclick="confirmAction('Apakah Anda yakin ingin mengosongkan keranjang?', function() { document.getElementById('clearCartForm').submit(); })">
+                                    onclick="clearCart()">
                                     Kosongkan Keranjang
                                 </button>
-                                <form id="clearCartForm" action="{{ route('customer.cart.clear') }}" method="POST"
-                                    class="hidden">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -79,23 +74,21 @@
 
                                         <!-- Quantity & Actions -->
                                         <div class="mt-2 flex items-center justify-between">
-                                            <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
-                                                class="flex items-center space-x-1">
-                                                @csrf
-                                                @method('PUT')
+                                            <div class="flex items-center space-x-1">
                                                 <button type="button" onclick="decreaseQuantity(this)"
                                                     class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                                     <i class="fas fa-minus text-xs"></i>
                                                 </button>
-                                                <input type="number" name="quantity" value="{{ $detail->quantity }}"
+                                                <input type="number" value="{{ $detail->quantity }}"
                                                     min="1" max="{{ $detail->product->productstock }}"
                                                     class="w-8 text-center border-gray-300 rounded text-xs"
-                                                    onchange="this.form.submit()">
+                                                    data-detail-id="{{ $detail->id }}"
+                                                    onchange="updateQuantity(this, {{ $detail->id }})">
                                                 <button type="button" onclick="increaseQuantity(this)"
                                                     class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                                     <i class="fas fa-plus text-xs"></i>
                                                 </button>
-                                            </form>
+                                            </div>
 
                                             <div class="flex items-center space-x-2">
                                                 <span class="text-xs font-medium text-gray-900">
@@ -177,17 +170,11 @@
                                 <!-- Remove Button -->
                                 <div class="flex justify-end">
                                     <button type="button" class="text-red-600 hover:text-red-700 p-2"
-                                        onclick="confirmAction('Hapus item ini dari keranjang?', function() { document.getElementById('removeItemForm{{ $detail->id }}').submit(); })">
+                                        onclick="removeItem({{ $detail->id }})">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
-
-                            <form id="removeItemForm{{ $detail->id }}"
-                                action="{{ route('customer.cart.remove', $detail) }}" method="POST" class="hidden">
-                                @csrf
-                                @method('DELETE')
-                            </form>
                         </div>
                         @endforeach
                     </div>
@@ -273,49 +260,154 @@
 </div>
 
 <script>
+    // Show alert function
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300 ${
+            type === 'error' ? 'bg-red-600 text-white' : 
+            type === 'success' ? 'bg-green-600 text-white' : 
+            'bg-blue-600 text-white'
+        }`;
+        alertDiv.textContent = message;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Show alert
+        setTimeout(() => {
+            alertDiv.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Hide and remove alert
+        setTimeout(() => {
+            alertDiv.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 300);
+        }, 3000);
+    }
+
     function increaseQuantity(button) {
-    const input = button.previousElementSibling;
-    const max = parseInt(input.getAttribute('max'));
-    const current = parseInt(input.value);
-    
-    if (current < max) {
-        input.value = current + 1;
-        input.form.submit();
+        const input = button.previousElementSibling;
+        const max = parseInt(input.getAttribute('max'));
+        const current = parseInt(input.value);
+        
+        if (current < max) {
+            input.value = current + 1;
+            updateQuantity(input, input.getAttribute('data-detail-id'));
+        }
     }
-}
 
-function decreaseQuantity(button) {
-    const input = button.nextElementSibling;
-    const current = parseInt(input.value);
-    
-    if (current > 1) {
-        input.value = current - 1;
-        input.form.submit();
+    function decreaseQuantity(button) {
+        const input = button.nextElementSibling;
+        const current = parseInt(input.value);
+        
+        if (current > 1) {
+            input.value = current - 1;
+            updateQuantity(input, input.getAttribute('data-detail-id'));
+        }
     }
-}
 
-// Refresh cart count after any cart action
-function refreshCartCount() {
-    fetch(`${window.location.origin}/api/cart/count`)
+    function updateQuantity(input, detailId) {
+        const quantity = input.value;
+        
+        fetch(`${window.location.origin}/customer/cart/update/${detailId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
         .then(response => response.json())
         .then(data => {
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                cartCount.textContent = data.count;
-                cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+            if (data.success) {
+                showAlert(data.message || 'Kuantitas berhasil diperbarui', 'success');
+                refreshCartCount();
+                // Reload page to update totals
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showAlert(data.message || 'Gagal memperbarui kuantitas', 'error');
             }
         })
-        .catch(error => console.error('Error refreshing cart count:', error));
-}
-
-// Refresh cart count after form submissions
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form[action*="cart"]');
-    forms.forEach(form => {
-        form.addEventListener('submit', function() {
-            setTimeout(refreshCartCount, 1000); // Refresh after 1 second
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Terjadi kesalahan saat memperbarui kuantitas', 'error');
         });
-    });
-});
+    }
+
+    function removeItem(detailId) {
+        if (confirm('Hapus item ini dari keranjang?')) {
+            fetch(`${window.location.origin}/customer/cart/remove/${detailId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message || 'Item berhasil dihapus', 'success');
+                    refreshCartCount();
+                    // Reload page to update cart
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAlert(data.message || 'Gagal menghapus item', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Terjadi kesalahan saat menghapus item', 'error');
+            });
+        }
+    }
+
+    function clearCart() {
+        if (confirm('Apakah Anda yakin ingin mengosongkan keranjang?')) {
+            fetch(`${window.location.origin}/customer/cart/clear`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message || 'Keranjang berhasil dikosongkan', 'success');
+                    refreshCartCount();
+                    // Reload page to show empty cart
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAlert(data.message || 'Gagal mengosongkan keranjang', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Terjadi kesalahan saat mengosongkan keranjang', 'error');
+            });
+        }
+    }
+
+    // Refresh cart count after any cart action
+    function refreshCartCount() {
+        fetch(`${window.location.origin}/api/cart/count`)
+            .then(response => response.json())
+            .then(data => {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.count;
+                    cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                }
+            })
+            .catch(error => console.error('Error refreshing cart count:', error));
+    }
 </script>
 @endsection

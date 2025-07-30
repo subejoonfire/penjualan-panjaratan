@@ -134,25 +134,42 @@ class CartController extends Controller
      */
     public function update(Request $request, CartDetail $cartDetail)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        // Check if cart detail belongs to user
-        if ($cartDetail->cart->iduser !== $user->id) {
-            abort(403, 'Unauthorized');
+            // Check if cart detail belongs to user
+            if ($cartDetail->cart->iduser !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+
+            $request->validate([
+                'quantity' => 'required|integer|min:1|max:' . $cartDetail->product->productstock
+            ]);
+
+            // Check stock
+            if ($cartDetail->product->productstock < $request->quantity) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
+                }
+                return back()->with('error', 'Stok tidak mencukupi');
+            }
+
+            $cartDetail->update(['quantity' => $request->quantity]);
+
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Kuantitas berhasil diperbarui'
+                ]);
+            }
+            return back()->with('success', 'Keranjang berhasil diperbarui');
+            
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $cartDetail->product->productstock
-        ]);
-
-        // Check stock
-        if ($cartDetail->product->productstock < $request->quantity) {
-            return back()->with('error', 'Stok tidak mencukupi');
-        }
-
-        $cartDetail->update(['quantity' => $request->quantity]);
-
-        return back()->with('success', 'Keranjang berhasil diperbarui');
     }
 
     /**
@@ -160,16 +177,30 @@ class CartController extends Controller
      */
     public function remove(CartDetail $cartDetail)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        // Check if cart detail belongs to user
-        if ($cartDetail->cart->iduser !== $user->id) {
-            abort(403, 'Unauthorized');
+            // Check if cart detail belongs to user
+            if ($cartDetail->cart->iduser !== $user->id) {
+                abort(403, 'Unauthorized');
+            }
+
+            $cartDetail->delete();
+
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Item berhasil dihapus dari keranjang'
+                ]);
+            }
+            return back()->with('success', 'Item berhasil dihapus dari keranjang');
+            
+        } catch (\Exception $e) {
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $cartDetail->delete();
-
-        return back()->with('success', 'Item berhasil dihapus dari keranjang');
     }
 
     /**
@@ -177,14 +208,28 @@ class CartController extends Controller
      */
     public function clear()
     {
-        $user = Auth::user();
-        $cart = $user->activeCart;
+        try {
+            $user = Auth::user();
+            $cart = $user->activeCart;
 
-        if ($cart) {
-            $cart->cartDetails()->delete();
+            if ($cart) {
+                $cart->cartDetails()->delete();
+            }
+
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Keranjang berhasil dikosongkan'
+                ]);
+            }
+            return back()->with('success', 'Keranjang berhasil dikosongkan');
+            
+        } catch (\Exception $e) {
+            if (request()->ajax() || request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        return back()->with('success', 'Keranjang berhasil dikosongkan');
     }
 
     /**

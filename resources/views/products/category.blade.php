@@ -171,31 +171,7 @@
 </div>
 
 <script>
-    // Show alert function
-    function showAlert(message, type = 'info') {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300 ${
-            type === 'error' ? 'bg-red-600 text-white' : 
-            type === 'success' ? 'bg-green-600 text-white' : 
-            'bg-blue-600 text-white'
-        }`;
-        alertDiv.textContent = message;
-        
-        document.body.appendChild(alertDiv);
-        
-        // Show alert
-        setTimeout(() => {
-            alertDiv.classList.remove('translate-x-full');
-        }, 100);
-        
-        // Hide and remove alert
-        setTimeout(() => {
-            alertDiv.classList.add('translate-x-full');
-            setTimeout(() => {
-                document.body.removeChild(alertDiv);
-            }, 300);
-        }, 3000);
-    }
+
 
     // Add to cart function
     function addToCart(productId, event) {
@@ -240,7 +216,16 @@
                 }
                 
                 // Show success message
-                showAlert(data.message || 'Berhasil menambahkan ke keranjang', 'success');
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: data.message || 'Berhasil menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+                
+                // Refresh cart count
+                refreshCartCount();
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -252,7 +237,13 @@
                     }
                 }, 2000);
             } else {
-                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
                 if (button) {
                     button.innerHTML = originalText;
                     button.disabled = false;
@@ -261,12 +252,32 @@
         })
         .catch(error => {
             console.error('Cart error:', error);
-            showAlert('Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message, 'error');
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message,
+                confirmText: 'OK',
+                showCancel: false
+            });
             if (button) {
                 button.innerHTML = originalText;
                 button.disabled = false;
             }
         });
+    }
+
+    // Refresh cart count function
+    function refreshCartCount() {
+        fetch(`${window.location.origin}/api/cart/count`)
+            .then(response => response.json())
+            .then(data => {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.count;
+                    cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                }
+            })
+            .catch(error => console.error('Error refreshing cart count:', error));
     }
 </script>
 @endsection
