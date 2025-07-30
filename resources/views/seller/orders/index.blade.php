@@ -419,9 +419,6 @@
                                         $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                         $currentIdx = array_search($order->status, $statusOrder);
                                         if ($currentIdx === false) { $currentIdx = -1; }
-                                        $now = now();
-                                        $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
-                                        $diffHours = $statusUpdatedAt->diffInHours($now);
                                     @endphp
                                     @foreach($statusList as $status => $info)
                                         @php
@@ -435,16 +432,13 @@
                                             elseif ($targetIdx < $currentIdx) {
                                                 $disabled = true;
                                             }
-                                            elseif ($diffHours >= 3 && $targetIdx == $currentIdx) {
+                                            elseif ($targetIdx == $currentIdx) {
                                                 $disabled = true;
                                             }
                                         @endphp
                                         @php
                                             $tooltipText = $info['tooltip'];
-                                            if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
-                                                $remainingMinutes = 180 - ($diffHours * 60);
-                                                $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)";
-                                            }
+
                                         @endphp
                                         <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                             class="status-button {{ $info['class'] }} relative"
@@ -585,9 +579,6 @@
                                                         $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                                         $currentIdx = array_search($order->status, $statusOrder);
                                                         if ($currentIdx === false) { $currentIdx = -1; }
-                                                        $now = now();
-                                                        $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
-                                                        $diffHours = $statusUpdatedAt->diffInHours($now);
                                                     @endphp
                                                     @foreach($statusList as $status => $info)
                                                         @php
@@ -601,16 +592,13 @@
                                                             elseif ($targetIdx < $currentIdx) {
                                                                 $disabled = true;
                                                             }
-                                                            elseif ($diffHours >= 3 && $targetIdx == $currentIdx) {
+                                                            elseif ($targetIdx == $currentIdx) {
                                                                 $disabled = true;
                                                             }
                                                         @endphp
                                                         @php
                                                             $tooltipText = $info['tooltip'];
-                                                            if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
-                                                                $remainingMinutes = 180 - ($diffHours * 60);
-                                                                $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)";
-                                                            }
+
                                                         @endphp
                                                         <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                                             class="status-button {{ $info['class'] }} relative"
@@ -812,8 +800,6 @@
         }
     });
 
-    setTimeout(function() {
-        location.reload();
-    }, 300000);
+
 </script>
 @endsection
