@@ -154,8 +154,7 @@
                         </button>
 
                         @if($product->is_active && $product->productstock > 0)
-                        <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
-                            @csrf
+                        <div class="space-y-4">
                             <!-- Quantity Selector -->
                             <div>
                                 <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
@@ -166,7 +165,7 @@
                                         class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
                                         <i class="fas fa-minus text-sm"></i>
                                     </button>
-                                    <input type="number" name="quantity" id="quantity" min="1"
+                                    <input type="number" id="quantity" min="1"
                                         max="{{ $product->productstock }}" value="1"
                                         class="w-20 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <button type="button" onclick="increaseQuantity()"
@@ -178,12 +177,12 @@
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button type="submit"
+                            <button type="button" onclick="addToCart({{ $product->id }}, event)"
                                 class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
                                 <i class="fas fa-shopping-cart mr-2"></i>
                                 Tambah ke Keranjang
                             </button>
-                        </form>
+                        </div>
                         @else
                         <!-- Out of Stock Message -->
                         <div class="bg-gray-100 border border-gray-300 rounded-md p-4 text-center">
@@ -573,6 +572,72 @@
                 document.body.removeChild(toast);
             }, 300);
         }, 3000);
+    }
+
+    // Add to cart function
+    function addToCart(productId, event) {
+        if (event) event.preventDefault();
+        
+        // Get quantity
+        const quantity = document.getElementById('quantity').value;
+        
+        // Find the button that was clicked
+        const button = event ? event.target.closest('button') : null;
+        const originalText = button ? button.innerHTML : '';
+        
+        // Disable button and show loading animation
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+        }
+        
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        formData.append('quantity', quantity);
+        
+        fetch(`/customer/cart/add/${productId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Cart response:', data);
+            if (data.success) {
+                // Show success animation
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i>Berhasil!';
+                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    button.classList.add('bg-green-600');
+                }
+                
+                // Show success message
+                showToast(data.message || 'Berhasil menambahkan ke keranjang');
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    if (button) {
+                        button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Tambah ke Keranjang';
+                        button.classList.remove('bg-green-600');
+                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        button.disabled = false;
+                    }
+                }, 2000);
+            } else {
+                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                if (button) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
     }
 </script>
 @endsection
