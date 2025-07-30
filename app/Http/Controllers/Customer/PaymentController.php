@@ -33,9 +33,10 @@ class PaymentController extends Controller
 
         // Duitku API
         $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
-        $merchantCode = 'DS15538'; // Ganti sesuai merchantCode Duitku kamu
+        $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
         $paymentAmount = (int) $transaction->amount;
-        $paymentMethod = null; // null = semua channel
+        // $paymentMethod = null; // null = semua channel
+        $paymentMethod = 'VC'; // null = semua channel
         $merchantOrderId = $transaction->transaction_number;
         $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
         $email = $user->email;
@@ -57,9 +58,10 @@ class PaymentController extends Controller
             'signature' => $signature,
             'expiryPeriod' => 60 // menit
         ];
-
+        
         $response = Http::withHeaders(['Content-Type' => 'application/json'])
-            ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
+        ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
+        // dd($response);
         if ($response->successful() && isset($response['paymentUrl'])) {
             return redirect($response['paymentUrl']);
         }
