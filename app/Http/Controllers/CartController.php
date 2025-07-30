@@ -367,7 +367,7 @@ class CartController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $request->payment_method ?? 'cod',
+                'payment_method' => $request->payment_method ?? 'VC', // kode Duitku
                 'transactionstatus' => 'pending'
             ]);
 

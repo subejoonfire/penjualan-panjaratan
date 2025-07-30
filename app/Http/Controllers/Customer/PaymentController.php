@@ -36,7 +36,7 @@ class PaymentController extends Controller
         $merchantCode = 'DS15538'; // Ganti sesuai merchantCode Duitku kamu
         $paymentAmount = (int) $transaction->amount;
         // Duitku butuh paymentMethod, default ke 'VC' (Virtual Account) jika null
-        $paymentMethod = $transaction->payment_method ?? 'VC';
+        $paymentMethod = $transaction->payment_method ?: 'VC';
         $merchantOrderId = $transaction->transaction_number;
         $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
         $email = $user->email;
