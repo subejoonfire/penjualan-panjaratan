@@ -64,7 +64,7 @@ class CartController extends Controller
 
             // Check if product is active
             if (!$product->is_active) {
-                if ($request->ajax() || $request->wantsJson()) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                     return response()->json(['success' => false, 'message' => 'Produk tidak tersedia']);
                 }
                 return back()->with('error', 'Produk tidak tersedia');
@@ -72,7 +72,7 @@ class CartController extends Controller
 
             // Check stock
             if ($product->productstock < $quantity) {
-                if ($request->ajax() || $request->wantsJson()) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                     return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
                 }
                 return back()->with('error', 'Stok tidak mencukupi');
@@ -96,7 +96,7 @@ class CartController extends Controller
                 $newQuantity = $existingDetail->quantity + $quantity;
 
                 if ($newQuantity > $product->productstock) {
-                    if ($request->ajax() || $request->wantsJson()) {
+                    if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                         return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
                     }
                     return back()->with('error', 'Stok tidak mencukupi');
@@ -112,7 +112,7 @@ class CartController extends Controller
                 ]);
             }
 
-            if ($request->ajax() || $request->wantsJson()) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                 return response()->json([
                     'success' => true, 
                     'message' => 'Produk berhasil ditambahkan ke keranjang',
@@ -122,7 +122,7 @@ class CartController extends Controller
             return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
             
         } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                 return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
             }
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

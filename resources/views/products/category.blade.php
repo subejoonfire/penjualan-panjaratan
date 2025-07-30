@@ -212,14 +212,23 @@
         }
         
         const formData = new FormData();
-        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         formData.append('quantity', 1);
         
-        fetch(`/customer/cart/add/${productId}`, {
+        fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
             method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log('Cart response:', data);
             if (data.success) {
@@ -252,7 +261,7 @@
         })
         .catch(error => {
             console.error('Cart error:', error);
-            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            showAlert('Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message, 'error');
             if (button) {
                 button.innerHTML = originalText;
                 button.disabled = false;
