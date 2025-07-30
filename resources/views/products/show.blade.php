@@ -574,6 +574,32 @@
         }, 3000);
     }
 
+    // Show alert function
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300 ${
+            type === 'error' ? 'bg-red-600 text-white' : 
+            type === 'success' ? 'bg-green-600 text-white' : 
+            'bg-blue-600 text-white'
+        }`;
+        alertDiv.textContent = message;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Show alert
+        setTimeout(() => {
+            alertDiv.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Hide and remove alert
+        setTimeout(() => {
+            alertDiv.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 300);
+        }, 3000);
+    }
+
     // Add to cart function
     function addToCart(productId, event) {
         if (event) event.preventDefault();

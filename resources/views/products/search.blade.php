@@ -239,12 +239,9 @@
                                 </a>
                                 @auth
                                 @if(auth()->user()->isCustomer() && $product->productstock > 0)
-                                <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-shrink-0">
-                                    @csrf
-                                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-                                        <i class="fas fa-cart-plus"></i>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="addToCart({{ $product->id }}, event)" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
                                 @endif
                                 @endauth
                             </div>
@@ -275,4 +272,95 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Show alert function
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300 ${
+            type === 'error' ? 'bg-red-600 text-white' : 
+            type === 'success' ? 'bg-green-600 text-white' : 
+            'bg-blue-600 text-white'
+        }`;
+        alertDiv.textContent = message;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Show alert
+        setTimeout(() => {
+            alertDiv.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Hide and remove alert
+        setTimeout(() => {
+            alertDiv.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 300);
+        }, 3000);
+    }
+
+    // Add to cart function
+    function addToCart(productId, event) {
+        if (event) event.preventDefault();
+        
+        // Find the button that was clicked
+        const button = event ? event.target.closest('button') : null;
+        const originalText = button ? button.innerHTML : '';
+        
+        // Disable button and show loading animation
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+        
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        formData.append('quantity', 1);
+        
+        fetch(`/customer/cart/add/${productId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Cart response:', data);
+            if (data.success) {
+                // Show success animation
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    button.classList.add('bg-blue-600');
+                }
+                
+                // Show success message
+                showAlert(data.message || 'Berhasil menambahkan ke keranjang', 'success');
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    if (button) {
+                        button.innerHTML = '<i class="fas fa-cart-plus"></i>';
+                        button.classList.remove('bg-blue-600');
+                        button.classList.add('bg-green-600', 'hover:bg-green-700');
+                        button.disabled = false;
+                    }
+                }, 2000);
+            } else {
+                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                if (button) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    }
+</script>
 @endsection
