@@ -384,7 +384,7 @@ class DashboardController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
         ]);
 
         // Cek apakah masih bisa mengupdate status (dalam 6 jam sejak update terakhir)
@@ -401,8 +401,8 @@ class DashboardController extends Controller
 
         // Validasi transisi status yang diperbolehkan
         $allowedTransitions = [
-            'pending' => ['confirmed', 'cancelled'],
-            'confirmed' => ['shipped', 'cancelled'], 
+            'pending' => ['processing', 'cancelled'],
+            'processing' => ['shipped', 'cancelled'], 
             'shipped' => ['delivered'],
             'delivered' => [], // Tidak bisa diubah lagi
             'cancelled' => [] // Tidak bisa diubah lagi

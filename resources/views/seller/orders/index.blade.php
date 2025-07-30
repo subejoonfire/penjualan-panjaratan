@@ -28,6 +28,93 @@
         transform: translateY(-3px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     }
+
+    .status-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin: 0 2px;
+    }
+
+    .status-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-button.confirm {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .status-button.confirm:hover {
+        background: linear-gradient(135deg, #059669, #047857);
+    }
+
+    .status-button.ship {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+    }
+
+    .status-button.ship:hover {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .status-button.complete {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        color: white;
+    }
+
+    .status-button.complete:hover {
+        background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    }
+
+    .status-button.cancel {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .status-button.cancel:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    .status-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .status-button:disabled:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .status-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .status-button:hover .status-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
 </style>
 @endpush
 
@@ -267,13 +354,41 @@
                                     <i class="fas fa-eye mr-2"></i>
                                     Detail
                                 </button>
-                                @if($order->canBeUpdated())
-                                <button onclick="updateOrderStatus('{{ $order->id }}')"
-                                    class="w-full inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                    <i class="fas fa-edit mr-2"></i>
-                                    Update Status
-                                </button>
-                                @endif
+                                
+                                <!-- Status Action Buttons -->
+                                <div class="flex justify-center space-x-2">
+                                    @if($order->status === 'pending' && $order->canBeUpdated())
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'processing')" 
+                                                class="status-button confirm relative" title="Konfirmasi Pesanan">
+                                            <i class="fas fa-check"></i>
+                                            <span class="status-tooltip">Konfirmasi</span>
+                                        </button>
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')" 
+                                                class="status-button cancel relative" title="Batalkan Pesanan">
+                                            <i class="fas fa-times"></i>
+                                            <span class="status-tooltip">Batalkan</span>
+                                        </button>
+                                    @elseif($order->status === 'processing' && $order->canBeUpdated())
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'shipped')" 
+                                                class="status-button ship relative" title="Kirim Pesanan">
+                                            <i class="fas fa-truck"></i>
+                                            <span class="status-tooltip">Kirim</span>
+                                        </button>
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')" 
+                                                class="status-button cancel relative" title="Batalkan Pesanan">
+                                            <i class="fas fa-times"></i>
+                                            <span class="status-tooltip">Batalkan</span>
+                                        </button>
+                                    @elseif($order->status === 'shipped' && $order->canBeUpdated())
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'delivered')" 
+                                                class="status-button complete relative" title="Selesai">
+                                            <i class="fas fa-check-double"></i>
+                                            <span class="status-tooltip">Selesai</span>
+                                        </button>
+                                    @else
+                                        <span class="text-xs text-gray-500">Tidak dapat diupdate</span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
@@ -372,25 +487,41 @@
                                                     <i class="fas fa-eye mr-1"></i>
                                                     Detail
                                                 </button>
-                                                @if($order->canBeUpdated())
-                                                <button onclick="updateOrderStatus('{{ $order->id }}')"
-                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                    <i class="fas fa-edit mr-1"></i>
-                                                    Update Status
-                                                </button>
-                                                @if($order->remaining_update_time > 0)
-                                                    <span class="text-xs text-gray-500 ml-2">
-                                                        Bisa diupdate {{ floor($order->remaining_update_time / 60) }}j {{ $order->remaining_update_time % 60 }}m lagi
-                                                    </span>
-                                                @endif
-                                                @else
-                                                    @if(in_array($order->status, ['confirmed', 'shipped']) && !$order->canBeUpdated())
-                                                    <span class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-gray-100">
-                                                        <i class="fas fa-clock mr-1"></i>
-                                                        Tidak dapat diupdate (lebih dari 6 jam)
-                                                    </span>
+                                                
+                                                <!-- Status Action Buttons -->
+                                                <div class="flex items-center space-x-2">
+                                                                                        @if($order->status === 'pending' && $order->canBeUpdated())
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'processing')" 
+                                                class="status-button confirm relative" title="Konfirmasi Pesanan">
+                                            <i class="fas fa-check"></i>
+                                            <span class="status-tooltip">Konfirmasi</span>
+                                        </button>
+                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')" 
+                                                class="status-button cancel relative" title="Batalkan Pesanan">
+                                            <i class="fas fa-times"></i>
+                                            <span class="status-tooltip">Batalkan</span>
+                                        </button>
+                                    @elseif($order->status === 'processing' && $order->canBeUpdated())
+                                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'shipped')" 
+                                                                class="status-button ship relative" title="Kirim Pesanan">
+                                                            <i class="fas fa-truck"></i>
+                                                            <span class="status-tooltip">Kirim</span>
+                                                        </button>
+                                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')" 
+                                                                class="status-button cancel relative" title="Batalkan Pesanan">
+                                                            <i class="fas fa-times"></i>
+                                                            <span class="status-tooltip">Batalkan</span>
+                                                        </button>
+                                                    @elseif($order->status === 'shipped' && $order->canBeUpdated())
+                                                        <button onclick="updateOrderStatus('{{ $order->id }}', 'delivered')" 
+                                                                class="status-button complete relative" title="Selesai">
+                                                            <i class="fas fa-check-double"></i>
+                                                            <span class="status-tooltip">Selesai</span>
+                                                        </button>
+                                                    @else
+                                                        <span class="text-sm text-gray-500">Tidak dapat diupdate</span>
                                                     @endif
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -447,43 +578,6 @@
     </div>
 </div>
 
-<!-- Update Status Modal -->
-<div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
-    <div class="relative mx-auto border w-full max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-hidden">
-        <div class="flex flex-col h-full max-h-[90vh]">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-                <h3 class="text-lg font-medium text-gray-900">Update Status Pesanan</h3>
-                <button onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600 p-1">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4">
-                <form id="statusForm">
-                    <div class="mb-4">
-                        <label for="newStatus" class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
-                        <select id="newStatus"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="processing">Diproses</option>
-                            <option value="shipped">Dikirim</option>
-                            <option value="delivered">Selesai</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
-                        <button type="button" onclick="closeStatusModal()"
-                            class="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 order-2 sm:order-1">
-                            Batal
-                        </button>
-                        <button type="submit"
-                            class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 order-1 sm:order-2">
-                            Update Status
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     let currentOrderId = null;
 
@@ -523,65 +617,9 @@
             });
     }
 
-    function updateOrderStatus(orderId) {
-        currentOrderId = orderId;
-        
-        // Cari order untuk mendapatkan status saat ini
-        const orderRow = document.querySelector(`[data-order-id="${orderId}"]`);
-        const currentStatus = orderRow ? orderRow.dataset.orderStatus : '';
-        
-        // Atur opsi dropdown berdasarkan status saat ini
-        const statusSelect = document.getElementById('newStatus');
-        statusSelect.innerHTML = '';
-        
-        const statusTransitions = {
-            'pending': [
-                { value: 'confirmed', text: 'Konfirmasi' },
-                { value: 'cancelled', text: 'Batalkan' }
-            ],
-            'confirmed': [
-                { value: 'shipped', text: 'Kirim' },
-                { value: 'cancelled', text: 'Batalkan' }
-            ],
-            'shipped': [
-                { value: 'delivered', text: 'Selesai' }
-            ],
-            'delivered': [],
-            'cancelled': []
-        };
-        
-        const allowedStatuses = statusTransitions[currentStatus] || [];
-        
-        if (allowedStatuses.length === 0) {
-            statusSelect.innerHTML = '<option value="">Tidak ada status yang dapat diubah</option>';
-        } else {
-            allowedStatuses.forEach(status => {
-                const option = document.createElement('option');
-                option.value = status.value;
-                option.textContent = status.text;
-                statusSelect.appendChild(option);
-            });
-        }
-        
-        document.getElementById('statusModal').classList.remove('hidden');
-    }
-
-    function closeOrderModal() {
-        document.getElementById('orderModal').classList.add('hidden');
-        currentOrderId = null;
-    }
-
-    function closeStatusModal() {
-        document.getElementById('statusModal').classList.add('hidden');
-        currentOrderId = null;
-        document.getElementById('statusForm').reset();
-    }
-
-    document.getElementById('statusForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newStatus = document.getElementById('newStatus').value;
-        if (currentOrderId && newStatus) {
-            fetch(`/seller/orders/${currentOrderId}/status`, {
+    function updateOrderStatus(orderId, newStatus) {
+        if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
+            fetch(`/seller/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -599,7 +637,6 @@
                     data = null;
                 }
                 if (response.ok && data && data.success) {
-                    closeStatusModal();
                     showAlert('Status pesanan berhasil diupdate', 'success');
                     setTimeout(() => location.reload(), 1200);
                 } else if (response.status === 422 && data && data.errors) {
@@ -617,6 +654,11 @@
                 showAlert('Terjadi kesalahan saat mengupdate status', 'error');
             });
         }
-    });
+    }
+
+    function closeOrderModal() {
+        document.getElementById('orderModal').classList.add('hidden');
+        currentOrderId = null;
+    }
 </script>
 @endsection

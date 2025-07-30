@@ -32,7 +32,7 @@
                     <div class="text-right">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                             @if($order->status === 'pending') bg-yellow-100 text-yellow-800
-                            @elseif($order->status === 'confirmed') bg-blue-100 text-blue-800
+                            @elseif($order->status === 'processing') bg-blue-100 text-blue-800
                             @elseif($order->status === 'shipped') bg-purple-100 text-purple-800
                             @elseif($order->status === 'delivered') bg-green-100 text-green-800
                             @elseif($order->status === 'cancelled') bg-red-100 text-red-800
@@ -113,7 +113,7 @@
                                 {{ $order->status === 'delivered' ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-500' }}">
                                 <i class="fas fa-home text-xs sm:text-sm"></i>
                             </div>
-                            <span class="mt-1 sm:mt-0 sm:ml-2 text-xs sm:text-sm font-medium text-gray-900 text-center">Diterima</span>
+                            <span class="mt-1 sm:mt-0 sm:ml-2 text-xs sm:text-sm font-medium text-gray-900 text-center">Selesai</span>
                         </div>
                     </div>
                 </div>

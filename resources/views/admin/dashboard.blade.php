@@ -262,7 +262,7 @@
         new Chart(orderCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Menunggu', 'Diproses', 'Dikirim', 'Diterima', 'Dibatalkan'],
+                labels: ['Menunggu', 'Diproses', 'Dikirim', 'Selesai', 'Dibatalkan'],
                 datasets: [{
                     data: [
                         orderData.pending || 0,

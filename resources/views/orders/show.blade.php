@@ -21,7 +21,7 @@
                     <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                         @switch($order->status)
                             @case('pending') bg-yellow-100 text-yellow-800 @break
-                            @case('confirmed') bg-blue-100 text-blue-800 @break
+                            @case('processing') bg-blue-100 text-blue-800 @break
                             @case('shipped') bg-purple-100 text-purple-800 @break
                             @case('delivered') bg-green-100 text-green-800 @break
                             @case('cancelled') bg-red-100 text-red-800 @break
@@ -30,9 +30,9 @@
                     ">
                         @switch($order->status)
                             @case('pending') Menunggu @break
-                            @case('confirmed') Dikonfirmasi @break
+                            @case('processing') Diproses @break
                             @case('shipped') Dikirim @break
-                            @case('delivered') Diterima @break
+                            @case('delivered') Selesai @break
                             @case('cancelled') Dibatalkan @break
                             @default {{ $order->status }}
                         @endswitch
@@ -152,7 +152,7 @@
                                     <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
                                     <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Diproses</option>
                                     <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Dikirim</option>
-                                    <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Diterima</option>
+                                    <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Selesai</option>
                                     <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
                                 </select>
                                 <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">

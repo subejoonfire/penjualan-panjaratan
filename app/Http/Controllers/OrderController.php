@@ -145,20 +145,29 @@ class OrderController extends Controller
             $shippingCost = 15000;
             $total = $subtotal + $shippingCost;
 
+            // Generate order number with date format
+            $date = now()->format('Ymd');
+            $orderCount = Order::whereDate('created_at', today())->count() + 1;
+            $orderNumber = 'ORD-' . $date . '-' . str_pad($orderCount, 6, '0', STR_PAD_LEFT);
+
             // Create order
             $order = Order::create([
                 'idcart' => $cart->id,
-                'order_number' => 'ORD-' . time() . '-' . $user->id,
+                'order_number' => $orderNumber,
                 'grandtotal' => $total,
                 'shipping_address' => $request->shipping_address,
                 'status' => 'pending',
                 'notes' => $request->notes
             ]);
 
+            // Generate transaction number with date format
+            $transactionCount = Transaction::whereDate('created_at', today())->count() + 1;
+            $transactionNumber = 'TRX-' . $date . '-' . str_pad($transactionCount, 6, '0', STR_PAD_LEFT);
+
             // Create transaction
             Transaction::create([
                 'idorder' => $order->id,
-                'transaction_number' => 'TRX-' . time() . '-' . $user->id,
+                'transaction_number' => $transactionNumber,
                 'amount' => $total,
                 'payment_method' => $request->payment_method,
                 'transactionstatus' => 'pending'
@@ -256,7 +265,7 @@ class OrderController extends Controller
     private function adminUpdate(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled',
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
             'notes' => 'nullable|string|max:500'
         ]);
 
@@ -295,7 +304,7 @@ class OrderController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
         ]);
 
         $order->update(['status' => $request->status]);
@@ -325,7 +334,7 @@ class OrderController extends Controller
         }
 
         // Check if order can be cancelled
-        if (!in_array($order->status, ['pending', 'confirmed'])) {
+        if (!in_array($order->status, ['pending', 'processing'])) {
             return back()->with('error', 'Pesanan tidak dapat dibatalkan');
         }
 
@@ -392,7 +401,7 @@ class OrderController extends Controller
         }
 
         // Check if order can be cancelled
-        if (!in_array($order->status, ['pending', 'confirmed'])) {
+        if (!in_array($order->status, ['pending', 'processing'])) {
             return back()->with('error', 'Pesanan tidak dapat dibatalkan');
         }
 
