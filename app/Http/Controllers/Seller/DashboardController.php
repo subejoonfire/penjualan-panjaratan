@@ -447,33 +447,14 @@ class DashboardController extends Controller
                 'allowed_transitions' => $allowedTransitions[$currentStatus] ?? []
             ]);
 
-            if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Transisi status tidak diperbolehkan dari ' . $currentStatus . ' ke ' . $newStatus
-                ], 400);
-            }
+        if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transisi status tidak diperbolehkan dari ' . $currentStatus . ' ke ' . $newStatus
+            ], 400);
+        }
 
-            // Cek apakah order masih bisa diupdate berdasarkan waktu
-            $canBeUpdated = $order->canBeUpdated();
-            \Log::info('Order can be updated check', [
-                'can_be_updated' => $canBeUpdated,
-                'order_updated_at' => $order->updated_at
-            ]);
-
-            if (!$canBeUpdated) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak dapat mengupdate status. Sudah lebih dari 6 jam sejak update terakhir.'
-                ], 400);
-            }
-
-            $order->update(['status' => $request->status]);
-
-            \Log::info('Order status updated successfully', [
-                'order_id' => $order->id,
-                'new_status' => $request->status
-            ]);
+        $order->updateStatus($request->status);
 
             return response()->json([
                 'success' => true,

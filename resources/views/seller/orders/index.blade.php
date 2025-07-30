@@ -445,8 +445,7 @@
                                 $currentIdx = array_search($order->status, $statusOrder);
                                 if ($currentIdx === false) { $currentIdx = -1; }
                                 $now = now();
-                                $updatedAt = $order->updated_at;
-                                $diffHours = $updatedAt->diffInHours($now);
+                                $diffHours = $order->updated_at->diffInHours($now);
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
@@ -606,8 +605,7 @@
                                                 $currentIdx = array_search($order->status, $statusOrder);
                                                 if ($currentIdx === false) { $currentIdx = -1; }
                                                 $now = now();
-                                                $updatedAt = $order->updated_at;
-                                                $diffHours = $updatedAt->diffInHours($now);
+                                                $diffHours = $order->updated_at->diffInHours($now);
                                                 @endphp
                                                 @foreach($statusList as $status => $info)
                                                 @php
