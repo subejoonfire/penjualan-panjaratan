@@ -15,6 +15,9 @@ return new class extends Migration
             $table->string('phone')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
+            
+            // Add index for created_at for better performance
+            $table->index('created_at');
         });
     }
 

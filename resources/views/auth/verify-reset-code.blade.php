@@ -81,10 +81,15 @@
                 <!-- Link Actions -->
                 <div class="text-center space-y-3">
                     <div>
-                        <a href="{{ route('password.send-reset-code') }}" class="font-medium text-blue-600 hover:text-blue-500">
-                            <i class="fas fa-redo mr-1"></i>
-                            Kirim Ulang Kode
-                        </a>
+                        <form action="{{ route('password.send-reset-code') }}" method="POST" class="inline">
+                            @csrf
+                            <input type="hidden" name="identifier" value="{{ session('reset_data')['identifier'] ?? '' }}">
+                            <input type="hidden" name="reset_method" value="{{ session('reset_data')['method'] ?? 'email' }}">
+                            <button type="submit" class="font-medium text-blue-600 hover:text-blue-500 bg-transparent border-none cursor-pointer">
+                                <i class="fas fa-redo mr-1"></i>
+                                Kirim Ulang Kode
+                            </button>
+                        </form>
                     </div>
                     <div>
                         <a href="{{ route('password.request') }}" class="font-medium text-gray-600 hover:text-gray-500">
@@ -141,6 +146,73 @@
         // Convert to uppercase for better readability
         tokenInput.addEventListener('input', function(e) {
             e.target.value = e.target.value.toUpperCase();
+        });
+        
+        // Form validation with better UX
+        const form = document.querySelector('form');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', function(e) {
+            const token = tokenInput.value.trim();
+            
+            // Disable submit button to prevent double submission
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-spinner fa-spin text-blue-500 group-hover:text-blue-400"></i></span>Memverifikasi...';
+            
+            if (!token) {
+                e.preventDefault();
+                showError('Silakan masukkan kode verifikasi');
+                resetSubmitButton();
+                return;
+            }
+            
+            if (token.length < 6) {
+                e.preventDefault();
+                showError('Kode verifikasi minimal 6 karakter');
+                resetSubmitButton();
+                return;
+            }
+        });
+        
+        function showError(message) {
+            // Remove existing error alerts
+            const existingAlerts = document.querySelectorAll('.alert-error');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // Create new error alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert-error bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mt-4';
+            alertDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            form.appendChild(alertDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        function resetSubmitButton() {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-check text-blue-500 group-hover:text-blue-400"></i></span>Verifikasi Kode';
+        }
+        
+        // Auto-submit when 6 characters are entered
+        tokenInput.addEventListener('input', function(e) {
+            if (e.target.value.length === 6) {
+                setTimeout(() => {
+                    form.submit();
+                }, 500);
+            }
         });
     });
     </script>

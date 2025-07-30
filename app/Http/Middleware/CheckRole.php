@@ -39,13 +39,25 @@ class CheckRole
             }
         }
 
-        // Tambahan: Cek verifikasi untuk customer
+        // Tambahan: Cek verifikasi untuk customer (kecuali untuk route tertentu)
         if ($user->role === 'customer') {
-            if (!$user->isEmailVerified()) {
-                return redirect()->route('verification.email.notice');
-            }
-            if (!$user->isWaVerified()) {
-                return redirect()->route('verification.wa.notice');
+            // Skip verification check for password reset routes
+            $passwordResetRoutes = [
+                'password.request',
+                'password.send-reset-code',
+                'password.reset.verify.form',
+                'password.verify-reset-code',
+                'password.reset.form',
+                'password.reset'
+            ];
+            
+            if (!in_array($request->route()->getName(), $passwordResetRoutes)) {
+                if (!$user->isEmailVerified()) {
+                    return redirect()->route('verification.email.notice');
+                }
+                if (!$user->isWaVerified()) {
+                    return redirect()->route('verification.wa.notice');
+                }
             }
         }
 

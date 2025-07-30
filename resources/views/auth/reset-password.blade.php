@@ -172,6 +172,65 @@
             }
         }
         
+        // Form validation with better UX
+        const form = document.querySelector('form');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', function(e) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // Disable submit button to prevent double submission
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-spinner fa-spin text-blue-500 group-hover:text-blue-400"></i></span>Mereset Password...';
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                showError('Password minimal 6 karakter');
+                resetSubmitButton();
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showError('Konfirmasi password tidak cocok');
+                resetSubmitButton();
+                return;
+            }
+        });
+        
+        function showError(message) {
+            // Remove existing error alerts
+            const existingAlerts = document.querySelectorAll('.alert-error');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // Create new error alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert-error bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mt-4';
+            alertDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            form.appendChild(alertDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        function resetSubmitButton() {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-key text-blue-500 group-hover:text-blue-400"></i></span>Reset Password';
+        }
+        
         passwordInput.addEventListener('input', validatePasswords);
         confirmPasswordInput.addEventListener('input', validatePasswords);
         

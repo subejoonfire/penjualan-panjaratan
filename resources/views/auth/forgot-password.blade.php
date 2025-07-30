@@ -11,7 +11,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
@@ -142,7 +146,7 @@
                 identifierInput.type = 'email';
                 identifierIcon.className = 'fas fa-envelope text-gray-400';
             } else {
-                identifierInput.placeholder = 'Masukkan nomor WhatsApp';
+                identifierInput.placeholder = 'Masukkan nomor WhatsApp (contoh: 08123456789)';
                 identifierInput.type = 'tel';
                 identifierIcon.className = 'fab fa-whatsapp text-gray-400';
             }
@@ -156,6 +160,77 @@
         
         // Auto focus
         identifierInput.focus();
+        
+        // Form validation with better UX
+        const form = document.querySelector('form');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        form.addEventListener('submit', function(e) {
+            const method = document.querySelector('input[name="reset_method"]:checked').value;
+            const identifier = identifierInput.value.trim();
+            
+            // Disable submit button to prevent double submission
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+            
+            if (!identifier) {
+                e.preventDefault();
+                showError('Silakan masukkan email atau nomor WhatsApp');
+                resetSubmitButton();
+                return;
+            }
+            
+            if (method === 'email') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(identifier)) {
+                    e.preventDefault();
+                    showError('Format email tidak valid');
+                    resetSubmitButton();
+                    return;
+                }
+            } else {
+                const phoneRegex = /^[0-9]{10,13}$/;
+                const cleanPhone = identifier.replace(/[^0-9]/g, '');
+                if (!phoneRegex.test(cleanPhone)) {
+                    e.preventDefault();
+                    showError('Format nomor WhatsApp tidak valid. Gunakan 10-13 digit angka');
+                    resetSubmitButton();
+                    return;
+                }
+            }
+        });
+        
+        function showError(message) {
+            // Remove existing error alerts
+            const existingAlerts = document.querySelectorAll('.alert-error');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // Create new error alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert-error bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mt-4';
+            alertDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            form.appendChild(alertDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        function resetSubmitButton() {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="absolute left-0 inset-y-0 flex items-center pl-3"><i class="fas fa-paper-plane text-blue-500 group-hover:text-blue-400"></i></span>Kirim Kode Reset';
+        }
     });
     </script>
 </body>

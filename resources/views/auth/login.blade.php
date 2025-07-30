@@ -32,6 +32,20 @@
             </p>
         </div>
 
+        <!-- Success Messages -->
+        @if(session('success'))
+        <div class="bg-green-50 border border-green-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-600">{{ session('success') }}</p>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Login Form -->
         <form class="mt-8 space-y-6" method="POST" action="{{ route('login') }}">
             @csrf
