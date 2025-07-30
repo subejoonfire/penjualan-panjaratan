@@ -19,7 +19,7 @@
                     @case('pending') Menunggu @break
                     @case('processing') Diproses @break
                     @case('shipped') Dikirim @break
-                    @case('delivered') Diterima @break
+                    @case('delivered') Selesai @break
                     @case('cancelled') Dibatalkan @break
                     @default {{ ucfirst($order->status) }}
                 @endswitch

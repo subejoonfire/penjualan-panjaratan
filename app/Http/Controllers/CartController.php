@@ -280,20 +280,29 @@ class CartController extends Controller
             $shippingCost = 15000;
             $total = $subtotal + $shippingCost;
 
+            // Generate order number with date format
+            $date = now()->format('Ymd');
+            $orderCount = Order::whereDate('created_at', today())->count() + 1;
+            $orderNumber = 'ORD-' . $date . '-' . str_pad($orderCount, 6, '0', STR_PAD_LEFT);
+
             // Create order
             $order = Order::create([
                 'idcart' => $cart->id,
-                'order_number' => 'ORD-' . time() . '-' . $user->id,
+                'order_number' => $orderNumber,
                 'grandtotal' => $total,
                 'shipping_address' => $shippingAddress,
                 'status' => 'pending',
                 'notes' => $request->notes
             ]);
 
+            // Generate transaction number with date format
+            $transactionCount = Transaction::whereDate('created_at', today())->count() + 1;
+            $transactionNumber = 'TRX-' . $date . '-' . str_pad($transactionCount, 6, '0', STR_PAD_LEFT);
+
             // Create transaction
             $transaction = Transaction::create([
                 'idorder' => $order->id,
-                'transaction_number' => 'TRX-' . time() . '-' . $user->id,
+                'transaction_number' => $transactionNumber,
                 'amount' => $total,
                 'payment_method' => $request->payment_method,
                 'transactionstatus' => 'pending'

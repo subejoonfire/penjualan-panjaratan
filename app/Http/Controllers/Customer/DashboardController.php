@@ -131,7 +131,7 @@ class DashboardController extends Controller
         }
         
         // Check if order can be cancelled
-        if (!in_array($order->status, ['pending', 'confirmed'])) {
+        if (!in_array($order->status, ['pending', 'processing'])) {
             return back()->with('error', 'Order cannot be cancelled');
         }
         
