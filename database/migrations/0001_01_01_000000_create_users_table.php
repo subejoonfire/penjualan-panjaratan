@@ -23,8 +23,6 @@ return new class extends Migration
             $table->timestamp('phone_verified_at')->nullable(); // Verifikasi telepon
             $table->string('verification_token', 100)->nullable(); // Token verifikasi email
             $table->string('phone_verification_token', 100)->nullable(); // Token verifikasi WA
-            $table->boolean('status_verifikasi_email')->default(false); // Status verifikasi email
-            $table->boolean('status_verifikasi_wa')->default(false); // Status verifikasi WA
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

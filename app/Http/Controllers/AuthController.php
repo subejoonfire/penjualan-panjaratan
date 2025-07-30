@@ -120,8 +120,7 @@ class AuthController extends Controller
             'role' => $request->role,
             'verification_token' => $verification_token,
             'phone_verification_token' => $phone_verification_token,
-            'status_verifikasi_email' => false,
-            'status_verifikasi_wa' => false,
+            // email_verified_at and phone_verified_at will be null initially
         ]);
 
         Auth::login($user);
@@ -160,8 +159,8 @@ class AuthController extends Controller
         $user = Auth::user();
         if ($request->token === $user->verification_token) {
             $user->update([
-                'status_verifikasi_email' => true,
                 'email_verified_at' => now(),
+                'verification_token' => null, // Clear token after successful verification
             ]);
             return redirect()->route('verification.wa.notice')->with('success', 'Email berhasil diverifikasi.');
         }
@@ -197,8 +196,8 @@ class AuthController extends Controller
         $user = Auth::user();
         if ($request->token == $user->phone_verification_token) {
             $user->update([
-                'status_verifikasi_wa' => true,
                 'phone_verified_at' => now(),
+                'phone_verification_token' => null, // Clear token after successful verification
             ]);
             return $this->redirectToDashboard();
         }

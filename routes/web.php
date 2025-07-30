@@ -31,6 +31,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    
+    // Password Reset Routes
+    Route::get('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/password/send-reset-code', [\App\Http\Controllers\PasswordResetController::class, 'sendResetCode'])->name('password.send-reset-code');
+    Route::get('/password/verify-code', [\App\Http\Controllers\PasswordResetController::class, 'showVerifyResetCodeForm'])->name('password.reset.verify.form');
+    Route::post('/password/verify-code', [\App\Http\Controllers\PasswordResetController::class, 'verifyResetCode'])->name('password.verify-reset-code');
+    Route::get('/password/reset-form', [\App\Http\Controllers\PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset.form');
+    Route::post('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'resetPassword'])->name('password.reset');
 });
 
 Route::middleware('auth')->group(function () {
