@@ -34,14 +34,13 @@ class DashboardController extends Controller
             $query->where('iduserseller', $user->id);
         })->count();
 
-        // Calculate total revenue from delivered orders with paid transactions
+        // Calculate total revenue from all orders with paid transactions (not just delivered)
         $totalRevenue = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
         })
         ->whereHas('transaction', function ($query) {
             $query->where('transactionstatus', 'paid');
         })
-        ->where('status', 'delivered')
         ->get()
         ->sum(function ($order) use ($user) {
             return $order->cart->cartDetails
@@ -75,21 +74,37 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Monthly revenue (last 6 months)
+        // Monthly revenue (last 6 months) - calculate based on seller's products
         $monthlyRevenue = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
         })
             ->where('transactionstatus', 'paid')
             ->where('created_at', '>=', now()->subMonths(6))
-            ->select(
-                DB::raw("strftime('%m', created_at) as month"),
-                DB::raw("strftime('%Y', created_at) as year"),
-                DB::raw('SUM(amount) as total')
-            )
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
+            ->get()
+            ->groupBy(function ($transaction) {
+                return $transaction->created_at->format('Y-m');
+            })
+            ->map(function ($transactions, $yearMonth) use ($user) {
+                $total = $transactions->sum(function ($transaction) use ($user) {
+                    return $transaction->order->cart->cartDetails
+                        ->where('product.iduserseller', $user->id)
+                        ->sum(function ($item) {
+                            return $item->quantity * $item->productprice;
+                        });
+                });
+                
+                $date = \Carbon\Carbon::createFromFormat('Y-m', $yearMonth);
+                
+                return (object) [
+                    'month' => $date->format('m'),
+                    'year' => $date->format('Y'),
+                    'total' => $total
+                ];
+            })
+            ->values()
+            ->sortBy(function ($item) {
+                return $item->year . $item->month;
+            });
 
         // Low stock products
         $lowStockProducts = $user->products()
@@ -313,8 +328,8 @@ class DashboardController extends Controller
             'cancelled' => $allOrders->where('status', 'cancelled')->count(),
         ];
 
-        // Calculate total revenue from delivered orders with paid transactions
-        $totalRevenue = $allOrders->where('status', 'delivered')
+        // Calculate total revenue from all orders with paid transactions (not just delivered)
+        $totalRevenue = $allOrders
             ->filter(function ($order) {
                 return $order->transaction && $order->transaction->transactionstatus === 'paid';
             })
@@ -437,13 +452,20 @@ class DashboardController extends Controller
         $startDate = $request->get('start_date', now()->startOfMonth());
         $endDate = $request->get('end_date', now());
 
-        // Sales statistics
+        // Sales statistics - calculate based on seller's products in paid transactions
         $totalSales = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
         })
             ->where('transactionstatus', 'paid')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('amount');
+            ->get()
+            ->sum(function ($transaction) use ($user) {
+                return $transaction->order->cart->cartDetails
+                    ->where('product.iduserseller', $user->id)
+                    ->sum(function ($item) {
+                        return $item->quantity * $item->productprice;
+                    });
+            });
 
         $totalOrders = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
@@ -451,20 +473,33 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
-        // Daily sales data
+        // Daily sales data - calculate based on seller's products
         $dailySales = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
         })
             ->where('transactionstatus', 'paid')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->select(
-                DB::raw("date(created_at) as date"),
-                DB::raw('SUM(amount) as total'),
-                DB::raw('COUNT(*) as orders')
-            )
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->get()
+            ->groupBy(function ($transaction) {
+                return $transaction->created_at->format('Y-m-d');
+            })
+            ->map(function ($transactions, $date) use ($user) {
+                $total = $transactions->sum(function ($transaction) use ($user) {
+                    return $transaction->order->cart->cartDetails
+                        ->where('product.iduserseller', $user->id)
+                        ->sum(function ($item) {
+                            return $item->quantity * $item->productprice;
+                        });
+                });
+                
+                return (object) [
+                    'date' => $date,
+                    'total' => $total,
+                    'orders' => $transactions->count()
+                ];
+            })
+            ->values()
+            ->sortBy('date');
 
         // Product sales data
         $productSales = Product::where('iduserseller', $user->id)

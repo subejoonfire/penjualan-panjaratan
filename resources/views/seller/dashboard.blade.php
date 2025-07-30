@@ -104,8 +104,7 @@
                             <dl>
                                 <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Bulan Ini</dt>
                                 <dd class="text-sm sm:text-lg font-medium text-gray-900">
-                                    Rp {{ number_format($monthlyRevenue->where('month', date('m'))->where('year',
-                                    date('Y'))->first()->total ?? 0) }}
+                                    Rp {{ number_format($monthlyRevenue->where('month', date('m'))->where('year', date('Y'))->first()->total ?? 0) }}
                                 </dd>
                             </dl>
                         </div>
