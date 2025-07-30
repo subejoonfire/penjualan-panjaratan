@@ -246,16 +246,24 @@
                 container.innerHTML = '';
                 if (data.paymentFee) {
                     data.paymentFee.forEach(method => {
+                        const isQris = method.paymentName.toLowerCase().includes('qris');
+                        const isEwallet = /ovo|dana|linkaja|shopeepay|indodana/i.test(method.paymentName);
+                        const isVA = /va|virtual account/i.test(method.paymentName);
+                        let badge = '';
+                        if (isQris) badge = '<span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">QRIS</span>';
+                        else if (isEwallet) badge = '<span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700">E-Wallet</span>';
+                        else if (isVA) badge = '<span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700">VA</span>';
                         const label = document.createElement('label');
-                        label.className = 'flex items-center space-x-2 sm:space-x-3 cursor-pointer';
+                        label.className = 'flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition mb-2';
                         label.innerHTML = `
                             <input type="radio" name="payment_method" value="${method.paymentMethod}" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <div class="flex items-center">
-                                <img src="${method.paymentImage}" alt="${method.paymentName}" class="w-8 h-8 mr-2">
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900">${method.paymentName}</div>
-                                    <div class="text-xs sm:text-sm text-gray-600">${method.paymentMethod}</div>
+                            <img src="${method.paymentImage}" alt="${method.paymentName}" class="w-10 h-10 object-contain rounded bg-white border mr-2">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center">
+                                    <span class="text-sm font-medium text-gray-900">${method.paymentName}</span>
+                                    ${badge}
                                 </div>
+                                <div class="text-xs text-gray-500 mt-0.5">Kode: <span class="font-mono">${method.paymentMethod}</span></div>
                             </div>
                         `;
                         container.appendChild(label);
