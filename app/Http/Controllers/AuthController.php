@@ -108,8 +108,8 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $verification_token = Str::random(6);
-        $phone_verification_token = rand(100000, 999999);
+        $verification_token = strtoupper(Str::random(6));
+        $phone_verification_token = strtoupper(Str::random(6));
 
         $user = User::create([
             'username' => $request->username,
@@ -144,8 +144,15 @@ class AuthController extends Controller
     public function sendEmailVerification()
     {
         $user = Auth::user();
+        
+        // Generate new token for resend
+        $verification_token = strtoupper(Str::random(6));
+        $user->update([
+            'verification_token' => $verification_token
+        ]);
+        
         $this->sendEmailVerificationInternal($user);
-        return back()->with('success', 'Kode verifikasi email telah dikirim ulang.');
+        return back()->with('success', 'Kode verifikasi email baru telah dikirim ulang.');
     }
 
     private function sendEmailVerificationInternal($user)
@@ -157,7 +164,7 @@ class AuthController extends Controller
     {
         $request->validate(['token' => 'required|string']);
         $user = Auth::user();
-        if ($request->token === $user->verification_token) {
+        if (strtoupper($request->token) === $user->verification_token) {
             $user->update([
                 'email_verified_at' => now(),
                 'verification_token' => null, // Clear token after successful verification
@@ -186,15 +193,22 @@ class AuthController extends Controller
     public function sendWaVerification()
     {
         $user = Auth::user();
+        
+        // Generate new token for resend
+        $phone_verification_token = strtoupper(Str::random(6));
+        $user->update([
+            'phone_verification_token' => $phone_verification_token
+        ]);
+        
         SendVerificationWaJob::dispatch($user->id);
-        return back()->with('success', 'Kode verifikasi WhatsApp telah dikirim ulang.');
+        return back()->with('success', 'Kode verifikasi WhatsApp baru telah dikirim ulang.');
     }
 
     public function checkWaVerification(Request $request)
     {
         $request->validate(['token' => 'required|string']);
         $user = Auth::user();
-        if ($request->token == $user->phone_verification_token) {
+        if (strtoupper($request->token) === $user->phone_verification_token) {
             $user->update([
                 'phone_verified_at' => now(),
                 'phone_verification_token' => null, // Clear token after successful verification

@@ -58,7 +58,7 @@ class PasswordResetController extends Controller
         }
 
         // Generate token
-        $token = ($method === 'email') ? Str::random(6) : rand(100000, 999999);
+        $token = strtoupper(Str::random(6));
 
         if ($method === 'email') {
             // Simpan token untuk email
@@ -73,7 +73,7 @@ class PasswordResetController extends Controller
             // Kirim email
             try {
                 Mail::to($user->email)->send(new PasswordResetCode($user, $token));
-                $message = 'Kode reset password telah dikirim ke email Anda.';
+                $message = 'Kode reset password baru telah dikirim ke email Anda.';
             } catch (\Exception $e) {
                 return back()->withErrors(['identifier' => 'Gagal mengirim email. Silakan coba lagi.'])->withInput();
             }
@@ -90,7 +90,7 @@ class PasswordResetController extends Controller
             // Kirim WhatsApp
             try {
                 $this->sendWhatsAppResetCode($user->phone, $token);
-                $message = 'Kode reset password telah dikirim ke WhatsApp Anda.';
+                $message = 'Kode reset password baru telah dikirim ke WhatsApp Anda.';
             } catch (\Exception $e) {
                 return back()->withErrors(['identifier' => 'Gagal mengirim WhatsApp. Silakan coba lagi.'])->withInput();
             }
@@ -138,7 +138,7 @@ class PasswordResetController extends Controller
 
         $identifier = $resetData['identifier'];
         $method = $resetData['method'];
-        $token = $request->token;
+        $token = strtoupper($request->token);
 
         // Verifikasi token
         $isValidToken = false;
