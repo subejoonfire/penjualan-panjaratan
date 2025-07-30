@@ -469,6 +469,8 @@
                                 'tooltip' => 'Batalkan',
                                 ],
                                 ];
+                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                $currentIdx = array_search($order->status, $statusOrder);
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
@@ -626,6 +628,8 @@
                                 'tooltip' => 'Batalkan',
                                 ],
                                 ];
+                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                $currentIdx = array_search($order->status, $statusOrder);
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
