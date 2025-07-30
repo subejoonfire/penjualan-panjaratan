@@ -2,6 +2,8 @@
 
 @section('title', 'Manajemen Pesanan - Dashboard Penjual')
 
+@include('components.modal-notification')
+
 @push('styles')
 <style>
     .order-card {
@@ -410,39 +412,71 @@
                                 Detail
                             </button>
 
-                            <!-- Status Action Buttons -->
+                            <!-- Status Action Buttons: Selalu tampil, disable jika tidak valid -->
                             <div class="flex justify-center space-x-2">
-                                @if($order->status === 'pending' && $order->canBeUpdated())
-                                <button onclick="updateOrderStatus('{{ $order->id }}', 'processing')"
-                                    class="status-button confirm relative" title="Konfirmasi Pesanan">
-                                    <i class="fas fa-check"></i>
-                                    <span class="status-tooltip">Konfirmasi</span>
-                                </button>
-                                <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')"
-                                    class="status-button cancel relative" title="Batalkan Pesanan">
-                                    <i class="fas fa-times"></i>
-                                    <span class="status-tooltip">Batalkan</span>
-                                </button>
-                                @elseif($order->status === 'processing' && $order->canBeUpdated())
-                                <button onclick="updateOrderStatus('{{ $order->id }}', 'shipped')"
-                                    class="status-button ship relative" title="Kirim Pesanan">
-                                    <i class="fas fa-truck"></i>
-                                    <span class="status-tooltip">Kirim</span>
-                                </button>
-                                <button onclick="updateOrderStatus('{{ $order->id }}', 'cancelled')"
-                                    class="status-button cancel relative" title="Batalkan Pesanan">
-                                    <i class="fas fa-times"></i>
-                                    <span class="status-tooltip">Batalkan</span>
-                                </button>
-                                @elseif($order->status === 'shipped' && $order->canBeUpdated())
-                                <button onclick="updateOrderStatus('{{ $order->id }}', 'delivered')"
-                                    class="status-button complete relative" title="Selesai">
-                                    <i class="fas fa-check-double"></i>
-                                    <span class="status-tooltip">Selesai</span>
-                                </button>
-                                @else
-                                <span class="text-xs text-gray-500">Tidak dapat diupdate</span>
-                                @endif
+                                @php
+                                $statusList = [
+                                'processing' => [
+                                'icon' => 'fa-check',
+                                'class' => 'confirm',
+                                'label' => 'Proses',
+                                'tooltip' => 'Proses',
+                                ],
+                                'shipped' => [
+                                'icon' => 'fa-truck',
+                                'class' => 'ship',
+                                'label' => 'Kirim',
+                                'tooltip' => 'Kirim',
+                                ],
+                                'delivered' => [
+                                'icon' => 'fa-check-double',
+                                'class' => 'complete',
+                                'label' => 'Selesai',
+                                'tooltip' => 'Selesai',
+                                ],
+                                'cancelled' => [
+                                'icon' => 'fa-times',
+                                'class' => 'cancel',
+                                'label' => 'Batalkan',
+                                'tooltip' => 'Batalkan',
+                                ],
+                                ];
+                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                $currentIdx = array_search($order->status, $statusOrder);
+                                if ($currentIdx === false) {
+                                $currentIdx = -1; // Jika status tidak ditemukan
+                                }
+                                $canUpdate = $order->canBeUpdated();
+                                $canBack = false;
+                                $now = now();
+                                $updatedAt = $order->updated_at;
+                                $diffHours = $updatedAt->diffInHours($now);
+                                @endphp
+                                @foreach($statusList as $status => $info)
+                                @php
+                                // Disable if:
+                                // 1. Status already delivered/cancelled
+                                // 2. Status want to go back (new status idx < current status idx) // 3. More than 3
+                                    hours since last update (except forward) $targetIdx=array_search($status,
+                                    $statusOrder); if ($targetIdx===false) { $targetIdx=-1; // Jika status tidak
+                                    ditemukan } $disabled=false; if (in_array($order->status, ['delivered',
+                                    'cancelled'])) {
+                                    $disabled = true;
+                                    } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
+                                        $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !==
+                                        'cancelled' && $order->status !== 'delivered' &&
+                                        $order->created_at->diffInMinutes($order->updated_at) > 0 && $order->status !==
+                                        'pending') {
+                                        $disabled = true;
+                                        }
+                                        @endphp
+                                        <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                            class="status-button {{ $info['class'] }} relative"
+                                            title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
+                                            <i class="fas {{ $info['icon'] }}"></i>
+                                            <span class="status-tooltip">{{ $info['label'] }}</span>
+                                        </button>
+                                        @endforeach
                             </div>
                         </div>
                     </div>
@@ -583,6 +617,9 @@
                                                 ];
                                                 $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                                 $currentIdx = array_search($order->status, $statusOrder);
+                                                if ($currentIdx === false) {
+                                                $currentIdx = -1; // Jika status tidak ditemukan
+                                                }
                                                 $canUpdate = $order->canBeUpdated();
                                                 $canBack = false;
                                                 $now = now();
@@ -591,15 +628,20 @@
                                                 @endphp
                                                 @foreach($statusList as $status => $info)
                                                 @php
-                                                // Disable jika:
-                                                // 1. Status sudah delivered/cancelled
-                                                // 2. Status ingin mundur (idx status baru < idx status sekarang) // 3.
-                                                    Sudah lebih dari 3 jam sejak update terakhir (kecuali ke depan)
-                                                    $targetIdx=array_search($status, $statusOrder); $disabled=false; if
-                                                    (in_array($order->status, ['delivered', 'cancelled'])) {
+                                                // Disable if:
+                                                // 1. Status already delivered/cancelled
+                                                // 2. Status want to go back (new status idx < current status idx) // 3.
+                                                    More than 3 hours since last update (except forward)
+                                                    $targetIdx=array_search($status, $statusOrder); if
+                                                    ($targetIdx===false) { $targetIdx=-1; // Jika status tidak ditemukan
+                                                    } $disabled=false; if (in_array($order->status, ['delivered',
+                                                    'cancelled'])) {
                                                     $disabled = true;
                                                     } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
-                                                        ($diffHours>= 3 && $targetIdx > $currentIdx) {
+                                                        ($diffHours>= 3 && $targetIdx > $currentIdx && $order->status
+                                                        !== 'pending' && $order->status !== 'cancelled' &&
+                                                        $order->status !== 'delivered' &&
+                                                        $order->created_at->diffInMinutes($order->updated_at) > 0) {
                                                         $disabled = true;
                                                         }
                                                         @endphp
@@ -711,47 +753,40 @@
     }
 
     function updateOrderStatus(orderId, newStatus) {
-        if (confirm('Apakah Anda yakin ingin mengubah status pesanan ini?')) {
-            fetch(`/seller/orders/${orderId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    status: newStatus
-                })
+        fetch(`/seller/orders/${orderId}/status`, {
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: newStatus
             })
-            .then(async response => {
-                let data;
-                try {
-                    data = await response.json();
-                } catch (e) {
-                    console.error('Error parsing JSON:', e);
-                    data = null;
-                }
-                
-                console.log('Response status:', response.status);
-                console.log('Response data:', data);
-                
-                if (response.ok && data && data.success) {
-                    showAlert('Status pesanan berhasil diupdate', 'success');
-                    setTimeout(() => location.reload(), 1200);
-                } else if (response.status === 422 && data && data.errors) {
-                    // Laravel validation error
-                    const errors = Object.values(data.errors).flat();
-                    showAlert(errors.join(', '), 'error');
-                } else if (data && data.message) {
-                    showAlert(data.message, 'error');
-                } else {
-                    showAlert('Terjadi kesalahan saat mengupdate status. Status: ' + response.status, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                showAlert('Terjadi kesalahan saat mengupdate status: ' + error.message, 'error');
-            });
-        }
+        })
+        .then(async response => {
+            let data;
+            try {
+                data = await response.json();
+            } catch (e) {
+                data = null;
+            }
+            if (response.ok && data && data.success) {
+                showAlert('Status pesanan berhasil diupdate', 'success');
+                setTimeout(() => location.reload(), 1200);
+            } else if (response.status === 422 && data && data.errors) {
+                // Laravel validation error
+                const errors = Object.values(data.errors).flat();
+                showAlert(errors, 'error');
+            } else if (data && data.message) {
+                showAlert(data.message, 'error');
+            } else {
+                showAlert('Terjadi kesalahan saat mengupdate status', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Terjadi kesalahan saat mengupdate status', 'error');
+        });
     }
 
     function closeOrderModal() {
