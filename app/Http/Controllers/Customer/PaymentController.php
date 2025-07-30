@@ -43,27 +43,78 @@ class PaymentController extends Controller
         $callbackUrl = route('customer.payments.callback');
         $returnUrl = route('customer.payments.index');
         $signature = md5($merchantCode . $merchantOrderId . $paymentAmount . $apiKey);
-
+        $expiryPeriod = 60;
+        $additionalParam = '';
+        $merchantUserInfo = $user->nickname ?? $user->username;
+        $customerVaName = $user->nickname ?? $user->username;
+        // Item details
+        $itemDetails = [];
+        if ($transaction->order->cart) {
+            foreach ($transaction->order->cart->cartDetails as $detail) {
+                $itemDetails[] = [
+                    'name' => $detail->product->productname,
+                    'price' => (int) $detail->productprice,
+                    'quantity' => (int) $detail->quantity
+                ];
+            }
+        } else {
+            // direct checkout (tanpa cart)
+            $dt = $transaction->order->detailTransactions()->first();
+            if ($dt && $dt->product) {
+                $itemDetails[] = [
+                    'name' => $dt->product->productname,
+                    'price' => (int) $dt->price,
+                    'quantity' => (int) $dt->quantity
+                ];
+            }
+        }
+        // Customer detail
+        $address = $user->defaultAddress()?->address ?? $transaction->order->shipping_address;
+        $customerDetail = [
+            'firstName' => $user->nickname ?? $user->username,
+            'email' => $email,
+            'phoneNumber' => $phoneNumber,
+            'billingAddress' => [
+                'firstName' => $user->nickname ?? $user->username,
+                'address' => $address,
+                'city' => '',
+                'postalCode' => '',
+                'phone' => $phoneNumber,
+                'countryCode' => 'ID'
+            ],
+            'shippingAddress' => [
+                'firstName' => $user->nickname ?? $user->username,
+                'address' => $address,
+                'city' => '',
+                'postalCode' => '',
+                'phone' => $phoneNumber,
+                'countryCode' => 'ID'
+            ]
+        ];
         $params = [
             'merchantCode' => $merchantCode,
             'paymentAmount' => $paymentAmount,
             'paymentMethod' => $paymentMethod,
             'merchantOrderId' => $merchantOrderId,
             'productDetails' => $productDetails,
+            'additionalParam' => $additionalParam,
+            'merchantUserInfo' => $merchantUserInfo,
+            'customerVaName' => $customerVaName,
             'email' => $email,
             'phoneNumber' => $phoneNumber,
+            'itemDetails' => $itemDetails,
+            'customerDetail' => $customerDetail,
             'callbackUrl' => $callbackUrl,
             'returnUrl' => $returnUrl,
             'signature' => $signature,
-            'expiryPeriod' => 60 // menit
+            'expiryPeriod' => $expiryPeriod
         ];
-
         $response = Http::withHeaders(['Content-Type' => 'application/json'])
             ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
         if ($response->successful() && isset($response['paymentUrl'])) {
             return redirect($response['paymentUrl']);
         }
-        Log::error('Duitku error', ['response' => $response->json()]);
+        Log::error('Duitku error', ['response' => $response->json(), 'params' => $params]);
         return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
     }
 
