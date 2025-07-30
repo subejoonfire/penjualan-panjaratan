@@ -15,12 +15,12 @@ class PaymentController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $transactions = Transaction::whereHas('order.cart', function($q) use ($user) {
+        $transactions = Transaction::whereHas('order.cart', function ($q) use ($user) {
             $q->where('iduser', $user->id);
         })
-        ->with(['order.cart.cartDetails.product.images'])
-        ->orderByDesc('created_at')
-        ->get();
+            ->with(['order.cart.cartDetails.product.images'])
+            ->orderByDesc('created_at')
+            ->get();
         return view('customer.payments.index', compact('transactions'));
     }
 
@@ -28,8 +28,10 @@ class PaymentController extends Controller
     public function pay(Transaction $transaction)
     {
         $user = Auth::user();
-        if ($transaction->order->cart->iduser !== $user->id) abort(403);
-        if ($transaction->isPaid()) return redirect()->route('customer.payments.index')->with('success', 'Sudah dibayar');
+        if ($transaction->order->cart->iduser !== $user->id)
+            abort(403);
+        if ($transaction->isPaid())
+            return redirect()->route('customer.payments.index')->with('success', 'Sudah dibayar');
 
         // Duitku API
         $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
@@ -112,7 +114,7 @@ class PaymentController extends Controller
             'expiryPeriod' => $expiryPeriod
         ];
         $response = Http::withHeaders(['Content-Type' => 'application/json'])
-        ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
+            ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
         // dd($response);
         if ($response->successful() && isset($response['paymentUrl'])) {
             return redirect($response['paymentUrl']);
@@ -138,6 +140,7 @@ class PaymentController extends Controller
         $response = \Illuminate\Support\Facades\Http::withHeaders([
             'Content-Type' => 'application/json'
         ])->post($url, $params);
+        dd($response);
         if ($response->successful()) {
             return $response->json();
         }
@@ -150,7 +153,8 @@ class PaymentController extends Controller
         $merchantOrderId = $request->merchantOrderId;
         $resultCode = $request->resultCode;
         $transaction = Transaction::where('transaction_number', $merchantOrderId)->first();
-        if (!$transaction) return response('Order not found', 404);
+        if (!$transaction)
+            return response('Order not found', 404);
         if ($resultCode == '00') {
             $transaction->markAsPaid();
             $transaction->order->updateStatus('processing');

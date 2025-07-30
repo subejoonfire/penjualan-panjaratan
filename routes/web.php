@@ -9,6 +9,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 
+Route::get('customer/payment-method', [\App\Http\Controllers\Customer\PaymentController::class, 'getPaymentMethods'])->name('customer/payment-method');
+
 Route::get('/', function () {
     if (auth()->check()) {
         $user = auth()->user();
@@ -31,7 +33,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-    
+
     // Password Reset Routes
     Route::get('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/password/send-reset-code', [\App\Http\Controllers\PasswordResetController::class, 'sendResetCode'])
@@ -110,11 +112,11 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/orders/{order}', [CustomerDashboardController::class, 'orderDetail'])->name('orders.show');
     Route::put('/orders/{order}/cancel', [CustomerDashboardController::class, 'cancelOrder'])->name('orders.cancel');
     Route::post('/products/{product}/reviews', [CustomerDashboardController::class, 'addReview'])->name('products.reviews.store');
-            Route::get('/notifications', [CustomerDashboardController::class, 'notifications'])->name('notifications.index');
-        Route::get('/notifications/{notification}', [CustomerDashboardController::class, 'showNotification'])->name('notifications.show');
-        Route::put('/notifications/{notification}/read', [CustomerDashboardController::class, 'markAsRead'])->name('notifications.read');
-        Route::put('/notifications/mark-all-read', [CustomerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-    
+    Route::get('/notifications', [CustomerDashboardController::class, 'notifications'])->name('notifications.index');
+    Route::get('/notifications/{notification}', [CustomerDashboardController::class, 'showNotification'])->name('notifications.show');
+    Route::put('/notifications/{notification}/read', [CustomerDashboardController::class, 'markAsRead'])->name('notifications.read');
+    Route::put('/notifications/mark-all-read', [CustomerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
     // Wishlist routes
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/add/{product}', [\App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
@@ -124,7 +126,6 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('payments/pay/{transaction}', [\App\Http\Controllers\Customer\PaymentController::class, 'pay'])->name('payments.pay');
     Route::post('payments/callback', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('payments.callback');
     Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('checkout.direct');
-    Route::get('/customer/payment-methods', [\App\Http\Controllers\Customer\PaymentController::class, 'getPaymentMethods']);
 });
 
 Route::middleware('auth')->group(function () {
@@ -165,7 +166,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     })->name('notifications.count');
     Route::get('/notifications/unread', function () {
         $user = auth()->user();
-        
+
         // Get recent notifications for dropdown using optimized method
         $notifications = $user->getRecentNotifications(5)->map(function ($notification) {
             return [
@@ -177,7 +178,7 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
                 'created_at' => $notification->created_at->diffForHumans()
             ];
         });
-        
+
         // Get cart count for customer
         $cart_count = 0;
         if ($user->isCustomer()) {
@@ -192,14 +193,14 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
             'cart_count' => $cart_count
         ]);
     })->name('notifications.unread');
-    
+
     Route::put('/notifications/{notification}/read', function ($notificationId) {
         $user = auth()->user();
         $notification = $user->notifications()->findOrFail($notificationId);
         $notification->update(['readstatus' => true]);
-        
+
         return response()->json(['success' => true]);
     })->name('notifications.read');
-    
+
     Route::get('/products/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('products.search.suggestions');
 });

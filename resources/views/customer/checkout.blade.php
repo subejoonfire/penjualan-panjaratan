@@ -18,7 +18,8 @@
                 <!-- Order Items -->
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
-                        <h3 class="text-base sm:text-lg font-medium text-gray-900">Order Items ({{ $cartDetails->count() }})</h3>
+                        <h3 class="text-base sm:text-lg font-medium text-gray-900">Order Items ({{ $cartDetails->count()
+                            }})</h3>
                     </div>
                     <div class="divide-y divide-gray-200">
                         @foreach($cartDetails as $detail)
@@ -30,15 +31,18 @@
                                         alt="{{ $detail->product->productname }}"
                                         class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover">
                                     @else
-                                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <div
+                                        class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-image text-gray-400 text-sm sm:text-base"></i>
                                     </div>
                                     @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="text-sm font-medium text-gray-900 truncate">{{ $detail->product->productname }}
+                                    <h4 class="text-sm font-medium text-gray-900 truncate">{{
+                                        $detail->product->productname }}
                                     </h4>
-                                    <p class="text-xs sm:text-sm text-gray-600">Seller: {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}
+                                    <p class="text-xs sm:text-sm text-gray-600">Seller: {{
+                                        $detail->product->seller->nickname ?? $detail->product->seller->username }}
                                     </p>
                                     <p class="text-xs sm:text-sm text-gray-600">Qty: {{ $detail->quantity }} × Rp {{
                                         number_format($detail->productprice) }}</p>
@@ -65,8 +69,9 @@
                             @foreach($addresses as $address)
                             <label class="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
                                 <input type="radio" name="address_id" value="{{ $address->id }}"
-                                    class="mt-0.5 sm:mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" {{ ($defaultAddress
-                                    && $defaultAddress->id === $address->id) || (!$defaultAddress && $loop->first) ?
+                                    class="mt-0.5 sm:mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" {{
+                                    ($defaultAddress && $defaultAddress->id === $address->id) || (!$defaultAddress &&
+                                $loop->first) ?
                                 'checked' : '' }}>
                                 <div class="flex-1">
                                     <div class="text-sm font-medium text-gray-900">
@@ -145,7 +150,8 @@
 
                     <div class="space-y-2 sm:space-y-3">
                         <div class="flex justify-between">
-                            <span class="text-sm text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} item)</span>
+                            <span class="text-sm text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }}
+                                item)</span>
                             <span class="text-sm font-medium">Rp {{ number_format($subtotal) }}</span>
                         </div>
                         <div class="flex justify-between">
@@ -155,7 +161,8 @@
                         <div class="border-t pt-2 sm:pt-3">
                             <div class="flex justify-between">
                                 <span class="text-base sm:text-lg font-medium text-gray-900">Total</span>
-                                <span class="text-base sm:text-lg font-medium text-gray-900">Rp {{ number_format($total) }}</span>
+                                <span class="text-base sm:text-lg font-medium text-gray-900">Rp {{ number_format($total)
+                                    }}</span>
                             </div>
                         </div>
                     </div>
@@ -232,7 +239,7 @@
         toggleManualAddress();
 
         // Fetch payment methods from Duitku
-        fetch('/customer/payment-methods')
+        fetch({{ url('/customer/payment-methods') }})
             .then(response => response.json())
             .then(data => {
                 const container = document.getElementById('payment-methods-list');
