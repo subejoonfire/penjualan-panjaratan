@@ -185,6 +185,18 @@ class AuthController extends Controller
         }
         // Strict: hanya bisa akses halaman ini jika sudah email verified dan belum wa verified
         if ($user->isEmailVerified() && !$user->isWaVerified()) {
+            // Otomatis kirim token WA jika belum ada token atau token sudah expired
+            if (!$user->phone_verification_token) {
+                $phone_verification_token = strtoupper(Str::random(6));
+                $user->update([
+                    'phone_verification_token' => $phone_verification_token
+                ]);
+                
+                SendVerificationWaJob::dispatch($user->id);
+                
+                return view('auth.verify-wa', compact('user'))->with('success', 'Kode verifikasi WhatsApp telah dikirim otomatis ke nomor Anda.');
+            }
+            
             return view('auth.verify-wa', compact('user'));
         }
         return $this->redirectToDashboard();
