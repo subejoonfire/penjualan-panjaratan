@@ -143,6 +143,24 @@
                 </div>
             </div>
 
+            <div class="stat-card bg-white overflow-hidden shadow-lg rounded-lg border-t-4 border-emerald-500">
+                <div class="p-3 md:p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-dollar-sign text-white text-xs md:text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="ml-3 md:ml-4 w-0 flex-1">
+                            <dl>
+                                <dt class="text-xs md:text-sm font-medium text-gray-500 truncate">Total Pendapatan</dt>
+                                <dd class="text-sm md:text-lg font-bold text-gray-900">Rp {{ number_format($totalRevenue) }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="stat-card bg-white overflow-hidden shadow-lg rounded-lg border-t-4 border-red-500">
                 <div class="p-3 md:p-5">
                     <div class="flex items-center">

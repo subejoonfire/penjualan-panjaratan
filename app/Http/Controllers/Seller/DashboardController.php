@@ -35,15 +35,13 @@ class DashboardController extends Controller
         })->count();
 
         // Calculate total revenue from all orders with paid transactions (not just delivered)
-        $totalRevenue = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
+        $totalRevenue = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
         })
-        ->whereHas('transaction', function ($query) {
-            $query->where('transactionstatus', 'paid');
-        })
+        ->where('transactionstatus', 'paid')
         ->get()
-        ->sum(function ($order) use ($user) {
-            return $order->cart->cartDetails
+        ->sum(function ($transaction) use ($user) {
+            return $transaction->order->cart->cartDetails
                 ->where('product.iduserseller', $user->id)
                 ->sum(function ($item) {
                     return $item->quantity * $item->productprice;
@@ -329,17 +327,18 @@ class DashboardController extends Controller
         ];
 
         // Calculate total revenue from all orders with paid transactions (not just delivered)
-        $totalRevenue = $allOrders
-            ->filter(function ($order) {
-                return $order->transaction && $order->transaction->transactionstatus === 'paid';
-            })
-            ->sum(function ($order) use ($user) {
-                return $order->cart->cartDetails
-                    ->where('product.iduserseller', $user->id)
-                    ->sum(function ($item) {
-                        return $item->quantity * $item->productprice;
-                    });
-            });
+        $totalRevenue = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
+            $query->where('iduserseller', $user->id);
+        })
+        ->where('transactionstatus', 'paid')
+        ->get()
+        ->sum(function ($transaction) use ($user) {
+            return $transaction->order->cart->cartDetails
+                ->where('product.iduserseller', $user->id)
+                ->sum(function ($item) {
+                    return $item->quantity * $item->productprice;
+                });
+        });
 
         return view('seller.orders.index', compact('orders', 'stats', 'totalRevenue'));
     }
@@ -399,25 +398,13 @@ class DashboardController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled'
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
         ]);
-
-        // Cek apakah masih bisa mengupdate status (dalam 6 jam sejak update terakhir)
-        $lastUpdated = $order->updated_at;
-        $sixHoursAgo = now()->subHours(6);
-        
-        // Jika status sudah pernah diupdate dan sudah lebih dari 6 jam
-        if ($lastUpdated->lt($sixHoursAgo) && $order->status !== 'pending') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak dapat mengupdate status. Sudah lebih dari 6 jam sejak update terakhir.'
-            ], 400);
-        }
 
         // Validasi transisi status yang diperbolehkan
         $allowedTransitions = [
-            'pending' => ['confirmed', 'cancelled'],
-            'confirmed' => ['shipped', 'cancelled'], 
+            'pending' => ['processing', 'cancelled'],
+            'processing' => ['shipped', 'cancelled'], 
             'shipped' => ['delivered'],
             'delivered' => [], // Tidak bisa diubah lagi
             'cancelled' => [] // Tidak bisa diubah lagi
