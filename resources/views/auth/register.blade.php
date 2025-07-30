@@ -34,7 +34,7 @@
             <div class="bg-white rounded-lg shadow-xl overflow-hidden">
                 <form action="{{ route('register') }}" method="POST" class="p-8">
                     @csrf
-                    
+
                     <!-- Two Column Layout for Desktop, Single Column for Mobile -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Left Column -->
@@ -46,16 +46,17 @@
                                 </label>
                                 <div class="mt-1 relative">
                                     <input id="username" name="username" type="text" autocomplete="username" required
-                                           value="{{ old('username') }}"
-                                           class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('username') border-red-300 @enderror"
-                                           placeholder="contoh: usernameku">
+                                        value="{{ old('username') }}"
+                                        class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('username') border-red-300 @enderror"
+                                        placeholder="contoh: usernameku">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-user text-gray-400"></i>
                                     </div>
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">Username tidak boleh mengandung spasi dan akan digunakan untuk login.</p>
+                                <p class="mt-1 text-xs text-gray-500">Username tidak boleh mengandung spasi dan akan
+                                    digunakan untuk login.</p>
                                 @error('username')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -66,16 +67,17 @@
                                 </label>
                                 <div class="mt-1 relative">
                                     <input id="nickname" name="nickname" type="text" autocomplete="nickname"
-                                           value="{{ old('nickname') }}"
-                                           class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('nickname') border-red-300 @enderror"
-                                           placeholder="contoh: John Doe">
+                                        value="{{ old('nickname') }}"
+                                        class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('nickname') border-red-300 @enderror"
+                                        placeholder="contoh: John Doe">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-id-card text-gray-400"></i>
                                     </div>
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">Nama panggilan boleh mengandung spasi dan akan ditampilkan di profil Anda.</p>
+                                <p class="mt-1 text-xs text-gray-500">Nama panggilan boleh mengandung spasi dan akan
+                                    ditampilkan di profil Anda.</p>
                                 @error('nickname')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -86,15 +88,15 @@
                                 </label>
                                 <div class="mt-1 relative">
                                     <input id="email" name="email" type="email" autocomplete="email" required
-                                           value="{{ old('email') }}"
-                                           class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('email') border-red-300 @enderror"
-                                           placeholder="contoh@email.com">
+                                        value="{{ old('email') }}"
+                                        class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('email') border-red-300 @enderror"
+                                        placeholder="contoh@email.com">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-envelope text-gray-400"></i>
                                     </div>
                                 </div>
                                 @error('email')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -108,16 +110,17 @@
                                 </label>
                                 <div class="mt-1 relative">
                                     <input id="phone" name="phone" type="tel" autocomplete="tel" required
-                                           value="{{ old('phone') }}"
-                                           class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('phone') border-red-300 @enderror"
-                                           placeholder="08xxxxxxxxxx">
+                                        value="{{ old('phone') }}"
+                                        class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('phone') border-red-300 @enderror"
+                                        placeholder="08xxxxxxxxxx">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fab fa-whatsapp text-gray-400"></i>
                                     </div>
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">Nomor WhatsApp akan digunakan untuk verifikasi akun.</p>
+                                <p class="mt-1 text-xs text-gray-500">Nomor WhatsApp akan digunakan untuk verifikasi
+                                    akun.</p>
                                 @error('phone')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -127,15 +130,16 @@
                                     Kata Sandi <span class="text-red-500">*</span>
                                 </label>
                                 <div class="mt-1 relative">
-                                    <input id="password" name="password" type="password" autocomplete="new-password" required
-                                           class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('password') border-red-300 @enderror"
-                                           placeholder="Minimal 6 karakter">
+                                    <input id="password" name="password" type="password" autocomplete="new-password"
+                                        required
+                                        class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('password') border-red-300 @enderror"
+                                        placeholder="Minimal 6 karakter">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-lock text-gray-400"></i>
                                     </div>
                                 </div>
                                 @error('password')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -145,9 +149,10 @@
                                     Konfirmasi Kata Sandi <span class="text-red-500">*</span>
                                 </label>
                                 <div class="mt-1 relative">
-                                    <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
-                                           class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                           placeholder="Ulangi kata sandi">
+                                    <input id="password_confirmation" name="password_confirmation" type="password"
+                                        autocomplete="new-password" required
+                                        class="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        placeholder="Ulangi kata sandi">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-lock text-gray-400"></i>
                                     </div>
@@ -170,7 +175,8 @@
                                     Pendaftaran Pembeli
                                 </h3>
                                 <div class="mt-2 text-sm text-blue-700">
-                                    <p>Anda akan mendaftar sebagai pembeli. Jika ingin menjadi penjual, silakan hubungi administrator setelah registrasi.</p>
+                                    <p>Anda akan mendaftar sebagai pembeli. Jika ingin menjadi penjual, silakan hubungi
+                                        administrator setelah registrasi.</p>
                                 </div>
                             </div>
                         </div>
@@ -179,25 +185,22 @@
                     <!-- Terms and Conditions -->
                     <div class="mt-6 flex items-center">
                         <input id="terms" name="terms" type="checkbox" required
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label for="terms" class="ml-2 block text-sm text-gray-900">
-                            Saya setuju dengan 
+                            Saya setuju dengan
                             <a href="#" class="text-blue-600 hover:text-blue-500">Syarat dan Ketentuan</a>
-                            dan 
+                            dan
                             <a href="#" class="text-blue-600 hover:text-blue-500">Kebijakan Privasi</a>
                         </label>
                     </div>
                     @error('terms')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
 
                     <!-- Submit Button -->
                     <div class="mt-6">
                         <button type="submit"
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
-                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                <i class="fas fa-user-plus text-blue-500 group-hover:text-blue-400"></i>
-                            </span>
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
                             Buat Akun
                         </button>
                     </div>
@@ -216,20 +219,20 @@
 
             <!-- Alert Messages -->
             @if(session('success'))
-                <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">
-                    {{ session('success') }}
-                </div>
+            <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">
+                {{ session('success') }}
+            </div>
             @endif
 
             @if($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-                    <p class="font-medium">Terdapat kesalahan dalam form:</p>
-                    <ul class="mt-2 list-disc list-inside text-sm">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                <p class="font-medium">Terdapat kesalahan dalam form:</p>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
             @endif
 
             <!-- Footer -->
