@@ -46,9 +46,6 @@ class PasswordResetTest extends TestCase
 
     public function test_user_can_send_reset_code_via_whatsapp()
     {
-        // Set simulation mode for testing
-        putenv('FONNTE_TOKEN=isi_token_fonnte_anda_disini');
-        
         Http::fake([
             'https://api.fonnte.com/send' => Http::response(['status' => true], 200)
         ]);
@@ -299,9 +296,6 @@ class PasswordResetTest extends TestCase
 
     public function test_phone_number_formatting()
     {
-        // Set simulation mode for testing
-        putenv('FONNTE_TOKEN=isi_token_fonnte_anda_disini');
-        
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'phone' => '628123456789'

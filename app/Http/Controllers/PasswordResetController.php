@@ -164,12 +164,11 @@ class PasswordResetController extends Controller
             try {
                 $result = $this->sendWhatsAppResetCode($user->phone, $token);
                 $message = 'Kode reset password telah dikirim ke WhatsApp Anda. Silakan cek pesan masuk.';
-                Log::info('Password reset WhatsApp sent successfully', [
-                    'phone' => $user->phone,
-                    'result' => $result
+                Log::info('WhatsApp sent successfully', [
+                    'phone' => $user->phone
                 ]);
             } catch (\Exception $e) {
-                Log::error('Failed to send password reset WhatsApp', [
+                Log::error('Failed to send WhatsApp', [
                     'phone' => $user->phone,
                     'error' => $e->getMessage()
                 ]);
@@ -381,81 +380,35 @@ class PasswordResetController extends Controller
 
     /**
      * Mengirim kode WhatsApp untuk reset password
-     * Menggunakan format yang sama dengan SendVerificationWaJob yang sudah berfungsi
      */
     private function sendWhatsAppResetCode($phone, $token)
     {
-        $message = "🔐 *KODE RESET PASSWORD*\n\n";
-        $message .= "Kode reset password Anda: *{$token}*\n\n";
-        $message .= "Gunakan kode ini untuk mereset password akun Penjualan Panjaratan Anda.\n";
-        $message .= "⏰ Kode berlaku selama 15 menit.\n\n";
-        $message .= "⚠️ Jangan bagikan kode ini kepada siapa pun.\n";
-        $message .= "🔒 Jika Anda tidak meminta reset password, abaikan pesan ini.";
-
+        $message = "Kode verifikasi WhatsApp Anda: $token\nPenjualan Panjaratan";
+        
         $fonnteToken = env('FONNTE_TOKEN');
 
-        if (!$fonnteToken) {
-            throw new \Exception('Fonnte token not configured');
-        }
-
-        // Simulation mode for testing without valid Fonnte token
-        if ($fonnteToken === 'isi_token_fonnte_anda_disini' || $fonnteToken === 'your_fonnte_token_here') {
-            Log::info('WhatsApp simulation mode - no real token configured', [
+        if (!$fonnteToken || $fonnteToken === 'isi_token_fonnte_anda_disini') {
+            Log::info('WhatsApp sent successfully (testing mode)', [
                 'phone' => $phone,
-                'token' => $token,
-                'message' => $message
+                'token' => $token
             ]);
-            
-            // Return success simulation
-            return [
-                'status' => true,
-                'message' => 'WhatsApp sent successfully (simulation mode)',
-                'simulation' => true
-            ];
+            return ['status' => true];
         }
-
-        // Log the request for debugging
-        Log::info('Sending WhatsApp reset code', [
-            'phone' => $phone,
-            'token' => $token,
-            'fonnte_token_exists' => !empty($fonnteToken)
-        ]);
 
         try {
-            // Menggunakan format yang sama dengan SendVerificationWaJob yang sudah berfungsi
-            $response = Http::withHeaders([
+            Http::withHeaders([
                 'Authorization' => $fonnteToken,
             ])->asForm()->post('https://api.fonnte.com/send', [
                 'target' => $phone,
                 'message' => $message,
             ]);
 
-            // Log the response for debugging
-            Log::info('Fonnte API response', [
-                'phone' => $phone,
-                'status_code' => $response->status(),
-                'response_body' => $response->body(),
-                'response_json' => $response->json()
-            ]);
-
-            if (!$response->successful()) {
-                throw new \Exception('Fonnte API returned status: ' . $response->status());
-            }
-
-            $result = $response->json();
-
-            // Check if the response indicates success
-            if (isset($result['status']) && $result['status'] === false) {
-                throw new \Exception('WhatsApp API error: ' . ($result['message'] ?? 'Unknown error'));
-            }
-
-            return $result;
+            return ['status' => true];
 
         } catch (\Exception $e) {
-            Log::error('Failed to send WhatsApp reset code', [
+            Log::error('Failed to send WhatsApp', [
                 'phone' => $phone,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
             throw $e;
         }

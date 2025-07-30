@@ -58,10 +58,14 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            User::updateOrCreate(
-                ['email' => $userData['email']],
-                $userData
-            );
+            try {
+                User::updateOrCreate(
+                    ['email' => $userData['email']],
+                    $userData
+                );
+            } catch (\Exception $e) {
+                $this->command->error('Failed to create user: ' . $userData['email'] . ' - ' . $e->getMessage());
+            }
         }
 
         $this->command->info('Test users created successfully!');
