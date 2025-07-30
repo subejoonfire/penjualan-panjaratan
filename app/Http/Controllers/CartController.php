@@ -455,4 +455,175 @@ class CartController extends Controller
 
         return response()->json(['items' => $items, 'total' => $total]);
     }
+
+    /**
+     * Direct checkout for single product
+     */
+    public function directCheckout(Product $product)
+    {
+        $user = Auth::user();
+        
+        // Check if product is active
+        if (!$product->is_active) {
+            return back()->with('error', 'Produk tidak tersedia');
+        }
+
+        // Check stock
+        if ($product->productstock <= 0) {
+            return back()->with('error', 'Produk sedang tidak tersedia');
+        }
+
+        // Get quantity from URL parameter
+        $quantity = request('quantity', 1);
+        if ($quantity > $product->productstock) {
+            $quantity = $product->productstock;
+        }
+
+        // Get user addresses
+        $addresses = $user->addresses()->orderBy('is_default', 'desc')->get();
+        $defaultAddress = $addresses->where('is_default', true)->first();
+
+        return view('customer.direct-checkout', compact('product', 'addresses', 'defaultAddress', 'quantity'));
+    }
+
+    /**
+     * Process direct checkout
+     */
+    public function processDirectCheckout(Request $request, Product $product)
+    {
+        try {
+            $user = Auth::user();
+
+            $request->validate([
+                'quantity' => 'required|integer|min:1|max:' . $product->productstock,
+                'address_id' => 'nullable|exists:addresses,id',
+                'manual_address' => 'nullable|string|max:500',
+                'notes' => 'nullable|string|max:1000',
+                'payment_method' => 'nullable|string|in:cod,bank_transfer'
+            ]);
+
+            // Check if product is active
+            if (!$product->is_active) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Produk tidak tersedia']);
+                }
+                return back()->with('error', 'Produk tidak tersedia');
+            }
+
+            // Check stock
+            if ($product->productstock < $request->quantity) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
+                }
+                return back()->with('error', 'Stok tidak mencukupi');
+            }
+
+            DB::beginTransaction();
+
+            try {
+                // Create temporary cart for this order
+                $cart = Cart::create([
+                    'iduser' => $user->id,
+                    'checkoutstatus' => 'checkout'
+                ]);
+
+                // Add product to cart
+                CartDetail::create([
+                    'idcart' => $cart->id,
+                    'idproduct' => $product->id,
+                    'quantity' => $request->quantity,
+                    'productprice' => $product->productprice
+                ]);
+
+                // Determine shipping address
+                $shippingAddress = '';
+                if ($request->address_id) {
+                    $address = $user->addresses()->find($request->address_id);
+                    $shippingAddress = $address->address;
+                } elseif ($request->manual_address) {
+                    $shippingAddress = $request->manual_address;
+                } else {
+                    if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                        return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
+                    }
+                    return back()->with('error', 'Alamat pengiriman harus diisi');
+                }
+
+                // Calculate totals
+                $subtotal = $request->quantity * $product->productprice;
+                $shippingCost = 15000; // Fixed shipping cost
+                $tax = 0; // No tax for now
+                $grandTotal = $subtotal + $shippingCost + $tax;
+
+                // Generate order number
+                $date = now()->format('Ymd');
+                $maxAttempts = 5;
+                $orderNumber = null;
+                for ($i = 0; $i < $maxAttempts; $i++) {
+                    $orderCount = Order::whereDate('created_at', today())->count() + 1 + $i;
+                    $orderNumberCandidate = 'ORD-' . $date . '-' . str_pad($orderCount, 6, '0', STR_PAD_LEFT);
+                    if (!Order::where('order_number', $orderNumberCandidate)->exists()) {
+                        $orderNumber = $orderNumberCandidate;
+                        break;
+                    }
+                }
+                if (!$orderNumber) {
+                    $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
+                }
+
+                // Create order
+                $order = Order::create([
+                    'idcart' => $cart->id,
+                    'order_number' => $orderNumber,
+                    'grandtotal' => $grandTotal,
+                    'shipping_address' => $shippingAddress,
+                    'status' => 'pending',
+                    'notes' => $request->notes
+                ]);
+
+                // Update cart status
+                $cart->update(['checkoutstatus' => 'ordered']);
+
+                // Create transaction
+                $transaction = Transaction::create([
+                    'idorder' => $order->id,
+                    'amount' => $grandTotal,
+                    'payment_method' => $request->payment_method ?? 'cod',
+                    'status' => 'pending'
+                ]);
+
+                // Create notification for seller
+                $notification = Notification::create([
+                    'iduser' => $product->seller->id,
+                    'title' => 'Pesanan Baru',
+                    'notification' => "Pesanan baru #{$orderNumber} untuk produk {$product->productname}",
+                    'type' => 'order',
+                    'readstatus' => false
+                ]);
+
+                DB::commit();
+
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Pesanan berhasil dibuat',
+                        'redirect_url' => route('customer.orders.show', $order)
+                    ]);
+                }
+
+                return redirect()->route('customer.orders.show', $order)
+                    ->with('success', 'Pesanan berhasil dibuat');
+
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

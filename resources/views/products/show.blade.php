@@ -737,80 +737,8 @@
         // Get quantity
         const quantity = document.getElementById('quantity').value;
         
-        // Find the button that was clicked
-        const button = event ? event.target.closest('button') : null;
-        const originalText = button ? button.innerHTML : '';
-        
-        // Disable button and show loading animation
-        if (button) {
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
-        }
-        
-        const formData = new FormData();
-        formData.append('quantity', quantity);
-        
-        fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: formData
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Cart response:', data);
-            if (data.success) {
-                // Show success message
-                showModalNotification({
-                    type: 'success',
-                    title: 'Berhasil!',
-                    message: 'Produk berhasil ditambahkan ke keranjang. Mengalihkan ke checkout...',
-                    confirmText: 'OK',
-                    showCancel: false,
-                    onConfirm: () => {
-                        // Redirect to checkout
-                        window.location.href = `${window.location.origin}/customer/checkout`;
-                    }
-                });
-                
-                // Refresh cart count
-                refreshCartCount();
-            } else {
-                showModalNotification({
-                    type: 'error',
-                    title: 'Gagal!',
-                    message: data.message || 'Gagal menambahkan ke keranjang',
-                    confirmText: 'OK',
-                    showCancel: false
-                });
-                if (button) {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Cart error:', error);
-            showModalNotification({
-                type: 'error',
-                title: 'Error!',
-                message: 'Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message,
-                confirmText: 'OK',
-                showCancel: false
-            });
-            if (button) {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        });
+        // Redirect to direct checkout page
+        window.location.href = `${window.location.origin}/customer/direct-checkout/${productId}?quantity=${quantity}`;
     }
 
     // Submit review function

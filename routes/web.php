@@ -106,6 +106,8 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::post('/checkout', [CartController::class, 'processCheckout'])->name('checkout.process');
+    Route::get('/direct-checkout/{product}', [CartController::class, 'directCheckout'])->name('direct-checkout');
+    Route::post('/direct-checkout/{product}', [CartController::class, 'processDirectCheckout'])->name('direct-checkout.process');
     Route::get('/orders', [CustomerDashboardController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{order}', [CustomerDashboardController::class, 'orderDetail'])->name('orders.show');
     Route::put('/orders/{order}/cancel', [CustomerDashboardController::class, 'cancelOrder'])->name('orders.cancel');

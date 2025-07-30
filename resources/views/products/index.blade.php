@@ -242,6 +242,22 @@
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
 
+                <!-- Skeleton Loading -->
+                <div id="skeleton-loading" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6 gap-3 sm:gap-6">
+                    @for($i = 0; $i < 12; $i++)
+                    <div class="bg-white shadow rounded-lg overflow-hidden animate-pulse">
+                        <div class="aspect-w-1 aspect-h-1 bg-gray-200">
+                            <div class="w-full h-48 bg-gray-300"></div>
+                        </div>
+                        <div class="p-3">
+                            <div class="h-4 bg-gray-300 rounded mb-2"></div>
+                            <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+                            <div class="h-4 bg-gray-300 rounded w-1/2 mt-2"></div>
+                        </div>
+                    </div>
+                    @endfor
+                </div>
+
                 <!-- No Products Message -->
                 <div id="no-products" class="hidden bg-white shadow rounded-lg">
                     <div class="px-6 py-12 text-center">
@@ -292,6 +308,7 @@
             document.getElementById('products-container').innerHTML = '';
             document.getElementById('no-products').classList.add('hidden');
             document.getElementById('load-more-container').classList.add('hidden');
+            document.getElementById('skeleton-loading').classList.remove('hidden');
         }
         
         // Show loading spinner
@@ -337,6 +354,7 @@
             .then(data => {
                 isLoading = false;
                 document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('skeleton-loading').classList.add('hidden');
                 
                 if (data.error) {
                     console.error('API Error:', data.error);
@@ -424,8 +442,8 @@
         
         card.innerHTML = `
             <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
-                <a href="${product.url}">
-                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="w-full h-32 sm:h-48 object-cover">` : `<div class="w-full h-32 sm:h-48 flex items-center justify-center"><i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i></div>`}
+                <a href="${product.url}" onclick="handleProductClick(event, '${product.url}')">
+                    ${product.image ? `<img data-src="${product.image}" alt="${product.name}" class="w-full h-32 sm:h-48 object-cover" loading="lazy" onload="this.style.opacity='1'" onerror="handleImageError(this)" style="opacity: 0; transition: opacity 0.3s;"><div class="w-full h-32 sm:h-48 flex items-center justify-center" style="display: none;"><i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i></div>` : `<div class="w-full h-32 sm:h-48 flex items-center justify-center"><i class="fas fa-image text-gray-400 text-lg sm:text-2xl"></i></div>`}
                 </a>
                 ${stockBadge}
             </div>
@@ -459,6 +477,49 @@
         `;
         
         return card;
+    }
+
+    // Handle product click for immediate navigation
+    function handleProductClick(event, url) {
+        // Show loading indicator on the clicked product
+        const productCard = event.currentTarget.closest('.bg-white');
+        if (productCard) {
+            productCard.style.opacity = '0.7';
+            productCard.style.pointerEvents = 'none';
+        }
+        
+        // Preload the destination page
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = url;
+        document.head.appendChild(link);
+        
+        // Navigate immediately
+        window.location.href = url;
+    }
+
+    // Handle image loading error
+    function handleImageError(img) {
+        img.style.display = 'none';
+        const placeholder = img.nextElementSibling;
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+        }
+    }
+
+    // Preload critical images
+    function preloadCriticalImages() {
+        const criticalImages = [
+            // Add any critical images here
+        ];
+        
+        criticalImages.forEach(src => {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = src;
+            document.head.appendChild(link);
+        });
     }
 
     // Load more products function
@@ -707,7 +768,52 @@
         }
     }
 
+    // Initialize intersection observer for lazy loading
+    function initializeIntersectionObserver() {
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            // Preload image
+                            const preloadImg = new Image();
+                            preloadImg.onload = function() {
+                                img.src = img.dataset.src;
+                                img.style.opacity = '1';
+                                img.removeAttribute('data-src');
+                                observer.unobserve(img);
+                            };
+                            preloadImg.onerror = function() {
+                                handleImageError(img);
+                                observer.unobserve(img);
+                            };
+                            preloadImg.src = img.dataset.src;
+                        }
+                    }
+                });
+            });
+
+            // Observe all images with data-src
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Hide skeleton loading initially
+        document.getElementById('skeleton-loading').classList.add('hidden');
+        
+        // Load products with skeleton loading
+        loadProducts(1, true);
+        
+        // Initialize filters
+        initializeFilters();
+        
+        // Initialize intersection observer for lazy loading
+        initializeIntersectionObserver();
+        
         setRupiahInput('min_price');
         setRupiahInput('max_price');
         setRupiahInput('min_price_mobile');
