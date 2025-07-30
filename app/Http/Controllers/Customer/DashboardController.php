@@ -171,45 +171,62 @@ class DashboardController extends Controller
      */
     public function addReview(Request $request, Product $product)
     {
-        $user = Auth::user();
-        
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'productreviews' => 'nullable|string|max:1000'
-        ]);
-        
-        // Check if user has purchased this product (has delivered order)
-        $hasPurchased = Order::whereHas('cart', function($query) use ($user) {
-            $query->where('iduser', $user->id);
-        })->whereHas('cart.cartDetails', function($query) use ($product) {
-            $query->where('idproduct', $product->id);
-        })->where('status', 'delivered')->exists();
-        
-        if (!$hasPurchased) {
-            return back()->with('error', 'Anda hanya dapat memberikan ulasan untuk produk yang telah Anda beli dan terima');
-        }
-        
-        // Check if user already reviewed this product
-        $existingReview = ProductReview::where('iduser', $user->id)
-            ->where('idproduct', $product->id)
-            ->first();
-        
-        if ($existingReview) {
-            $existingReview->update([
-                'rating' => $request->rating,
-                'productreviews' => $request->productreviews
+        try {
+            $user = Auth::user();
+            
+            $request->validate([
+                'rating' => 'required|integer|min:1|max:5',
+                'productreviews' => 'nullable|string|max:1000'
             ]);
             
-            return back()->with('success', 'Ulasan berhasil diperbarui');
-        } else {
-            ProductReview::create([
-                'iduser' => $user->id,
-                'idproduct' => $product->id,
-                'rating' => $request->rating,
-                'productreviews' => $request->productreviews
-            ]);
+            // Check if user has purchased this product (has delivered order)
+            $hasPurchased = Order::whereHas('cart', function($query) use ($user) {
+                $query->where('iduser', $user->id);
+            })->whereHas('cart.cartDetails', function($query) use ($product) {
+                $query->where('idproduct', $product->id);
+            })->where('status', 'delivered')->exists();
             
-            return back()->with('success', 'Ulasan berhasil ditambahkan');
+            if (!$hasPurchased) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Anda hanya dapat memberikan ulasan untuk produk yang telah Anda beli dan terima']);
+                }
+                return back()->with('error', 'Anda hanya dapat memberikan ulasan untuk produk yang telah Anda beli dan terima');
+            }
+            
+            // Check if user already reviewed this product
+            $existingReview = ProductReview::where('iduser', $user->id)
+                ->where('idproduct', $product->id)
+                ->first();
+            
+            if ($existingReview) {
+                $existingReview->update([
+                    'rating' => $request->rating,
+                    'productreviews' => $request->productreviews
+                ]);
+                
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => true, 'message' => 'Ulasan berhasil diperbarui']);
+                }
+                return back()->with('success', 'Ulasan berhasil diperbarui');
+            } else {
+                ProductReview::create([
+                    'iduser' => $user->id,
+                    'idproduct' => $product->id,
+                    'rating' => $request->rating,
+                    'productreviews' => $request->productreviews
+                ]);
+                
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => true, 'message' => 'Ulasan berhasil ditambahkan']);
+                }
+                return back()->with('success', 'Ulasan berhasil ditambahkan');
+            }
+            
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
     

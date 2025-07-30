@@ -139,48 +139,56 @@
                 @if(auth()->user()->role === 'customer')
                 <div class="border-t border-gray-200 pt-6">
                     <!-- Wishlist and Cart Actions -->
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @php
                         $isInWishlist = auth()->user() && \App\Models\Wishlist::where('user_id',
                         auth()->id())->where('product_id', $product->id)->exists();
                         @endphp
 
-                        <!-- Wishlist Button -->
-                        <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
-                            class="w-full {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-2 px-4 rounded-md transition-colors">
-                            <i class="fas fa-heart mr-2"></i>
-                            <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Produk Disukai' : 'Tambah ke Produk Disukai'
-                                }}</span>
-                        </button>
-
                         @if($product->is_active && $product->productstock > 0)
-                        <div class="space-y-4">
-                            <!-- Quantity Selector -->
-                            <div>
-                                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Jumlah
-                                </label>
-                                <div class="flex items-center space-x-2">
-                                    <button type="button" onclick="decreaseQuantity()"
-                                        class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                                        <i class="fas fa-minus text-sm"></i>
-                                    </button>
-                                    <input type="number" id="quantity" min="1"
-                                        max="{{ $product->productstock }}" value="1"
-                                        class="w-20 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                    <button type="button" onclick="increaseQuantity()"
-                                        class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                                        <i class="fas fa-plus text-sm"></i>
-                                    </button>
-                                    <span class="text-sm text-gray-500">Max: {{ $product->productstock }}</span>
-                                </div>
+                        <!-- Quantity Selector -->
+                        <div>
+                            <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                                Jumlah
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <button type="button" onclick="decreaseQuantity()"
+                                    class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                                    <i class="fas fa-minus text-sm"></i>
+                                </button>
+                                <input type="number" id="quantity" min="1"
+                                    max="{{ $product->productstock }}" value="1"
+                                    class="w-20 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <button type="button" onclick="increaseQuantity()"
+                                    class="p-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                                    <i class="fas fa-plus text-sm"></i>
+                                </button>
+                                <span class="text-sm text-gray-500">Max: {{ $product->productstock }}</span>
                             </div>
+                        </div>
 
+                        <!-- Action Buttons Grid -->
+                        <div class="grid grid-cols-1 gap-3">
                             <!-- Add to Cart Button -->
                             <button type="button" onclick="addToCart({{ $product->id }}, event)"
                                 class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
                                 <i class="fas fa-shopping-cart mr-2"></i>
                                 Tambah ke Keranjang
+                            </button>
+
+                            <!-- Buy Now Button -->
+                            <button type="button" onclick="buyNow({{ $product->id }}, event)"
+                                class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium">
+                                <i class="fas fa-credit-card mr-2"></i>
+                                Beli Sekarang
+                            </button>
+
+                            <!-- Wishlist Button -->
+                            <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
+                                class="w-full {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-3 px-4 rounded-md transition-colors font-medium">
+                                <i class="fas fa-heart mr-2"></i>
+                                <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Produk Disukai' : 'Tambah ke Produk Disukai'
+                                    }}</span>
                             </button>
                         </div>
                         @else
@@ -191,6 +199,14 @@
                                 Produk sedang tidak tersedia
                             </p>
                         </div>
+
+                        <!-- Wishlist Button (even when out of stock) -->
+                        <button onclick="toggleWishlist({{ $product->id }})" id="wishlistBtn"
+                            class="w-full {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700' }} text-white py-3 px-4 rounded-md transition-colors font-medium">
+                            <i class="fas fa-heart mr-2"></i>
+                            <span id="wishlistText">{{ $isInWishlist ? 'Hapus dari Produk Disukai' : 'Tambah ke Produk Disukai'
+                                }}</span>
+                        </button>
                         @endif
                     </div>
                 </div>
@@ -375,8 +391,7 @@
                     <h3 class="text-lg font-medium text-gray-900">Tulis Ulasan</h3>
                 </div>
                 <div class="px-6 py-6">
-                    <form action="{{ route('customer.products.reviews.store', $product) }}" method="POST">
-                        @csrf
+                    <div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Penilaian</label>
                             <div class="flex items-center space-x-1">
@@ -387,7 +402,7 @@
                                     </button>
                                     @endfor
                             </div>
-                            <input type="hidden" name="rating" id="rating" value="5" required>
+                            <input type="hidden" id="rating" value="5" required>
                             @error('rating')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -396,7 +411,7 @@
                         <div class="mb-4">
                             <label for="productreviews" class="block text-sm font-medium text-gray-700 mb-2">Ulasan
                                 (Opsional)</label>
-                            <textarea name="productreviews" id="productreviews" rows="4"
+                            <textarea id="productreviews" rows="4"
                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 placeholder="Bagikan pengalaman Anda dengan produk ini...">{{ old('productreviews') }}</textarea>
                             @error('productreviews')
@@ -405,12 +420,12 @@
                         </div>
 
                         <div class="flex justify-end">
-                            <button type="submit"
+                            <button type="button" onclick="submitReview({{ $product->id }})"
                                 class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
                                 Kirim Ulasan
                             </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -703,6 +718,151 @@
                 }
             })
             .catch(error => console.error('Error refreshing cart count:', error));
+    }
+
+    // Buy Now function (direct checkout)
+    function buyNow(productId, event) {
+        if (event) event.preventDefault();
+        
+        // Get quantity
+        const quantity = document.getElementById('quantity').value;
+        
+        // Find the button that was clicked
+        const button = event ? event.target.closest('button') : null;
+        const originalText = button ? button.innerHTML : '';
+        
+        // Disable button and show loading animation
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+        }
+        
+        const formData = new FormData();
+        formData.append('quantity', quantity);
+        
+        fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Cart response:', data);
+            if (data.success) {
+                // Show success message
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: 'Produk berhasil ditambahkan ke keranjang. Mengalihkan ke checkout...',
+                    confirmText: 'OK',
+                    showCancel: false,
+                    onConfirm: () => {
+                        // Redirect to checkout
+                        window.location.href = `${window.location.origin}/customer/checkout`;
+                    }
+                });
+                
+                // Refresh cart count
+                refreshCartCount();
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+                if (button) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message,
+                confirmText: 'OK',
+                showCancel: false
+            });
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    }
+
+    // Submit review function
+    function submitReview(productId) {
+        const rating = document.getElementById('rating').value;
+        const review = document.getElementById('productreviews').value;
+        const button = event.target;
+        const originalText = button.textContent;
+        
+        // Disable button and show loading
+        button.disabled = true;
+        button.textContent = 'Mengirim...';
+        
+        const formData = new FormData();
+        formData.append('rating', rating);
+        formData.append('productreviews', review);
+        
+        fetch(`${window.location.origin}/customer/products/${productId}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: data.message || 'Ulasan berhasil dikirim',
+                    confirmText: 'OK',
+                    showCancel: false,
+                    onConfirm: () => {
+                        window.location.reload();
+                    }
+                });
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal mengirim ulasan',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Review error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat mengirim ulasan',
+                confirmText: 'OK',
+                showCancel: false
+            });
+            button.textContent = originalText;
+            button.disabled = false;
+        });
     }
 </script>
 @endsection
