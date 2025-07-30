@@ -124,6 +124,39 @@ class PaymentController extends Controller
     }
 
     /**
+     * Get available payment methods from Duitku dan render checkout
+     */
+    public function checkout(Request $request)
+    {
+        $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+        $merchantCode = 'DS24203';
+        $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+        $amount = (int) ($request->amount ?? 10000);
+        $datetime = now()->format('Y-m-d H:i:s');
+        $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
+        $params = [
+            'merchantcode' => $merchantCode,
+            'amount' => $amount,
+            'datetime' => $datetime,
+            'signature' => $signature
+        ];
+        $response = \Illuminate\Support\Facades\Http::withHeaders([
+            'Content-Type' => 'application/json'
+        ])->post($url, $params);
+        $paymentMethods = $response->successful() && isset($response['paymentFee']) ? $response['paymentFee'] : [];
+        // ...ambil data cart, addresses, dsb seperti sebelumnya
+        $user = auth()->user();
+        $cart = $user->activeCart;
+        $cartDetails = $cart ? $cart->cartDetails()->with('product.images', 'product.seller')->get() : collect();
+        $addresses = $user->addresses ?? collect();
+        $defaultAddress = $addresses->where('is_default', true)->first();
+        $subtotal = $cartDetails->sum(function ($detail) { return $detail->quantity * $detail->productprice; });
+        $shippingCost = 15000;
+        $total = $subtotal + $shippingCost;
+        return view('customer.checkout', compact('cart', 'cartDetails', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost', 'total', 'paymentMethods'));
+    }
+
+    /**
      * Get available payment methods from Duitku
      */
     public function getPaymentMethods(Request $request)

@@ -121,8 +121,41 @@
                         <h3 class="text-base sm:text-lg font-medium text-gray-900">Metode Pembayaran</h3>
                     </div>
                     <div class="p-3 sm:p-6">
-                        <div id="payment-methods-list" class="space-y-3 sm:space-y-4">
-                            <div class="text-gray-500 text-sm">Memuat metode pembayaran...</div>
+                        <div class="space-y-3 sm:space-y-4">
+                            @forelse($paymentMethods as $method)
+                            @php
+                            $isQris = stripos($method['paymentName'], 'qris') !== false;
+                            $isEwallet = preg_match('/ovo|dana|linkaja|shopeepay|indodana/i', $method['paymentName']);
+                            $isVA = preg_match('/va|virtual account/i', $method['paymentName']);
+                            @endphp
+                            <label
+                                class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition mb-2">
+                                <input type="radio" name="payment_method" value="{{ $method['paymentMethod'] }}"
+                                    class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <img src="{{ $method['paymentImage'] }}" alt="{{ $method['paymentName'] }}"
+                                    class="w-10 h-10 object-contain rounded bg-white border mr-2">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900">{{ $method['paymentName']
+                                            }}</span>
+                                        @if($isQris)
+                                        <span
+                                            class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">QRIS</span>
+                                        @elseif($isEwallet)
+                                        <span
+                                            class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700">E-Wallet</span>
+                                        @elseif($isVA)
+                                        <span
+                                            class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700">VA</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-0.5">Kode: <span class="font-mono">{{
+                                            $method['paymentMethod'] }}</span></div>
+                                </div>
+                            </label>
+                            @empty
+                            <div class="text-red-500 text-sm">Gagal memuat metode pembayaran</div>
+                            @endforelse
                         </div>
                         @error('payment_method')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -238,47 +271,7 @@
         // Initial state
         toggleManualAddress();
 
-        // Fetch payment methods from Duitku
-        fetch({{ url('/customer/payment-methods') }})
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('payment-methods-list');
-                container.innerHTML = '';
-                if (data.paymentFee) {
-                    data.paymentFee.forEach(method => {
-                        const isQris = method.paymentName.toLowerCase().includes('qris');
-                        const isEwallet = /ovo|dana|linkaja|shopeepay|indodana/i.test(method.paymentName);
-                        const isVA = /va|virtual account/i.test(method.paymentName);
-                        let badge = '';
-                        if (isQris) badge = '<span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">QRIS</span>';
-                        else if (isEwallet) badge = '<span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-700">E-Wallet</span>';
-                        else if (isVA) badge = '<span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700">VA</span>';
-                        const label = document.createElement('label');
-                        label.className = 'flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition mb-2';
-                        label.innerHTML = `
-                            <input type="radio" name="payment_method" value="${method.paymentMethod}" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <img src="${method.paymentImage}" alt="${method.paymentName}" class="w-10 h-10 object-contain rounded bg-white border mr-2">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center">
-                                    <span class="text-sm font-medium text-gray-900">${method.paymentName}</span>
-                                    ${badge}
-                                </div>
-                                <div class="text-xs text-gray-500 mt-0.5">Kode: <span class="font-mono">${method.paymentMethod}</span></div>
-                            </div>
-                        `;
-                        container.appendChild(label);
-                    });
-                    // Select first by default
-                    const firstRadio = container.querySelector('input[type=radio]');
-                    if (firstRadio) firstRadio.checked = true;
-                } else {
-                    container.innerHTML = '<div class="text-red-500 text-sm">Gagal memuat metode pembayaran</div>';
-                }
-            })
-            .catch(() => {
-                const container = document.getElementById('payment-methods-list');
-                container.innerHTML = '<div class="text-red-500 text-sm">Gagal memuat metode pembayaran</div>';
-            });
+        // Hapus/freeze JS fetch payment method
     });
 
     function processCheckout() {
