@@ -154,6 +154,10 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
     Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'getWishlist'])->name('wishlist.list');
+    Route::get('/notifications/count', function () {
+        $user = auth()->user();
+        return response()->json(['count' => $user->unread_notification_count]);
+    })->name('notifications.count');
     Route::get('/notifications/unread', function () {
         $user = auth()->user();
         
