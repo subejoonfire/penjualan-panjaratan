@@ -327,7 +327,7 @@
         }
         
         // Fetch products
-        fetch(`{{ route('api.products.list') }}?${params.toString()}`)
+        fetch(`${window.location.origin}/api/products?${params.toString()}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
