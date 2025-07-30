@@ -381,6 +381,7 @@ class PasswordResetController extends Controller
 
     /**
      * Mengirim kode WhatsApp untuk reset password
+     * Menggunakan format yang sama dengan SendVerificationWaJob yang sudah berfungsi
      */
     private function sendWhatsAppResetCode($phone, $token)
     {
@@ -390,70 +391,73 @@ class PasswordResetController extends Controller
         $message .= "⏰ Kode berlaku selama 15 menit.\n\n";
         $message .= "⚠️ Jangan bagikan kode ini kepada siapa pun.\n";
         $message .= "🔒 Jika Anda tidak meminta reset password, abaikan pesan ini.";
-        
-        $fonnteToken = config('services.fonnte.token');
-        $fonnteUrl = config('services.fonnte.url');
-        
+
+        $fonnteToken = env('FONNTE_TOKEN');
+
         if (!$fonnteToken) {
             throw new \Exception('Fonnte token not configured');
         }
 
-        // Menggunakan Fonnte API dengan retry mechanism
-        $maxRetries = 3;
-        $retryDelay = 2; // seconds
-        
-        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-            try {
-                $response = Http::timeout(30)->post($fonnteUrl, [
-                    'target' => $phone,
-                    'message' => $message,
-                    'token' => $fonnteToken
-                ]);
+        // Simulation mode for testing without valid Fonnte token
+        if ($fonnteToken === 'isi_token_fonnte_anda_disini' || $fonnteToken === 'your_fonnte_token_here') {
+            Log::info('WhatsApp simulation mode - no real token configured', [
+                'phone' => $phone,
+                'token' => $token,
+                'message' => $message
+            ]);
+            
+            // Return success simulation
+            return [
+                'status' => true,
+                'message' => 'WhatsApp sent successfully (simulation mode)',
+                'simulation' => true
+            ];
+        }
 
-                if (!$response->successful()) {
-                    $errorData = $response->json();
-                    Log::error('Fonnte API error', [
-                        'phone' => $phone,
-                        'status' => $response->status(),
-                        'response' => $errorData,
-                        'attempt' => $attempt
-                    ]);
-                    
-                    if ($attempt === $maxRetries) {
-                        throw new \Exception('Failed to send WhatsApp message: ' . ($errorData['message'] ?? 'Unknown error'));
-                    }
-                    
-                    sleep($retryDelay);
-                    continue;
-                }
+        // Log the request for debugging
+        Log::info('Sending WhatsApp reset code', [
+            'phone' => $phone,
+            'token' => $token,
+            'fonnte_token_exists' => !empty($fonnteToken)
+        ]);
 
-                $result = $response->json();
-                
-                // Check if message was sent successfully
-                if (isset($result['status']) && $result['status'] === false) {
-                    if ($attempt === $maxRetries) {
-                        throw new \Exception('WhatsApp API error: ' . ($result['message'] ?? 'Unknown error'));
-                    }
-                    
-                    sleep($retryDelay);
-                    continue;
-                }
+        try {
+            // Menggunakan format yang sama dengan SendVerificationWaJob yang sudah berfungsi
+            $response = Http::withHeaders([
+                'Authorization' => $fonnteToken,
+            ])->asForm()->post('https://api.fonnte.com/send', [
+                'target' => $phone,
+                'message' => $message,
+            ]);
 
-                return $result;
-                
-            } catch (\Exception $e) {
-                Log::error('Fonnte API exception', [
-                    'phone' => $phone,
-                    'error' => $e->getMessage(),
-                    'attempt' => $attempt
-                ]);
-                
-                if ($attempt === $maxRetries) {
-                    throw $e;
-                }
-                
-                sleep($retryDelay);
+            // Log the response for debugging
+            Log::info('Fonnte API response', [
+                'phone' => $phone,
+                'status_code' => $response->status(),
+                'response_body' => $response->body(),
+                'response_json' => $response->json()
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception('Fonnte API returned status: ' . $response->status());
             }
+
+            $result = $response->json();
+
+            // Check if the response indicates success
+            if (isset($result['status']) && $result['status'] === false) {
+                throw new \Exception('WhatsApp API error: ' . ($result['message'] ?? 'Unknown error'));
+            }
+
+            return $result;
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send WhatsApp reset code', [
+                'phone' => $phone,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
         }
     }
 }
