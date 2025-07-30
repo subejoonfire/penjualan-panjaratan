@@ -418,7 +418,7 @@ class DashboardController extends Controller
             ], 400);
         }
 
-        $order->update(['status' => $request->status]);
+        $order->updateStatus($request->status);
 
         return response()->json([
             'success' => true,

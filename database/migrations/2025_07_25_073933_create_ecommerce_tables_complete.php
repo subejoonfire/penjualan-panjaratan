@@ -88,6 +88,7 @@ return new class extends Migration
             $table->decimal('grandtotal', 12, 2); // Total harga
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled'])->default('pending'); // Status pesanan
             $table->text('shipping_address'); // Alamat pengiriman
+            $table->timestamp('status_updated_at')->nullable(); // Waktu terakhir update status
             $table->timestamps();
         });
 

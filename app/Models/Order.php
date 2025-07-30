@@ -22,6 +22,7 @@ class Order extends Model
         'grandtotal',
         'status',
         'shipping_address',
+        'status_updated_at',
     ];
 
     /**
@@ -29,6 +30,7 @@ class Order extends Model
      */
     protected $casts = [
         'grandtotal' => 'decimal:2',
+        'status_updated_at' => 'datetime',
     ];
 
     // Relasi ke Cart (Many to One)
@@ -78,7 +80,10 @@ class Order extends Model
     // Helper method untuk update status
     public function updateStatus($status)
     {
-        $this->update(['status' => $status]);
+        $this->update([
+            'status' => $status,
+            'status_updated_at' => now()
+        ]);
     }
 
     // Scope berdasarkan status
