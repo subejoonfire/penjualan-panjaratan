@@ -328,10 +328,23 @@
         
         // Fetch products
         fetch(`{{ route('api.products.list') }}?${params.toString()}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 isLoading = false;
                 document.getElementById('loading-spinner').classList.add('hidden');
+                
+                if (data.error) {
+                    console.error('API Error:', data.error);
+                    document.getElementById('no-products').classList.remove('hidden');
+                    document.getElementById('no-products').querySelector('h3').textContent = 'Terjadi Kesalahan';
+                    document.getElementById('no-products').querySelector('p').textContent = data.error;
+                    return;
+                }
                 
                 if (data.products.length === 0 && page === 1) {
                     document.getElementById('no-products').classList.remove('hidden');
@@ -356,7 +369,11 @@
                 console.error('Error loading products:', error);
                 isLoading = false;
                 document.getElementById('loading-spinner').classList.add('hidden');
-                showAlert('Terjadi kesalahan saat memuat produk', 'error');
+                
+                // Show error message
+                document.getElementById('no-products').classList.remove('hidden');
+                document.getElementById('no-products').querySelector('h3').textContent = 'Terjadi Kesalahan';
+                document.getElementById('no-products').querySelector('p').textContent = 'Terjadi kesalahan saat memuat produk. Silakan coba lagi.';
             });
     }
 

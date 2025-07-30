@@ -155,10 +155,15 @@ class Product extends Model
     // Helper method untuk scope sold count
     public function scopeWithSoldCount($query)
     {
-        return $query->withSum(['cartDetails as sold_count' => function($q) {
-            $q->whereHas('cart.order', function($query) {
-                $query->where('status', 'delivered');
-            });
-        }], 'quantity');
+        return $query->addSelect([
+            'sold_count' => \DB::raw('(
+                SELECT COALESCE(SUM(cd.quantity), 0)
+                FROM cart_details cd
+                INNER JOIN carts c ON cd.idcart = c.id
+                INNER JOIN orders o ON c.id = o.idcart
+                WHERE cd.idproduct = products.id
+                AND o.status = "delivered"
+            )')
+        ]);
     }
 }
