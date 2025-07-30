@@ -143,12 +143,9 @@
                                 </a>
                                 @auth
                                 @if(auth()->user()->isCustomer() && $product->productstock > 0)
-                                <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="flex-shrink-0">
-                                    @csrf
-                                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-                                        <i class="fas fa-cart-plus"></i>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="addToCart({{ $product->id }}, event)" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
                                 @endif
                                 @endauth
                             </div>
@@ -172,4 +169,115 @@
         </div>
     </div>
 </div>
+
+<script>
+
+
+    // Add to cart function
+    function addToCart(productId, event) {
+        if (event) event.preventDefault();
+        
+        // Find the button that was clicked
+        const button = event ? event.target.closest('button') : null;
+        const originalText = button ? button.innerHTML : '';
+        
+        // Disable button and show loading animation
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+        
+        const formData = new FormData();
+        formData.append('quantity', 1);
+        
+        fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Cart response:', data);
+            if (data.success) {
+                // Show success animation
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    button.classList.add('bg-blue-600');
+                }
+                
+                // Show success message
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: data.message || 'Berhasil menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+                
+                // Refresh cart count
+                refreshCartCount();
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    if (button) {
+                        button.innerHTML = '<i class="fas fa-cart-plus"></i>';
+                        button.classList.remove('bg-blue-600');
+                        button.classList.add('bg-green-600', 'hover:bg-green-700');
+                        button.disabled = false;
+                    }
+                }, 2000);
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+                if (button) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message,
+                confirmText: 'OK',
+                showCancel: false
+            });
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    }
+
+    // Refresh cart count function
+    function refreshCartCount() {
+        fetch(`${window.location.origin}/api/cart/count`)
+            .then(response => response.json())
+            .then(data => {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.count;
+                    cartCount.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                }
+            })
+            .catch(error => console.error('Error refreshing cart count:', error));
+    }
+</script>
 @endsection
