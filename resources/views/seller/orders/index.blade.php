@@ -131,6 +131,36 @@
         opacity: 1;
         visibility: visible;
     }
+
+    /* Modal responsive styles */
+    #orderModal .relative {
+        min-height: auto;
+        max-height: 90vh;
+        height: auto;
+    }
+
+    #orderModal .relative>div {
+        height: auto;
+        min-height: auto;
+    }
+
+    #orderModalContent {
+        height: auto;
+        min-height: 200px;
+        max-height: calc(90vh - 80px);
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        #orderModal .relative {
+            max-width: 95vw;
+            margin: 0 10px;
+        }
+
+        #orderModalContent {
+            max-height: calc(90vh - 100px);
+        }
+    }
 </style>
 @endpush
 
@@ -668,8 +698,9 @@
 <!-- Order Details Modal -->
 <div id="orderModal"
     class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
-    <div class="relative mx-auto border max-w-6xl w-full max-h-[90vh] shadow-lg rounded-md bg-white overflow-hidden">
-        <div class="flex flex-col h-full max-h-[90vh]">
+    <div class="relative mx-auto border max-w-6xl w-full shadow-lg rounded-md bg-white overflow-hidden"
+        style="max-height: 90vh;">
+        <div class="flex flex-col">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
                 <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Detail Pesanan</h3>
                 <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 p-1">
