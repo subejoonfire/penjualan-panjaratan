@@ -612,7 +612,7 @@
                     }
                 }, 2000);
             } else {
-                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                showModalNotification(data.message || 'Gagal menambahkan ke keranjang', 'error');
                 if (button) {
                     button.innerHTML = originalText;
                     button.disabled = false;
@@ -621,7 +621,7 @@
         })
         .catch(error => {
             console.error('Cart error:', error);
-            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            showModalNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
             if (button) {
                 button.innerHTML = originalText;
                 button.disabled = false;
