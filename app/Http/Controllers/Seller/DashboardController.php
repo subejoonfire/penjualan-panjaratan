@@ -385,47 +385,102 @@ class DashboardController extends Controller
      */
     public function updateOrderStatus(Request $request, Order $order)
     {
-        $user = Auth::user();
+        try {
+            \Log::info('Update order status request received', [
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'request_status' => $request->status,
+                'current_status' => $order->status
+            ]);
 
-        // Check if order contains seller's products
-        $hasSellerProducts = $order->cart->cartDetails()
-            ->whereHas('product', function ($query) use ($user) {
-                $query->where('iduserseller', $user->id);
-            })->exists();
+            $user = Auth::user();
 
-        if (!$hasSellerProducts) {
-            abort(403, 'Unauthorized');
-        }
+            // Check if order contains seller's products
+            $hasSellerProducts = $order->cart->cartDetails()
+                ->whereHas('product', function ($query) use ($user) {
+                    $query->where('iduserseller', $user->id);
+                })->exists();
 
-        $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
-        ]);
+            \Log::info('Seller products check result', [
+                'has_seller_products' => $hasSellerProducts,
+                'order_cart_details_count' => $order->cart->cartDetails()->count()
+            ]);
 
-        // Validasi transisi status yang diperbolehkan
-        $allowedTransitions = [
-            'pending' => ['processing', 'cancelled'],
-            'processing' => ['shipped', 'cancelled'], 
-            'shipped' => ['delivered'],
-            'delivered' => [], // Tidak bisa diubah lagi
-            'cancelled' => [] // Tidak bisa diubah lagi
-        ];
+            if (!$hasSellerProducts) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized - Order tidak mengandung produk Anda'
+                ], 403);
+            }
 
-        $currentStatus = $order->status;
-        $newStatus = $request->status;
+            $request->validate([
+                'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+            ]);
 
-        if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
+            // Validasi transisi status yang diperbolehkan
+            $allowedTransitions = [
+                'pending' => ['processing', 'cancelled'],
+                'processing' => ['shipped', 'cancelled'], 
+                'shipped' => ['delivered'],
+                'delivered' => [], // Tidak bisa diubah lagi
+                'cancelled' => [] // Tidak bisa diubah lagi
+            ];
+
+            $currentStatus = $order->status;
+            $newStatus = $request->status;
+
+            \Log::info('Status transition check', [
+                'current_status' => $currentStatus,
+                'new_status' => $newStatus,
+                'allowed_transitions' => $allowedTransitions[$currentStatus] ?? []
+            ]);
+
+            if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transisi status tidak diperbolehkan dari ' . $currentStatus . ' ke ' . $newStatus
+                ], 400);
+            }
+
+            // Cek apakah order masih bisa diupdate berdasarkan waktu
+            $canBeUpdated = $order->canBeUpdated();
+            \Log::info('Order can be updated check', [
+                'can_be_updated' => $canBeUpdated,
+                'order_updated_at' => $order->updated_at
+            ]);
+
+            if (!$canBeUpdated) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak dapat mengupdate status. Sudah lebih dari 6 jam sejak update terakhir.'
+                ], 400);
+            }
+
+            $order->update(['status' => $request->status]);
+
+            \Log::info('Order status updated successfully', [
+                'order_id' => $order->id,
+                'new_status' => $request->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pesanan berhasil diupdate'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating order status: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'request_status' => $request->status,
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Transisi status tidak diperbolehkan dari ' . $currentStatus . ' ke ' . $newStatus
-            ], 400);
+                'message' => 'Terjadi kesalahan saat mengupdate status: ' . $e->getMessage()
+            ], 500);
         }
-
-        $order->update(['status' => $request->status]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Status pesanan berhasil diupdate'
-        ]);
     }
 
     /**

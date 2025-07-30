@@ -402,7 +402,7 @@
                                                     </span>
                                                 @endif
                                                 @else
-                                                    @if(in_array($order->status, ['confirmed', 'shipped']) && !$order->canBeUpdated())
+                                                    @if(in_array($order->status, ['processing', 'shipped']) && !$order->canBeUpdated())
                                                     <span class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-gray-100">
                                                         <i class="fas fa-clock mr-1"></i>
                                                         Tidak dapat diupdate (lebih dari 6 jam)
@@ -505,6 +505,65 @@
 <script>
     let currentOrderId = null;
 
+    // Function untuk menampilkan alert
+    function showAlert(message, type = 'info') {
+        // Hapus alert yang sudah ada
+        const existingAlert = document.querySelector('.alert-message');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Buat alert baru
+        const alert = document.createElement('div');
+        alert.className = `alert-message fixed top-4 right-4 z-[9999] px-6 py-4 rounded-lg shadow-lg max-w-md transform transition-all duration-300 translate-x-full`;
+        
+        // Set warna berdasarkan type
+        switch (type) {
+            case 'success':
+                alert.className += ' bg-green-500 text-white';
+                break;
+            case 'error':
+                alert.className += ' bg-red-500 text-white';
+                break;
+            case 'warning':
+                alert.className += ' bg-yellow-500 text-white';
+                break;
+            default:
+                alert.className += ' bg-blue-500 text-white';
+        }
+
+        alert.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} mr-3"></i>
+                    <span>${message}</span>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(alert);
+
+        // Animate in
+        setTimeout(() => {
+            alert.classList.remove('translate-x-full');
+        }, 100);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alert.parentElement) {
+                alert.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (alert.parentElement) {
+                        alert.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+
     function viewOrderDetails(orderId) {
         currentOrderId = orderId;
         document.getElementById('orderModalTitle').innerText = `Detail Pesanan #${orderId}`;
@@ -554,10 +613,10 @@
         
         const statusTransitions = {
             'pending': [
-                { value: 'confirmed', text: 'Konfirmasi' },
+                { value: 'processing', text: 'Proses' },
                 { value: 'cancelled', text: 'Batalkan' }
             ],
-            'confirmed': [
+            'processing': [
                 { value: 'shipped', text: 'Kirim' },
                 { value: 'cancelled', text: 'Batalkan' }
             ],
@@ -614,8 +673,13 @@
                 try {
                     data = await response.json();
                 } catch (e) {
+                    console.error('Error parsing JSON:', e);
                     data = null;
                 }
+                
+                console.log('Response status:', response.status);
+                console.log('Response data:', data);
+                
                 if (response.ok && data && data.success) {
                     closeStatusModal();
                     showAlert('Status pesanan berhasil diupdate', 'success');
@@ -623,16 +687,16 @@
                 } else if (response.status === 422 && data && data.errors) {
                     // Laravel validation error
                     const errors = Object.values(data.errors).flat();
-                    showAlert(errors, 'error');
+                    showAlert(errors.join(', '), 'error');
                 } else if (data && data.message) {
                     showAlert(data.message, 'error');
                 } else {
-                    showAlert('Terjadi kesalahan saat mengupdate status', 'error');
+                    showAlert('Terjadi kesalahan saat mengupdate status. Status: ' + response.status, 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showAlert('Terjadi kesalahan saat mengupdate status', 'error');
+                console.error('Fetch error:', error);
+                showAlert('Terjadi kesalahan saat mengupdate status: ' + error.message, 'error');
             });
         }
     });
