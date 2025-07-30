@@ -279,36 +279,42 @@ class CartController extends Controller
      */
     public function processCheckout(Request $request)
     {
-        $user = Auth::user();
-        $cart = $user->activeCart;
-
-        if (!$cart || $cart->cartDetails()->count() === 0) {
-            return back()->with('error', 'Keranjang belanja kosong');
-        }
-
-        $request->validate([
-            'address_id' => 'nullable|exists:user_addresses,id',
-            'shipping_address' => 'nullable|string',
-            'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
-            'notes' => 'nullable|string|max:500'
-        ]);
-
-        // Get shipping address
-        $shippingAddress = '';
-        if ($request->filled('address_id')) {
-            $address = $user->addresses()->find($request->address_id);
-            if ($address) {
-                $shippingAddress = $address->address;
-            }
-        } elseif ($request->filled('shipping_address')) {
-            $shippingAddress = $request->shipping_address;
-        } else {
-            return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
-        }
-
-        DB::beginTransaction();
-
         try {
+            $user = Auth::user();
+            $cart = $user->activeCart;
+
+            if (!$cart || $cart->cartDetails()->count() === 0) {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Keranjang belanja kosong']);
+                }
+                return back()->with('error', 'Keranjang belanja kosong');
+            }
+
+            $request->validate([
+                'address_id' => 'nullable|exists:user_addresses,id',
+                'shipping_address' => 'nullable|string',
+                'payment_method' => 'nullable|in:bank_transfer,credit_card,e_wallet,cod',
+                'notes' => 'nullable|string|max:500'
+            ]);
+
+            // Get shipping address
+            $shippingAddress = '';
+            if ($request->filled('address_id')) {
+                $address = $user->addresses()->find($request->address_id);
+                if ($address) {
+                    $shippingAddress = $address->address;
+                }
+            } elseif ($request->filled('shipping_address')) {
+                $shippingAddress = $request->shipping_address;
+            } else {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
+                }
+                return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
+            }
+
+            DB::beginTransaction();
+
             $cartDetails = $cart->cartDetails()->with('product')->get();
 
             // Check stock again
@@ -349,7 +355,7 @@ class CartController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $request->payment_method,
+                'payment_method' => $request->payment_method ?? 'cod',
                 'transactionstatus' => 'pending'
             ]);
 
@@ -372,10 +378,21 @@ class CartController extends Controller
 
             DB::commit();
 
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pesanan berhasil dibuat',
+                    'redirect_url' => route('customer.orders.show', $order)
+                ]);
+            }
             return redirect()->route('customer.orders.show', $order)
                 ->with('success', 'Pesanan berhasil dibuat');
+                
         } catch (\Exception $e) {
             DB::rollback();
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            }
             return back()->with('error', $e->getMessage());
         }
     }

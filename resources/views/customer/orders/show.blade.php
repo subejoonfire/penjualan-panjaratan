@@ -41,14 +41,10 @@
                         </span>
                         @if($order->status === 'pending')
                         <button type="button"
-                            onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm').submit(); })"
+                            onclick="cancelOrder({{ $order->id }})"
                             class="text-sm text-red-600 hover:text-red-500 mt-2">
                             Batalkan Pesanan
                         </button>
-                        <form id="cancelOrderForm" action="{{ route('customer.orders.cancel', $order) }}" method="POST" class="hidden">
-                            @csrf
-                            @method('PUT')
-                        </form>
                         @endif
                     </div>
                 </div>
@@ -340,43 +336,88 @@
 <script>
     let currentRating = 0;
 
-function openReviewModal(productId, productName) {
-    document.getElementById('productName').textContent = 'Produk: ' + productName;
-    document.getElementById('reviewForm').action = '/customer/products/' + productId + '/reviews';
-    document.getElementById('reviewModal').classList.remove('hidden');
-    resetRating();
-}
+    function openReviewModal(productId, productName) {
+        document.getElementById('productName').textContent = 'Produk: ' + productName;
+        document.getElementById('reviewForm').action = '/customer/products/' + productId + '/reviews';
+        document.getElementById('reviewModal').classList.remove('hidden');
+        resetRating();
+    }
 
-function closeReviewModal() {
-    document.getElementById('reviewModal').classList.add('hidden');
-    document.getElementById('reviewForm').reset();
-    resetRating();
-}
+    function closeReviewModal() {
+        document.getElementById('reviewModal').classList.add('hidden');
+        document.getElementById('reviewForm').reset();
+        resetRating();
+    }
 
-function setRating(rating) {
-    currentRating = rating;
-    document.getElementById('ratingInput').value = rating;
-    
-    for (let i = 1; i <= 5; i++) {
-        const star = document.getElementById('star-' + i);
-        if (i <= rating) {
-            star.classList.remove('text-gray-300');
-            star.classList.add('text-yellow-400');
-        } else {
+    function setRating(rating) {
+        currentRating = rating;
+        document.getElementById('ratingInput').value = rating;
+        
+        for (let i = 1; i <= 5; i++) {
+            const star = document.getElementById('star-' + i);
+            if (i <= rating) {
+                star.classList.remove('text-gray-300');
+                star.classList.add('text-yellow-400');
+            } else {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+            }
+        }
+    }
+
+    function resetRating() {
+        currentRating = 0;
+        document.getElementById('ratingInput').value = 0;
+        for (let i = 1; i <= 5; i++) {
+            const star = document.getElementById('star-' + i);
             star.classList.remove('text-yellow-400');
             star.classList.add('text-gray-300');
         }
     }
-}
 
-function resetRating() {
-    currentRating = 0;
-    document.getElementById('ratingInput').value = 0;
-    for (let i = 1; i <= 5; i++) {
-        const star = document.getElementById('star-' + i);
-        star.classList.remove('text-yellow-400');
-        star.classList.add('text-gray-300');
+    function cancelOrder(orderId) {
+        if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+            fetch(`${window.location.origin}/customer/orders/${orderId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showModalNotification({
+                        type: 'success',
+                        title: 'Berhasil!',
+                        message: data.message || 'Pesanan berhasil dibatalkan',
+                        confirmText: 'OK',
+                        showCancel: false,
+                        onConfirm: () => {
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    showModalNotification({
+                        type: 'error',
+                        title: 'Gagal!',
+                        message: data.message || 'Gagal membatalkan pesanan',
+                        confirmText: 'OK',
+                        showCancel: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Cancel order error:', error);
+                showModalNotification({
+                    type: 'error',
+                    title: 'Error!',
+                    message: 'Terjadi kesalahan saat membatalkan pesanan',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+            });
+        }
     }
-}
 </script>
 @endsection

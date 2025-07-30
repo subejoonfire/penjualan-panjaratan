@@ -11,9 +11,7 @@
             <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Review your order and complete your purchase</p>
         </div>
 
-        <form action="{{ route('customer.checkout.process') }}" method="POST"
-            class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
-            @csrf
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
 
             <!-- Order Details & Shipping -->
             <div class="lg:col-span-2 space-y-4 sm:space-y-6">
@@ -197,7 +195,7 @@
                     </div>
 
                     <div class="mt-4 sm:mt-6">
-                        <button type="submit"
+                        <button type="button" onclick="processCheckout()"
                             class="w-full bg-blue-600 text-white py-2.5 sm:py-3 px-4 rounded-md text-sm sm:text-base font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <i class="fas fa-credit-card mr-2"></i>
                             Buat Pesanan
@@ -224,48 +222,125 @@
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    // Handle address selection
-    const addressRadios = document.querySelectorAll('input[name="address_id"]');
-    const manualRadio = document.querySelector('input[name="address_type"][value="manual"]');
-    const manualAddressDiv = document.querySelector('.manual-address');
-    const shippingAddressTextarea = document.querySelector('textarea[name="shipping_address"]');
-    
-    // Show/hide manual address input
-    function toggleManualAddress() {
-        if (manualRadio && manualRadio.checked) {
-            manualAddressDiv.classList.remove('hidden');
-            shippingAddressTextarea.required = true;
-            // Clear address_id selection
-            addressRadios.forEach(radio => radio.checked = false);
-        } else {
-            manualAddressDiv.classList.add('hidden');
-            shippingAddressTextarea.required = false;
-        }
-    }
-    
-    // Handle saved address selection
-    addressRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                manualRadio.checked = false;
-                toggleManualAddress();
+        // Handle address selection
+        const addressRadios = document.querySelectorAll('input[name="address_id"]');
+        const manualRadio = document.querySelector('input[name="address_type"][value="manual"]');
+        const manualAddressDiv = document.querySelector('.manual-address');
+        const shippingAddressTextarea = document.querySelector('textarea[name="shipping_address"]');
+        
+        // Show/hide manual address input
+        function toggleManualAddress() {
+            if (manualRadio && manualRadio.checked) {
+                manualAddressDiv.classList.remove('hidden');
+                shippingAddressTextarea.required = true;
+                // Clear address_id selection
+                addressRadios.forEach(radio => radio.checked = false);
+            } else {
+                manualAddressDiv.classList.add('hidden');
+                shippingAddressTextarea.required = false;
             }
+        }
+        
+        // Handle saved address selection
+        addressRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    manualRadio.checked = false;
+                    toggleManualAddress();
+                }
+            });
         });
+        
+        // Handle manual address selection
+        if (manualRadio) {
+            manualRadio.addEventListener('change', toggleManualAddress);
+        }
+        
+        // Initial state
+        toggleManualAddress();
     });
-    
-    // Handle manual address selection
-    if (manualRadio) {
-        manualRadio.addEventListener('change', toggleManualAddress);
+
+    function processCheckout() {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        
+        // Disable button and show loading
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+        
+        // Get form data
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        
+        // Get selected address
+        const selectedAddress = document.querySelector('input[name="address_id"]:checked');
+        if (selectedAddress) {
+            formData.append('address_id', selectedAddress.value);
+        }
+        
+        // Get manual address
+        const manualAddress = document.querySelector('textarea[name="shipping_address"]');
+        if (manualAddress && manualAddress.value.trim()) {
+            formData.append('shipping_address', manualAddress.value.trim());
+        }
+        
+        // Get notes
+        const notes = document.querySelector('textarea[name="notes"]');
+        if (notes && notes.value.trim()) {
+            formData.append('notes', notes.value.trim());
+        }
+        
+        fetch(`${window.location.origin}/customer/checkout`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: data.message || 'Pesanan berhasil dibuat',
+                    confirmText: 'OK',
+                    showCancel: false,
+                    onConfirm: () => {
+                        window.location.href = data.redirect_url || '/customer/orders';
+                    }
+                });
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal membuat pesanan',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Checkout error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat memproses checkout',
+                confirmText: 'OK',
+                showCancel: false
+            });
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
     }
-    
-    // Initial state
-    toggleManualAddress();
-});
 </script>
 @endsection

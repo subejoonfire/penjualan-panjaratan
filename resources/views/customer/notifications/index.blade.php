@@ -13,14 +13,10 @@
                     <p class="mt-2 text-gray-600">Tetap terupdate dengan pesanan dan aktivitas akun Anda</p>
                 </div>
                 @if($notifications->where('readstatus', false)->count() > 0)
-                <form action="{{ route('customer.notifications.mark-all-read') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <button type="submit"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </form>
+                <button type="button" onclick="markAllAsRead()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-eye"></i>
+                </button>
                 @endif
             </div>
         </div>
@@ -91,15 +87,11 @@
                                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         Baru
                                     </span>
-                                    <form action="{{ route('customer.notifications.read', $notification) }}"
-                                        method="POST" class="inline-block">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="submit" class="text-green-600 hover:text-green-500 text-sm"
-                                            title="Tandai Dibaca">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="markAsRead({{ $notification->id }})" 
+                                        class="text-green-600 hover:text-green-500 text-sm"
+                                        title="Tandai Dibaca">
+                                        <i class="fas fa-check"></i>
+                                    </button>
                                     @endif
                                 </div>
                             </div>
@@ -134,4 +126,76 @@
         @endif
     </div>
 </div>
+
+<script>
+    function markAsRead(notificationId) {
+        fetch(`${window.location.origin}/customer/notifications/${notificationId}/read`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload page to update notification status
+                window.location.reload();
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal menandai notifikasi sebagai dibaca',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Mark as read error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat menandai notifikasi sebagai dibaca',
+                confirmText: 'OK',
+                showCancel: false
+            });
+        });
+    }
+
+    function markAllAsRead() {
+        fetch(`${window.location.origin}/customer/notifications/mark-all-read`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload page to update notification status
+                window.location.reload();
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal menandai semua notifikasi sebagai dibaca',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Mark all as read error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat menandai semua notifikasi sebagai dibaca',
+                confirmText: 'OK',
+                showCancel: false
+            });
+        });
+    }
+</script>
 @endsection
