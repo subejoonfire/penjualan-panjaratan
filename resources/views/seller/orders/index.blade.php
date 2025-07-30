@@ -852,9 +852,10 @@
                 </div>
             </div>
         </div>
-
-        <script>
-            let currentOrderId = null;
+    </div>
+</div>
+<script>
+    let currentOrderId = null;
 
     function viewOrderDetails(orderId) {
         currentOrderId = orderId;
@@ -987,7 +988,5 @@
             closeOrderModal();
         }
     });
-
-
-        </script>
-        @endsection
+</script>
+@endsection
