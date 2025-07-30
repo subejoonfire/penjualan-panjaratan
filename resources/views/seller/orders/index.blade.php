@@ -117,6 +117,46 @@
         opacity: 1;
         visibility: visible;
     }
+
+    /* Modal responsive styles */
+    #orderModal .relative {
+        min-height: auto;
+        max-height: 90vh;
+        height: auto;
+        width: auto;
+        max-width: 90vw;
+    }
+
+    #orderModal .relative > div {
+        height: auto;
+        min-height: auto;
+    }
+
+    #orderModalContent {
+        height: auto;
+        min-height: 200px;
+        max-height: calc(90vh - 80px);
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        #orderModal .relative {
+            max-width: 95vw;
+            margin: 0 10px;
+            width: calc(100vw - 20px);
+        }
+        
+        #orderModalContent {
+            max-height: calc(90vh - 100px);
+        }
+    }
+
+    @media (min-width: 769px) {
+        #orderModal .relative {
+            max-width: 800px;
+            width: auto;
+        }
+    }
 </style>
 @endpush
 
@@ -610,15 +650,15 @@
 
 <!-- Order Details Modal -->
 <div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
-    <div class="relative mx-auto border max-w-6xl w-full max-h-[90vh] shadow-lg rounded-md bg-white overflow-hidden">
-        <div class="flex flex-col h-full max-h-[90vh]">
+    <div class="relative mx-auto border shadow-lg rounded-md bg-white overflow-hidden" style="max-height: 90vh; width: auto;">
+        <div class="flex flex-col">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
                 <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Detail Pesanan</h3>
                 <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 p-1">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div id="orderModalContent" class="flex-1 overflow-y-auto p-4">
+            <div id="orderModalContent" class="overflow-y-auto p-4" style="max-height: calc(90vh - 80px);">
                 <!-- Order details will be loaded here -->
             </div>
         </div>
@@ -639,11 +679,31 @@
         `;
         document.getElementById('orderModal').classList.remove('hidden');
         
+        // Reset modal height to auto
+        const modalContainer = document.querySelector('#orderModal .relative');
+        if (modalContainer) {
+            modalContainer.style.height = 'auto';
+        }
+        
         fetch(`/seller/orders/${orderId}/details`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     document.getElementById('orderModalContent').innerHTML = data.html;
+                    // Adjust modal height after content is loaded
+                    setTimeout(() => {
+                        const modalContainer = document.querySelector('#orderModal .relative');
+                        const modalContent = document.getElementById('orderModalContent');
+                        if (modalContainer && modalContent) {
+                            const contentHeight = modalContent.scrollHeight;
+                            const maxHeight = window.innerHeight * 0.9 - 80; // 90vh - header height
+                            if (contentHeight < maxHeight) {
+                                modalContainer.style.height = 'auto';
+                            } else {
+                                modalContainer.style.height = '90vh';
+                            }
+                        }
+                    }, 100);
                 } else {
                     document.getElementById('orderModalContent').innerHTML = `
                         <div class="text-center py-8">
@@ -704,6 +764,12 @@
     function closeOrderModal() {
         document.getElementById('orderModal').classList.add('hidden');
         currentOrderId = null;
+        
+        // Reset modal height
+        const modalContainer = document.querySelector('#orderModal .relative');
+        if (modalContainer) {
+            modalContainer.style.height = 'auto';
+        }
     }
 
     function confirmUpdateStatus(orderId, newStatus) {
@@ -724,5 +790,19 @@
             }
         });
     }
+
+    // Close modal when clicking outside
+    document.getElementById('orderModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeOrderModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('orderModal').classList.contains('hidden')) {
+            closeOrderModal();
+        }
+    });
 </script>
 @endsection
