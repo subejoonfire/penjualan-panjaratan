@@ -132,7 +132,7 @@
         visibility: visible;
     }
 
-    /* Modal responsive styles */
+
     #orderModal .relative {
         min-height: auto;
         max-height: 90vh;
@@ -442,7 +442,7 @@
                                 Detail
                             </button>
 
-                            <!-- Status Action Buttons: Selalu tampil, disable jika tidak valid -->
+
                             <div class="flex justify-center space-x-2">
                                 @php
                                 $statusList = [
@@ -484,18 +484,15 @@
                                 if ($targetIdx === false) { $targetIdx = -1; }
                                 $disabled = false;
 
-                                // Jika status sudah delivered/cancelled, semua tombol disabled
                                 if (in_array($order->status, ['delivered', 'cancelled'])) {
                                 $disabled = true;
                                 }
-                                // Jika ingin mundur status, selalu disabled
-                                elseif ($targetIdx < $currentIdx) { $disabled=true; } // Jika sudah 3 jam dan ingin ke
-                                    status yang sama atau sebelumnya, disabled elseif ($diffHours>= 3 && $targetIdx <=
-                                        $currentIdx) { $disabled=true; } @endphp @php $tooltipText=$info['tooltip']; if
-                                        ($disabled && $diffHours>= 3 && $targetIdx <= $currentIdx) {
-                                            $remainingMinutes=180 - ($diffHours * 60); $tooltipText .=" (Tunggu " .
-                                            floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)"
-                                            ; } @endphp <button
+                                elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
+                                    $targetIdx <= $currentIdx) { $disabled=true; } @endphp @php
+                                        $tooltipText=$info['tooltip']; if ($disabled && $diffHours>= 3 && $targetIdx <=
+                                            $currentIdx) { $remainingMinutes=180 - ($diffHours * 60); $tooltipText
+                                            .=" (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes %
+                                            60) . "m lagi)" ; } @endphp <button
                                             onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                             class="status-button {{ $info['class'] }} relative"
                                             title="{{ $tooltipText }}" @if($disabled) disabled @endif>
@@ -612,7 +609,7 @@
                                                 <i class="fas fa-eye mr-1"></i>
                                                 Detail
                                             </button>
-                                            <!-- Status Action Buttons: Selalu tampil, disable jika tidak valid -->
+
                                             <div class="flex items-center space-x-2">
                                                 @php
                                                 $statusList = [
@@ -654,13 +651,10 @@
                                                 if ($targetIdx === false) { $targetIdx = -1; }
                                                 $disabled = false;
 
-                                                // Jika status sudah delivered/cancelled, semua tombol disabled
                                                 if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                 $disabled = true;
                                                 }
-                                                // Jika ingin mundur status, selalu disabled
-                                                elseif ($targetIdx < $currentIdx) { $disabled=true; } // Jika sudah 3
-                                                    jam dan ingin ke status yang sama atau sebelumnya, disabled elseif
+                                                elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
                                                     ($diffHours>= 3 && $targetIdx <= $currentIdx) { $disabled=true; }
                                                         @endphp @php $tooltipText=$info['tooltip']; if ($disabled &&
                                                         $diffHours>= 3 && $targetIdx <= $currentIdx) {
@@ -715,7 +709,7 @@
     </div>
 </div>
 
-<!-- Order Details Modal -->
+
 <div id="orderModal"
     class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
     <div class="relative mx-auto border max-w-6xl w-full shadow-lg rounded-md bg-white overflow-hidden"
@@ -727,8 +721,8 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div id="orderModalContent" class="flex-1 overflow-y-auto p-4">
-                <!-- Order details will be loaded here -->
+            <div id="orderModalContent" class="overflow-y-auto p-4" style="max-height: calc(90vh - 80px);">
+
             </div>
         </div>
     </div>
@@ -748,11 +742,29 @@
         `;
         document.getElementById('orderModal').classList.remove('hidden');
         
+        const modalContainer = document.querySelector('#orderModal .relative');
+        if (modalContainer) {
+            modalContainer.style.height = 'auto';
+        }
+        
         fetch(`/seller/orders/${orderId}/details`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     document.getElementById('orderModalContent').innerHTML = data.html;
+                    setTimeout(() => {
+                        const modalContainer = document.querySelector('#orderModal .relative');
+                        const modalContent = document.getElementById('orderModalContent');
+                        if (modalContainer && modalContent) {
+                            const contentHeight = modalContent.scrollHeight;
+                            const maxHeight = window.innerHeight * 0.9 - 80;
+                            if (contentHeight < maxHeight) {
+                                modalContainer.style.height = 'auto';
+                            } else {
+                                modalContainer.style.height = '90vh';
+                            }
+                        }
+                    }, 100);
                 } else {
                     document.getElementById('orderModalContent').innerHTML = `
                         <div class="text-center py-8">
@@ -813,6 +825,11 @@
     function closeOrderModal() {
         document.getElementById('orderModal').classList.add('hidden');
         currentOrderId = null;
+        
+        const modalContainer = document.querySelector('#orderModal .relative');
+        if (modalContainer) {
+            modalContainer.style.height = 'auto';
+        }
     }
 
     function confirmUpdateStatus(orderId, newStatus) {
@@ -834,23 +851,20 @@
         });
     }
 
-    // Close modal when clicking outside
     document.getElementById('orderModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeOrderModal();
         }
     });
 
-    // Close modal with Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !document.getElementById('orderModal').classList.contains('hidden')) {
             closeOrderModal();
         }
     });
 
-    // Auto refresh page every 5 minutes to update button status
     setTimeout(function() {
         location.reload();
-    }, 300000); // 5 minutes
+    }, 300000);
 </script>
 @endsection
