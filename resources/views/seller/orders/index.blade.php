@@ -123,8 +123,6 @@
         min-height: auto;
         max-height: 90vh;
         height: auto;
-        width: auto;
-        max-width: 90vw;
     }
 
     #orderModal .relative > div {
@@ -143,18 +141,10 @@
         #orderModal .relative {
             max-width: 95vw;
             margin: 0 10px;
-            width: calc(100vw - 20px);
         }
         
         #orderModalContent {
             max-height: calc(90vh - 100px);
-        }
-    }
-
-    @media (min-width: 769px) {
-        #orderModal .relative {
-            max-width: 800px;
-            width: auto;
         }
     }
 </style>
@@ -650,7 +640,7 @@
 
 <!-- Order Details Modal -->
 <div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
-    <div class="relative mx-auto border shadow-lg rounded-md bg-white overflow-hidden" style="max-height: 90vh; width: auto;">
+    <div class="relative mx-auto border max-w-6xl w-full shadow-lg rounded-md bg-white overflow-hidden" style="max-height: 90vh;">
         <div class="flex flex-col">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
                 <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Detail Pesanan</h3>
