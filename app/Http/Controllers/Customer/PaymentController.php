@@ -121,6 +121,29 @@ class PaymentController extends Controller
         return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
     }
 
+    /**
+     * Get available payment methods from Duitku
+     */
+    public function getPaymentMethods()
+    {
+        $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a'; // Ganti sesuai API key Duitku kamu
+        $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
+        $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+        $signature = md5($merchantCode . $apiKey);
+        $params = [
+            'merchantcode' => $merchantCode,
+            'amount' => 10000, // Nominal contoh, bisa diganti sesuai kebutuhan
+            'signature' => $signature
+        ];
+        $response = \Illuminate\Support\Facades\Http::withHeaders([
+            'Content-Type' => 'application/json'
+        ])->post($url, $params);
+        if ($response->successful()) {
+            return $response->json();
+        }
+        return ['error' => 'Gagal mengambil metode pembayaran'];
+    }
+
     // Callback Duitku (update status pembayaran)
     public function callback(Request $request)
     {
