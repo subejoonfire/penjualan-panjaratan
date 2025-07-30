@@ -367,7 +367,7 @@ class CartController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $request->payment_method ?? 'cod',
+                'payment_method' => $request->payment_method ?? 'VC', // kode Duitku
                 'transactionstatus' => 'pending'
             ]);
 
@@ -476,7 +476,7 @@ class CartController extends Controller
         $date = now()->format('Ymd');
         $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
         $order = \App\Models\Order::create([
-            'idcart' => null,
+            'idcart' => null, // pastikan null, bukan string kosong
             'order_number' => $orderNumber,
             'grandtotal' => $total,
             'shipping_address' => $user->defaultAddress()?->address ?? '',
