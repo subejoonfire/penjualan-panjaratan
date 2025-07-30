@@ -456,18 +456,14 @@
                                 if (in_array($order->status, ['delivered', 'cancelled'])) {
                                 $disabled = true;
                                 } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
-                                    $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !==
-                                    'cancelled' && $order->status !== 'delivered') {
-                                    $disabled = true;
-                                    }
-                                    @endphp
-                                    <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                    $targetIdx < $currentIdx) { $disabled=true; } @endphp <button
+                                        onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                         class="status-button {{ $info['class'] }} relative"
                                         title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
                                         <i class="fas {{ $info['icon'] }}"></i>
                                         <span class="status-tooltip">{{ $info['label'] }}</span>
-                                    </button>
-                                    @endforeach
+                                        </button>
+                                        @endforeach
                             </div>
                         </div>
                     </div>
@@ -621,20 +617,15 @@
                                                 if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                 $disabled = true;
                                                 } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
-                                                    ($diffHours>= 3 && $targetIdx > $currentIdx && $order->status !==
-                                                    'pending' && $order->status !== 'cancelled' && $order->status !==
-                                                    'delivered') {
-                                                    $disabled = true;
-                                                    }
-                                                    @endphp
-                                                    <button
+                                                    ($diffHours>= 3 && $targetIdx < $currentIdx) { $disabled=true; }
+                                                        @endphp <button
                                                         onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                                         class="status-button {{ $info['class'] }} relative"
                                                         title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
                                                         <i class="fas {{ $info['icon'] }}"></i>
                                                         <span class="status-tooltip">{{ $info['label'] }}</span>
-                                                    </button>
-                                                    @endforeach
+                                                        </button>
+                                                        @endforeach
                                             </div>
                                         </div>
                                     </div>
