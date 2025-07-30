@@ -154,8 +154,7 @@
                         </button>
 
                         @if($product->is_active && $product->productstock > 0)
-                        <form action="{{ route('customer.cart.add', $product) }}" method="POST" class="space-y-4">
-                            @csrf
+                        <div class="space-y-4">
                             <!-- Quantity Selector -->
                             <div>
                                 <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
@@ -178,12 +177,12 @@
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button type="submit"
+                            <button type="button" onclick="addToCart({{ $product->id }}, event)"
                                 class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
                                 <i class="fas fa-shopping-cart mr-2"></i>
                                 Tambah ke Keranjang
                             </button>
-                        </form>
+                        </div>
                         @else
                         <!-- Out of Stock Message -->
                         <div class="bg-gray-100 border border-gray-300 rounded-md p-4 text-center">
@@ -571,6 +570,137 @@
             toast.classList.add('translate-x-full');
             setTimeout(() => {
                 document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    // Add to cart function
+    function addToCart(productId, event) {
+        if (event) event.preventDefault();
+        
+        // Find the button that was clicked
+        const button = event ? event.target.closest('button') : null;
+        const originalText = button ? button.innerHTML : '';
+        
+        // Disable button and show loading animation
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
+        
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        formData.append('quantity', document.getElementById('quantity').value);
+
+        fetch(`${window.location.origin}/customer/cart/add/${productId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Cart response:', data);
+            if (data.success) {
+                // Show success animation
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    button.classList.add('bg-green-600');
+                }
+                
+                // Update cart count
+                if (typeof loadCartCount === 'function') {
+                    setTimeout(loadCartCount, 500);
+                }
+                
+                // Show success message
+                showToast(data.message || 'Produk berhasil ditambahkan ke keranjang');
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    if (button) {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-600');
+                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        button.disabled = false;
+                    }
+                }, 2000);
+            } else {
+                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                if (button) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Cart error:', error);
+            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    }
+
+    // Load cart count function (for customer only)
+    @if(auth()->check() && auth()->user()->isCustomer())
+    function loadCartCount() {
+        console.log('Loading cart count...');
+        fetch(`${window.location.origin}/api/cart/count`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cart count response not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Cart count data:', data);
+                const cartCounts = document.querySelectorAll('.cart-count');
+                console.log('Found cart count elements:', cartCounts.length);
+                cartCounts.forEach((cartCount, index) => {
+                    console.log(`Updating cart count ${index}:`, data.count);
+                    cartCount.textContent = data.count || 0;
+                });
+            })
+            .catch(error => {
+                console.error('Cart count error:', error);
+            });
+    }
+    @endif
+
+    // Show alert function
+    function showAlert(message, type = 'info') {
+        // Create alert element
+        const alert = document.createElement('div');
+        alert.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300 ${
+            type === 'error' ? 'bg-red-600 text-white' : 
+            type === 'success' ? 'bg-green-600 text-white' : 
+            'bg-blue-600 text-white'
+        }`;
+        alert.textContent = message;
+        
+        document.body.appendChild(alert);
+        
+        // Show alert
+        setTimeout(() => {
+            alert.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Hide and remove alert
+        setTimeout(() => {
+            alert.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(alert);
             }, 300);
         }, 3000);
     }
