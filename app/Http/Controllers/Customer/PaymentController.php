@@ -124,15 +124,18 @@ class PaymentController extends Controller
     /**
      * Get available payment methods from Duitku
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods(Request $request)
     {
         $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a'; // Ganti sesuai API key Duitku kamu
         $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
         $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
-        $signature = md5($merchantCode . $apiKey);
+        $amount = (int) ($request->amount ?? 10000); // Nominal contoh, bisa diganti sesuai kebutuhan
+        $datetime = now()->format('Y-m-d H:i:s');
+        $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
         $params = [
             'merchantcode' => $merchantCode,
-            'amount' => 10000, // Nominal contoh, bisa diganti sesuai kebutuhan
+            'amount' => $amount,
+            'datetime' => $datetime,
             'signature' => $signature
         ];
         $response = \Illuminate\Support\Facades\Http::withHeaders([
