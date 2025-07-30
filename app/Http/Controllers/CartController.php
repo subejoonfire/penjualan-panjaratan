@@ -363,11 +363,19 @@ class CartController extends Controller
             $transactionNumber = 'TRX-' . $date . '-' . str_pad($transactionCount, 6, '0', STR_PAD_LEFT);
 
             // Create transaction
+            $paymentMethodDuitku = $request->payment_method ?? 'VC';
+            $paymentMethodEnum = match (strtoupper($paymentMethodDuitku)) {
+                'VC', 'CREDITCARD', 'CREDIT_CARD' => 'credit_card',
+                'OV', 'OVO', 'DA', 'DANA', 'LA', 'LINKAJA', 'SP', 'SA', 'LQ', 'DN', 'OL', 'SHOPEEPAY', 'INDODANA' => 'e_wallet',
+                'VA', 'BT', 'B1', 'A1', 'I1', 'M2', 'AG', 'BR', 'BC', 'NC', 'BV', 'JP', 'NQ', 'GQ', 'FT' => 'bank_transfer',
+                'COD' => 'cod',
+                default => 'bank_transfer',
+            };
             $transaction = Transaction::create([
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $request->payment_method ?? 'VC', // kode Duitku
+                'payment_method' => $paymentMethodEnum,
                 'transactionstatus' => 'pending'
             ]);
 
