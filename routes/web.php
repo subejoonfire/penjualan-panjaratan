@@ -36,15 +36,15 @@ Route::middleware('guest')->group(function () {
     Route::get('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/password/send-reset-code', [\App\Http\Controllers\PasswordResetController::class, 'sendResetCode'])
         ->name('password.send-reset-code')
-        ->middleware('throttle:5,1'); // Max 5 attempts per minute
+        ->middleware('throttle:10,1'); // Max 10 attempts per minute
     Route::get('/password/verify-code', [\App\Http\Controllers\PasswordResetController::class, 'showVerifyResetCodeForm'])->name('password.reset.verify.form');
     Route::post('/password/verify-code', [\App\Http\Controllers\PasswordResetController::class, 'verifyResetCode'])
         ->name('password.verify-reset-code')
-        ->middleware('throttle:10,1'); // Max 10 attempts per minute
+        ->middleware('throttle:20,1'); // Max 20 attempts per minute
     Route::get('/password/reset-form', [\App\Http\Controllers\PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset.form');
     Route::post('/password/reset', [\App\Http\Controllers\PasswordResetController::class, 'resetPassword'])
         ->name('password.reset')
-        ->middleware('throttle:3,1'); // Max 3 attempts per minute
+        ->middleware('throttle:10,1'); // Max 10 attempts per minute
 });
 
 Route::middleware('auth')->group(function () {
