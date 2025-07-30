@@ -35,18 +35,63 @@ class DashboardController extends Controller
         })->count();
 
         // Calculate total revenue from all orders with paid transactions (not just delivered)
-        $totalRevenue = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
+        $paidTransactions = Transaction::whereHas('order.cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
         })
         ->where('transactionstatus', 'paid')
-        ->get()
-        ->sum(function ($transaction) use ($user) {
-            return $transaction->order->cart->cartDetails
+        ->get();
+
+        \Log::info('Revenue calculation debug', [
+            'user_id' => $user->id,
+            'paid_transactions_count' => $paidTransactions->count(),
+            'transactions' => $paidTransactions->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'amount' => $t->amount,
+                    'order_id' => $t->idorder,
+                    'cart_details_count' => $t->order->cart->cartDetails->count()
+                ];
+            })
+        ]);
+
+        $totalRevenue = $paidTransactions->sum(function ($transaction) use ($user) {
+            // Hitung proporsi produk seller dari total transaksi
+            $sellerItemsTotal = $transaction->order->cart->cartDetails
                 ->where('product.iduserseller', $user->id)
                 ->sum(function ($item) {
                     return $item->quantity * $item->productprice;
                 });
+            
+            $totalOrderAmount = $transaction->order->cart->cartDetails
+                ->sum(function ($item) {
+                    return $item->quantity * $item->productprice;
+                });
+            
+            // Jika total order 0, return 0
+            if ($totalOrderAmount == 0) {
+                return 0;
+            }
+            
+            // Hitung proporsi seller dari total transaksi
+            $sellerProportion = $sellerItemsTotal / $totalOrderAmount;
+            $revenue = $transaction->amount * $sellerProportion;
+
+            \Log::info('Transaction revenue calculation', [
+                'transaction_id' => $transaction->id,
+                'transaction_amount' => $transaction->amount,
+                'seller_items_total' => $sellerItemsTotal,
+                'total_order_amount' => $totalOrderAmount,
+                'seller_proportion' => $sellerProportion,
+                'calculated_revenue' => $revenue
+            ]);
+
+            return $revenue;
         });
+
+        \Log::info('Total revenue calculated', [
+            'user_id' => $user->id,
+            'total_revenue' => $totalRevenue
+        ]);
 
         $pendingOrders = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
             $query->where('iduserseller', $user->id);
@@ -84,11 +129,26 @@ class DashboardController extends Controller
             })
             ->map(function ($transactions, $yearMonth) use ($user) {
                 $total = $transactions->sum(function ($transaction) use ($user) {
-                    return $transaction->order->cart->cartDetails
+                    // Hitung proporsi produk seller dari total transaksi
+                    $sellerItemsTotal = $transaction->order->cart->cartDetails
                         ->where('product.iduserseller', $user->id)
                         ->sum(function ($item) {
                             return $item->quantity * $item->productprice;
                         });
+                    
+                    $totalOrderAmount = $transaction->order->cart->cartDetails
+                        ->sum(function ($item) {
+                            return $item->quantity * $item->productprice;
+                        });
+                    
+                    // Jika total order 0, return 0
+                    if ($totalOrderAmount == 0) {
+                        return 0;
+                    }
+                    
+                    // Hitung proporsi seller dari total transaksi
+                    $sellerProportion = $sellerItemsTotal / $totalOrderAmount;
+                    return $transaction->amount * $sellerProportion;
                 });
                 
                 $date = \Carbon\Carbon::createFromFormat('Y-m', $yearMonth);
@@ -333,11 +393,26 @@ class DashboardController extends Controller
         ->where('transactionstatus', 'paid')
         ->get()
         ->sum(function ($transaction) use ($user) {
-            return $transaction->order->cart->cartDetails
+            // Hitung proporsi produk seller dari total transaksi
+            $sellerItemsTotal = $transaction->order->cart->cartDetails
                 ->where('product.iduserseller', $user->id)
                 ->sum(function ($item) {
                     return $item->quantity * $item->productprice;
                 });
+            
+            $totalOrderAmount = $transaction->order->cart->cartDetails
+                ->sum(function ($item) {
+                    return $item->quantity * $item->productprice;
+                });
+            
+            // Jika total order 0, return 0
+            if ($totalOrderAmount == 0) {
+                return 0;
+            }
+            
+            // Hitung proporsi seller dari total transaksi
+            $sellerProportion = $sellerItemsTotal / $totalOrderAmount;
+            return $transaction->amount * $sellerProportion;
         });
 
         return view('seller.orders.index', compact('orders', 'stats', 'totalRevenue'));
@@ -502,11 +577,26 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->get()
             ->sum(function ($transaction) use ($user) {
-                return $transaction->order->cart->cartDetails
+                // Hitung proporsi produk seller dari total transaksi
+                $sellerItemsTotal = $transaction->order->cart->cartDetails
                     ->where('product.iduserseller', $user->id)
                     ->sum(function ($item) {
                         return $item->quantity * $item->productprice;
                     });
+                
+                $totalOrderAmount = $transaction->order->cart->cartDetails
+                    ->sum(function ($item) {
+                        return $item->quantity * $item->productprice;
+                    });
+                
+                // Jika total order 0, return 0
+                if ($totalOrderAmount == 0) {
+                    return 0;
+                }
+                
+                // Hitung proporsi seller dari total transaksi
+                $sellerProportion = $sellerItemsTotal / $totalOrderAmount;
+                return $transaction->amount * $sellerProportion;
             });
 
         $totalOrders = Order::whereHas('cart.cartDetails.product', function ($query) use ($user) {
@@ -527,11 +617,26 @@ class DashboardController extends Controller
             })
             ->map(function ($transactions, $date) use ($user) {
                 $total = $transactions->sum(function ($transaction) use ($user) {
-                    return $transaction->order->cart->cartDetails
+                    // Hitung proporsi produk seller dari total transaksi
+                    $sellerItemsTotal = $transaction->order->cart->cartDetails
                         ->where('product.iduserseller', $user->id)
                         ->sum(function ($item) {
                             return $item->quantity * $item->productprice;
                         });
+                    
+                    $totalOrderAmount = $transaction->order->cart->cartDetails
+                        ->sum(function ($item) {
+                            return $item->quantity * $item->productprice;
+                        });
+                    
+                    // Jika total order 0, return 0
+                    if ($totalOrderAmount == 0) {
+                        return 0;
+                    }
+                    
+                    // Hitung proporsi seller dari total transaksi
+                    $sellerProportion = $sellerItemsTotal / $totalOrderAmount;
+                    return $transaction->amount * $sellerProportion;
                 });
                 
                 return (object) [
@@ -765,11 +870,26 @@ class DashboardController extends Controller
         // Calculate total revenue from paid transactions
         $totalRevenue = $allTransactions->where('transactionstatus', 'paid')
             ->sum(function ($transaction) use ($user) {
-                return $transaction->order->cart->cartDetails
+                // Hitung proporsi produk seller dari total transaksi
+                $sellerItemsTotal = $transaction->order->cart->cartDetails
                     ->where('product.iduserseller', $user->id)
                     ->sum(function ($item) {
                         return $item->quantity * $item->productprice;
                     });
+                
+                $totalOrderAmount = $transaction->order->cart->cartDetails
+                    ->sum(function ($item) {
+                        return $item->quantity * $item->productprice;
+                    });
+                
+                // Jika total order 0, return 0
+                if ($totalOrderAmount == 0) {
+                    return 0;
+                }
+                
+                // Hitung proporsi seller dari total transaksi
+                $sellerProportion = $sellerItemsTotal / $totalOrderAmount;
+                return $transaction->amount * $sellerProportion;
             });
 
         return view('seller.transactions.index', compact('transactions', 'stats', 'totalRevenue'));

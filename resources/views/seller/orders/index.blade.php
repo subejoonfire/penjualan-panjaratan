@@ -398,7 +398,7 @@
                                                 </button>
                                                 @if($order->remaining_update_time > 0)
                                                     <span class="text-xs text-gray-500 ml-2">
-                                                        Bisa diupdate {{ floor($order->remaining_update_time / 60) }}j {{ $order->remaining_update_time % 60 }}m lagi
+                                                        Bisa diupdate
                                                     </span>
                                                 @endif
                                                 @else
