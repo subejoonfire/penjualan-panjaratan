@@ -414,7 +414,7 @@
         
         if (isCustomer) {
             if (product.stock > 0) {
-                cartButton = `<button type="button" onclick="addToCart(${product.id})" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+                cartButton = `<button type="button" onclick="addToCart(${product.id}, event)" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
             } else {
                 cartButton = `<button disabled class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
             }
@@ -555,14 +555,18 @@
     });
 
     // Add to cart function
-    function addToCart(productId) {
+    function addToCart(productId, event) {
+        if (event) event.preventDefault();
+        
         // Find the button that was clicked
-        const button = event.target.closest('button');
-        const originalText = button.innerHTML;
+        const button = event ? event.target.closest('button') : null;
+        const originalText = button ? button.innerHTML : '';
         
         // Disable button and show loading animation
-        button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        }
         
         const formData = new FormData();
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
@@ -587,9 +591,11 @@
             console.log('Cart response:', data);
             if (data.success) {
                 // Show success animation
-                button.innerHTML = '<i class="fas fa-check"></i>';
-                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                button.classList.add('bg-green-600');
+                if (button) {
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    button.classList.add('bg-green-600');
+                }
                 
                 // Update cart count
                 if (typeof loadCartCount === 'function') {
@@ -598,22 +604,28 @@
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('bg-green-600');
-                    button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                    button.disabled = false;
+                    if (button) {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-600');
+                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        button.disabled = false;
+                    }
                 }, 2000);
             } else {
                 showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
-                button.innerHTML = originalText;
-                button.disabled = false;
+                if (button) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
             }
         })
         .catch(error => {
             console.error('Cart error:', error);
             showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
-            button.innerHTML = originalText;
-            button.disabled = false;
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
         });
     }
 

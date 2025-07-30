@@ -96,7 +96,8 @@
 }
 
     // Add to cart function
-    function addToCart(productId) {
+    function addToCart(productId, event) {
+        if (event) event.preventDefault();
         // Find the button that was clicked
         const button = event.target.closest('button');
         const originalText = button.innerHTML;
@@ -225,7 +226,7 @@
         
         if (isCustomer) {
             if (wishlist.stock > 0) {
-                cartButton = `<button type="button" onclick="addToCart(${wishlist.product_id})" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
+                cartButton = `<button type="button" onclick="addToCart(${wishlist.product_id}, event)" class="flex-1 bg-blue-600 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded text-xs font-medium hover:bg-blue-700 flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
             } else {
                 cartButton = `<button disabled class="flex-1 bg-gray-400 text-white px-1.5 sm:px-2 py-1 sm:py-1.5 rounded cursor-not-allowed text-xs flex items-center justify-center"><i class="fas fa-shopping-cart text-xs"></i></button>`;
             }
