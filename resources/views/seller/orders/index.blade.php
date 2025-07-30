@@ -488,18 +488,25 @@
                                 $disabled = true;
                                 }
                                 elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
-                                    $targetIdx <= $currentIdx) { $disabled=true; } @endphp @php
-                                        $tooltipText=$info['tooltip']; if ($disabled && $diffHours>= 3 && $targetIdx <=
-                                            $currentIdx) { $remainingMinutes=180 - ($diffHours * 60); $tooltipText
-                                            .=" (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes %
-                                            60) . "m lagi)" ; } @endphp <button
-                                            onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                            class="status-button {{ $info['class'] }} relative"
-                                            title="{{ $tooltipText }}" @if($disabled) disabled @endif>
-                                            <i class="fas {{ $info['icon'] }}"></i>
-                                            <span class="status-tooltip">{{ $info['label'] }}</span>
-                                            </button>
-                                            @endforeach
+                                    $targetIdx == $currentIdx) {
+                                    $disabled = true;
+                                    }
+                                    @endphp
+                                    @php
+                                    $tooltipText = $info['tooltip'];
+                                    if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
+                                    $remainingMinutes = 180 - ($diffHours * 60);
+                                    $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " .
+                                    ($remainingMinutes % 60) . "m lagi)";
+                                    }
+                                    @endphp
+                                    <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                        class="status-button {{ $info['class'] }} relative" title="{{ $tooltipText }}"
+                                        @if($disabled) disabled @endif>
+                                        <i class="fas {{ $info['icon'] }}"></i>
+                                        <span class="status-tooltip">{{ $info['label'] }}</span>
+                                    </button>
+                                    @endforeach
                             </div>
                         </div>
                     </div>
@@ -655,19 +662,26 @@
                                                 $disabled = true;
                                                 }
                                                 elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
-                                                    ($diffHours>= 3 && $targetIdx <= $currentIdx) { $disabled=true; }
-                                                        @endphp @php $tooltipText=$info['tooltip']; if ($disabled &&
-                                                        $diffHours>= 3 && $targetIdx <= $currentIdx) {
-                                                            $remainingMinutes=180 - ($diffHours * 60); $tooltipText
-                                                            .=" (Tunggu " . floor($remainingMinutes / 60) . "j " .
-                                                            ($remainingMinutes % 60) . "m lagi)" ; } @endphp <button
-                                                            onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                                            class="status-button {{ $info['class'] }} relative"
-                                                            title="{{ $tooltipText }}" @if($disabled) disabled @endif>
-                                                            <i class="fas {{ $info['icon'] }}"></i>
-                                                            <span class="status-tooltip">{{ $info['label'] }}</span>
-                                                            </button>
-                                                            @endforeach
+                                                    ($diffHours>= 3 && $targetIdx == $currentIdx) {
+                                                    $disabled = true;
+                                                    }
+                                                    @endphp
+                                                    @php
+                                                    $tooltipText = $info['tooltip'];
+                                                    if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
+                                                    $remainingMinutes = 180 - ($diffHours * 60);
+                                                    $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " .
+                                                    ($remainingMinutes % 60) . "m lagi)";
+                                                    }
+                                                    @endphp
+                                                    <button
+                                                        onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                                        class="status-button {{ $info['class'] }} relative"
+                                                        title="{{ $tooltipText }}" @if($disabled) disabled @endif>
+                                                        <i class="fas {{ $info['icon'] }}"></i>
+                                                        <span class="status-tooltip">{{ $info['label'] }}</span>
+                                                    </button>
+                                                    @endforeach
                                             </div>
                                         </div>
                                     </div>
