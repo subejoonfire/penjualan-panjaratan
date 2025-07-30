@@ -42,6 +42,7 @@ class PaymentController extends Controller
         $phoneNumber = $user->phone ?? '';
         $callbackUrl = route('customer.payments.callback');
         $returnUrl = route('customer.payments.index');
+        // Perbaiki signature sesuai dokumentasi Duitku
         $signature = md5($merchantCode . $merchantOrderId . $paymentAmount . $apiKey);
         $expiryPeriod = 60;
         $additionalParam = '';
