@@ -418,6 +418,14 @@ class DashboardController extends Controller
             ], 400);
         }
 
+        // Cek apakah status bisa diupdate
+        if (!$order->canUpdateStatus($request->status)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak dapat diupdate. Sudah lebih dari 3 jam sejak update terakhir atau transisi status tidak diperbolehkan.'
+            ], 400);
+        }
+
         $order->updateStatus($request->status);
 
         return response()->json([

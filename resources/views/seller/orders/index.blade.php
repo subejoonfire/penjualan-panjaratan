@@ -420,24 +420,38 @@
                                         $currentIdx = array_search($order->status, $statusOrder);
                                         if ($currentIdx === false) { $currentIdx = -1; }
                                         $now = now();
-                                        $diffHours = $order->updated_at->diffInHours($now);
+                                        $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
+                                        $diffHours = $statusUpdatedAt->diffInHours($now);
                                     @endphp
                                     @foreach($statusList as $status => $info)
                                         @php
                                             $targetIdx = array_search($status, $statusOrder);
                                             if ($targetIdx === false) { $targetIdx = -1; }
                                             $disabled = false;
+                                            
+                                            // Jika status sudah delivered/cancelled, semua tombol disabled
                                             if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                 $disabled = true;
-                                            } elseif ($targetIdx < $currentIdx) {
+                                            }
+                                            // Jika ingin mundur status, selalu disabled
+                                            elseif ($targetIdx < $currentIdx) {
                                                 $disabled = true;
-                                            } elseif ($diffHours >= 3 && $targetIdx < $currentIdx) {
+                                            }
+                                            // Jika sudah 3 jam dan ingin ke status yang sama atau sebelumnya, disabled
+                                            elseif ($diffHours >= 3 && $targetIdx <= $currentIdx) {
                                                 $disabled = true;
+                                            }
+                                        @endphp
+                                        @php
+                                            $tooltipText = $info['tooltip'];
+                                            if ($disabled && $diffHours >= 3 && $targetIdx <= $currentIdx) {
+                                                $remainingMinutes = 180 - ($diffHours * 60);
+                                                $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)";
                                             }
                                         @endphp
                                         <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                             class="status-button {{ $info['class'] }} relative"
-                                            title="{{ $info['tooltip'] }}"
+                                            title="{{ $tooltipText }}"
                                             @if($disabled) disabled @endif>
                                             <i class="fas {{ $info['icon'] }}"></i>
                                             <span class="status-tooltip">{{ $info['label'] }}</span>
@@ -575,24 +589,38 @@
                                                         $currentIdx = array_search($order->status, $statusOrder);
                                                         if ($currentIdx === false) { $currentIdx = -1; }
                                                         $now = now();
-                                                        $diffHours = $order->updated_at->diffInHours($now);
+                                                        $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
+                                                        $diffHours = $statusUpdatedAt->diffInHours($now);
                                                     @endphp
                                                     @foreach($statusList as $status => $info)
                                                         @php
                                                             $targetIdx = array_search($status, $statusOrder);
                                                             if ($targetIdx === false) { $targetIdx = -1; }
                                                             $disabled = false;
+                                                            
+                                                            // Jika status sudah delivered/cancelled, semua tombol disabled
                                                             if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                                 $disabled = true;
-                                                            } elseif ($targetIdx < $currentIdx) {
+                                                            }
+                                                            // Jika ingin mundur status, selalu disabled
+                                                            elseif ($targetIdx < $currentIdx) {
                                                                 $disabled = true;
-                                                            } elseif ($diffHours >= 3 && $targetIdx < $currentIdx) {
+                                                            }
+                                                            // Jika sudah 3 jam dan ingin ke status yang sama atau sebelumnya, disabled
+                                                            elseif ($diffHours >= 3 && $targetIdx <= $currentIdx) {
                                                                 $disabled = true;
+                                                            }
+                                                        @endphp
+                                                        @php
+                                                            $tooltipText = $info['tooltip'];
+                                                            if ($disabled && $diffHours >= 3 && $targetIdx <= $currentIdx) {
+                                                                $remainingMinutes = 180 - ($diffHours * 60);
+                                                                $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)";
                                                             }
                                                         @endphp
                                                         <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                                             class="status-button {{ $info['class'] }} relative"
-                                                            title="{{ $info['tooltip'] }}"
+                                                            title="{{ $tooltipText }}"
                                                             @if($disabled) disabled @endif>
                                                             <i class="fas {{ $info['icon'] }}"></i>
                                                             <span class="status-tooltip">{{ $info['label'] }}</span>
@@ -794,5 +822,10 @@
             closeOrderModal();
         }
     });
+
+    // Auto refresh page every 5 minutes to update button status
+    setTimeout(function() {
+        location.reload();
+    }, 300000); // 5 minutes
 </script>
 @endsection

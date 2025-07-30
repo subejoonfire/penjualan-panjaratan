@@ -86,6 +86,38 @@ class Order extends Model
         ]);
     }
 
+    // Helper method untuk mengecek apakah status bisa diupdate dalam 3 jam
+    public function canUpdateStatus($targetStatus)
+    {
+        // Jika status sudah delivered/cancelled, tidak bisa diupdate
+        if (in_array($this->status, ['delivered', 'cancelled'])) {
+            return false;
+        }
+
+        $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+        $currentIdx = array_search($this->status, $statusOrder);
+        $targetIdx = array_search($targetStatus, $statusOrder);
+
+        if ($currentIdx === false || $targetIdx === false) {
+            return false;
+        }
+
+        // Jika ingin mundur status, tidak bisa
+        if ($targetIdx < $currentIdx) {
+            return false;
+        }
+
+        // Jika ingin ke status yang sama atau sebelumnya dan sudah 3 jam, tidak bisa
+        $statusUpdatedAt = $this->status_updated_at ?? $this->created_at;
+        $diffHours = $statusUpdatedAt->diffInHours(now());
+        
+        if ($diffHours >= 3 && $targetIdx <= $currentIdx) {
+            return false;
+        }
+
+        return true;
+    }
+
     // Scope berdasarkan status
     public function scopeByStatus($query, $status)
     {
