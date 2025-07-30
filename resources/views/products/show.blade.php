@@ -537,10 +537,22 @@
                 }
                 
                 // Show toast notification
-                showToast(data.message);
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: data.message || 'Berhasil menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
             } else {
                 text.textContent = originalText;
-                showAlert(data.message || 'Terjadi kesalahan', 'error');
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal menambahkan ke keranjang',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
             }
             btn.disabled = false;
         })
@@ -548,7 +560,13 @@
             console.error('Error:', error);
             text.textContent = originalText;
             btn.disabled = false;
-            showAlert('Terjadi kesalahan', 'error');
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message,
+                confirmText: 'OK',
+                showCancel: false
+            });
         });
     }
     

@@ -333,8 +333,20 @@ class CartController extends Controller
 
             // Generate order number with date format
             $date = now()->format('Ymd');
-            $orderCount = Order::whereDate('created_at', today())->count() + 1;
-            $orderNumber = 'ORD-' . $date . '-' . str_pad($orderCount, 6, '0', STR_PAD_LEFT);
+            $maxAttempts = 5;
+            $orderNumber = null;
+            for ($i = 0; $i < $maxAttempts; $i++) {
+                $orderCount = Order::whereDate('created_at', today())->count() + 1 + $i;
+                $orderNumberCandidate = 'ORD-' . $date . '-' . str_pad($orderCount, 6, '0', STR_PAD_LEFT);
+                if (!Order::where('order_number', $orderNumberCandidate)->exists()) {
+                    $orderNumber = $orderNumberCandidate;
+                    break;
+                }
+            }
+            if (!$orderNumber) {
+                // Fallback: use random string
+                $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
+            }
 
             // Create order
             $order = Order::create([

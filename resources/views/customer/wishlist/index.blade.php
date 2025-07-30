@@ -85,12 +85,12 @@
             if (data.success) {
                 location.reload();
             } else {
-                showAlert(data.message || 'Gagal menghapus dari wishlist', 'error');
+                showModalNotification(data.message || 'Gagal menghapus dari wishlist', 'error');
             }
         })
         .catch(error => {
             console.error('Wishlist error:', error);
-            showAlert('Terjadi kesalahan saat menghapus dari wishlist', 'error');
+            showModalNotification('Terjadi kesalahan saat menghapus dari wishlist', 'error');
         });
     });
 }
@@ -146,14 +146,14 @@
                     button.disabled = false;
                 }, 2000);
             } else {
-                showAlert(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                showModalNotification(data.message || 'Gagal menambahkan ke keranjang', 'error');
                 button.innerHTML = originalText;
                 button.disabled = false;
             }
         })
         .catch(error => {
             console.error('Cart error:', error);
-            showAlert('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            showModalNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
             button.innerHTML = originalText;
             button.disabled = false;
         });
@@ -309,16 +309,16 @@
                     }
                 }, 300);
                 
-                showAlert('Produk berhasil dihapus dari wishlist', 'success');
+                showModalNotification('Produk berhasil dihapus dari wishlist', 'success');
             } else {
                 card.style.opacity = originalOpacity;
-                showAlert(data.message || 'Gagal menghapus dari wishlist', 'error');
+                showModalNotification(data.message || 'Gagal menghapus dari wishlist', 'error');
             }
         })
         .catch(error => {
             console.error('Wishlist error:', error);
             card.style.opacity = originalOpacity;
-            showAlert('Terjadi kesalahan saat menghapus dari wishlist', 'error');
+            showModalNotification('Terjadi kesalahan saat menghapus dari wishlist', 'error');
         });
     }
 
