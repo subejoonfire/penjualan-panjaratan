@@ -458,7 +458,7 @@ class DashboardController extends Controller
         if (!$order->canUpdateStatus($request->status)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Status tidak dapat diupdate. Sudah lebih dari 3 jam sejak update terakhir atau transisi status tidak diperbolehkan.'
+                'message' => 'Status tidak dapat diupdate. Transisi status tidak diperbolehkan.'
             ], 400);
         }
 

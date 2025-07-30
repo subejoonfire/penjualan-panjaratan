@@ -506,244 +506,355 @@
                                         <i class="fas {{ $info['icon'] }}"></i>
                                         <span class="status-tooltip">{{ $info['label'] }}</span>
                                     </button>
-                                    @endforeach
+                                    <div class="flex justify-center space-x-2">
+                                        @php
+                                        $statusList = [
+                                        'processing' => [
+                                        'icon' => 'fa-check',
+                                        'class' => 'confirm',
+                                        'label' => 'Proses',
+                                        'tooltip' => 'Proses',
+                                        ],
+                                        'shipped' => [
+                                        'icon' => 'fa-truck',
+                                        'class' => 'ship',
+                                        'label' => 'Kirim',
+                                        'tooltip' => 'Kirim',
+                                        ],
+                                        'delivered' => [
+                                        'icon' => 'fa-check-double',
+                                        'class' => 'complete',
+                                        'label' => 'Selesai',
+                                        'tooltip' => 'Selesai',
+                                        ],
+                                        'cancelled' => [
+                                        'icon' => 'fa-times',
+                                        'class' => 'cancel',
+                                        'label' => 'Batalkan',
+                                        'tooltip' => 'Batalkan',
+                                        ],
+                                        ];
+                                        $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                        $currentIdx = array_search($order->status, $statusOrder);
+                                        if ($currentIdx === false) { $currentIdx = -1; }
+                                        @endphp
+                                        @foreach($statusList as $status => $info)
+                                        @php
+                                        $targetIdx = array_search($status, $statusOrder);
+                                        if ($targetIdx === false) { $targetIdx = -1; }
+                                        $disabled = false;
+
+                                        if (in_array($order->status, ['delivered', 'cancelled'])) {
+                                        $disabled = true;
+                                        }
+                                        elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
+                                            ($targetIdx==$currentIdx) { $disabled=true; } @endphp @php
+                                            $tooltipText=$info['tooltip']; @endphp <button
+                                            onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                            class="status-button {{ $info['class'] }} relative"
+                                            title="{{ $tooltipText }}" @if($disabled) disabled @endif>
+                                            <i class="fas {{ $info['icon'] }}"></i>
+                                            <span class="status-tooltip">{{ $info['label'] }}</span>
+                                            </button>
+                                            @endforeach
+                                    </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Desktop Layout -->
-                    <div class="hidden sm:block">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-start space-x-4 flex-1">
-                                <!-- Order Info -->
-                                <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 rounded-lg flex items-center justify-center
+                        <!-- Desktop Layout -->
+                        <div class="hidden sm:block">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-start space-x-4 flex-1">
+                                    <!-- Order Info -->
+                                    <div class="flex-shrink-0">
+                                        <div class="w-12 h-12 rounded-lg flex items-center justify-center
                                             {{ $order->status === 'pending' ? 'bg-yellow-100' : '' }}
                                             {{ $order->status === 'processing' ? 'bg-blue-100' : '' }}
                                             {{ $order->status === 'shipped' ? 'bg-purple-100' : '' }}
                                             {{ $order->status === 'delivered' ? 'bg-green-100' : '' }}
                                             {{ $order->status === 'cancelled' ? 'bg-red-100' : '' }}">
-                                        <i
-                                            class="fas 
+                                            <i
+                                                class="fas 
                                                 {{ $order->status === 'pending' ? 'fa-clock text-yellow-600' : '' }}
                                                 {{ $order->status === 'processing' ? 'fa-cogs text-blue-600' : '' }}
                                                 {{ $order->status === 'shipped' ? 'fa-truck text-purple-600' : '' }}
                                                 {{ $order->status === 'delivered' ? 'fa-check-circle text-green-600' : '' }}
                                                 {{ $order->status === 'cancelled' ? 'fa-times-circle text-red-600' : '' }}"></i>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Order Details -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="text-lg font-medium text-gray-900">{{ $order->order_number }}</h4>
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    <!-- Order Details -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="text-lg font-medium text-gray-900">{{ $order->order_number }}
+                                            </h4>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                                 {{ $order->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
                                                 {{ $order->status === 'processing' ? 'bg-blue-100 text-blue-800' : '' }}
                                                 {{ $order->status === 'shipped' ? 'bg-purple-100 text-purple-800' : '' }}
                                                 {{ $order->status === 'delivered' ? 'bg-green-100 text-green-800' : '' }}
                                                 {{ $order->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                                            @switch($order->status)
-                                            @case('pending') Menunggu @break
-                                            @case('processing') Diproses @break
-                                            @case('shipped') Dikirim @break
-                                            @case('delivered') Selesai @break
-                                            @case('cancelled') Dibatalkan @break
-                                            @default {{ ucfirst($order->status) }}
-                                            @endswitch
-                                        </span>
-                                    </div>
+                                                @switch($order->status)
+                                                @case('pending') Menunggu @break
+                                                @case('processing') Diproses @break
+                                                @case('shipped') Dikirim @break
+                                                @case('delivered') Selesai @break
+                                                @case('cancelled') Dibatalkan @break
+                                                @default {{ ucfirst($order->status) }}
+                                                @endswitch
+                                            </span>
+                                        </div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                        <!-- Customer Info -->
-                                        <div>
-                                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                                                Pelanggan</p>
-                                            <div class="flex items-center mt-1">
-                                                <div
-                                                    class="flex-shrink-0 w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                                                    <i class="fas fa-user text-gray-600 text-xs"></i>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                            <!-- Customer Info -->
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                                                    Pelanggan</p>
+                                                <div class="flex items-center mt-1">
+                                                    <div
+                                                        class="flex-shrink-0 w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-user text-gray-600 text-xs"></i>
+                                                    </div>
+                                                    <div class="ml-2">
+                                                        <p class="text-sm font-medium text-gray-900">{{
+                                                            $order->cart->user->nickname ?? $order->cart->user->username
+                                                            }}
+                                                        </p>
+                                                        <p class="text-xs text-gray-500">{{ $order->cart->user->email }}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div class="ml-2">
-                                                    <p class="text-sm font-medium text-gray-900">{{
-                                                        $order->cart->user->nickname ?? $order->cart->user->username }}
-                                                    </p>
-                                                    <p class="text-xs text-gray-500">{{ $order->cart->user->email }}</p>
-                                                </div>
+                                            </div>
+
+                                            <!-- Products Info -->
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                                                    Produk
+                                                    Anda</p>
+                                                <p class="text-sm font-medium text-gray-900 mt-1">{{
+                                                    $sellerItems->count()
+                                                    }} produk</p>
+                                                <p class="text-xs text-gray-500">
+                                                    @foreach($sellerItems->take(2) as $item)
+                                                    {{ $item->product->productname }}@if(!$loop->last), @endif
+                                                    @endforeach
+                                                    @if($sellerItems->count() > 2)
+                                                    +{{ $sellerItems->count() - 2 }} lainnya
+                                                    @endif
+                                                </p>
+                                            </div>
+
+                                            <!-- Amount Info -->
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                                                    Total
+                                                    Anda</p>
+                                                <p class="text-lg font-bold text-gray-900 mt-1">Rp {{
+                                                    number_format($totalAmount) }}</p>
+                                                <p class="text-xs text-gray-500">{{ $sellerItems->sum('quantity') }}
+                                                    item
+                                                </p>
                                             </div>
                                         </div>
 
-                                        <!-- Products Info -->
-                                        <div>
-                                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Produk
-                                                Anda</p>
-                                            <p class="text-sm font-medium text-gray-900 mt-1">{{ $sellerItems->count()
-                                                }} produk</p>
-                                            <p class="text-xs text-gray-500">
-                                                @foreach($sellerItems->take(2) as $item)
-                                                {{ $item->product->productname }}@if(!$loop->last), @endif
-                                                @endforeach
-                                                @if($sellerItems->count() > 2)
-                                                +{{ $sellerItems->count() - 2 }} lainnya
-                                                @endif
-                                            </p>
-                                        </div>
+                                        <!-- Date and Actions -->
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center text-sm text-gray-500">
+                                                <i class="fas fa-calendar-alt mr-1"></i>
+                                                {{ $order->created_at->format('d M Y, H:i') }}
+                                                <span class="mx-2">•</span>
+                                                <i class="fas fa-clock mr-1"></i>
+                                                {{ $order->created_at->diffForHumans() }}
+                                            </div>
 
-                                        <!-- Amount Info -->
-                                        <div>
-                                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total
-                                                Anda</p>
-                                            <p class="text-lg font-bold text-gray-900 mt-1">Rp {{
-                                                number_format($totalAmount) }}</p>
-                                            <p class="text-xs text-gray-500">{{ $sellerItems->sum('quantity') }} item
-                                            </p>
-                                        </div>
-                                    </div>
+                                            <div class="flex items-center space-x-3">
+                                                <button onclick="viewOrderDetails('{{ $order->id }}')"
+                                                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                    <i class="fas fa-eye mr-1"></i>
+                                                    Detail
+                                                </button>
 
-                                    <!-- Date and Actions -->
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-calendar-alt mr-1"></i>
-                                            {{ $order->created_at->format('d M Y, H:i') }}
-                                            <span class="mx-2">•</span>
-                                            <i class="fas fa-clock mr-1"></i>
-                                            {{ $order->created_at->diffForHumans() }}
-                                        </div>
+                                                <div class="flex items-center space-x-2">
+                                                    @php
+                                                    $statusList = [
+                                                    'processing' => [
+                                                    'icon' => 'fa-check',
+                                                    'class' => 'confirm',
+                                                    'label' => 'Proses',
+                                                    'tooltip' => 'Proses',
+                                                    ],
+                                                    'shipped' => [
+                                                    'icon' => 'fa-truck',
+                                                    'class' => 'ship',
+                                                    'label' => 'Kirim',
+                                                    'tooltip' => 'Kirim',
+                                                    ],
+                                                    'delivered' => [
+                                                    'icon' => 'fa-check-double',
+                                                    'class' => 'complete',
+                                                    'label' => 'Selesai',
+                                                    'tooltip' => 'Selesai',
+                                                    ],
+                                                    'cancelled' => [
+                                                    'icon' => 'fa-times',
+                                                    'class' => 'cancel',
+                                                    'label' => 'Batalkan',
+                                                    'tooltip' => 'Batalkan',
+                                                    ],
+                                                    ];
+                                                    $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+                                                    $currentIdx = array_search($order->status, $statusOrder);
+                                                    if ($currentIdx === false) { $currentIdx = -1; }
+                                                    $now = now();
+                                                    $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
+                                                    $diffHours = $statusUpdatedAt->diffInHours($now);
+                                                    @endphp
+                                                    @foreach($statusList as $status => $info)
+                                                    @php
+                                                    $targetIdx = array_search($status, $statusOrder);
+                                                    if ($targetIdx === false) { $targetIdx = -1; }
+                                                    $disabled = false;
 
-                                        <div class="flex items-center space-x-3">
-                                            <button onclick="viewOrderDetails('{{ $order->id }}')"
-                                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                <i class="fas fa-eye mr-1"></i>
-                                                Detail
-                                            </button>
-
-                                            <div class="flex items-center space-x-2">
-                                                @php
-                                                $statusList = [
-                                                'processing' => [
-                                                'icon' => 'fa-check',
-                                                'class' => 'confirm',
-                                                'label' => 'Proses',
-                                                'tooltip' => 'Proses',
-                                                ],
-                                                'shipped' => [
-                                                'icon' => 'fa-truck',
-                                                'class' => 'ship',
-                                                'label' => 'Kirim',
-                                                'tooltip' => 'Kirim',
-                                                ],
-                                                'delivered' => [
-                                                'icon' => 'fa-check-double',
-                                                'class' => 'complete',
-                                                'label' => 'Selesai',
-                                                'tooltip' => 'Selesai',
-                                                ],
-                                                'cancelled' => [
-                                                'icon' => 'fa-times',
-                                                'class' => 'cancel',
-                                                'label' => 'Batalkan',
-                                                'tooltip' => 'Batalkan',
-                                                ],
-                                                ];
-                                                $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
-                                                $currentIdx = array_search($order->status, $statusOrder);
-                                                if ($currentIdx === false) { $currentIdx = -1; }
-                                                $now = now();
-                                                $statusUpdatedAt = $order->status_updated_at ?? $order->created_at;
-                                                $diffHours = $statusUpdatedAt->diffInHours($now);
-                                                @endphp
-                                                @foreach($statusList as $status => $info)
-                                                @php
-                                                $targetIdx = array_search($status, $statusOrder);
-                                                if ($targetIdx === false) { $targetIdx = -1; }
-                                                $disabled = false;
-
-                                                if (in_array($order->status, ['delivered', 'cancelled'])) {
-                                                $disabled = true;
-                                                }
-                                                elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
-                                                    ($diffHours>= 3 && $targetIdx == $currentIdx) {
+                                                    if (in_array($order->status, ['delivered', 'cancelled'])) {
                                                     $disabled = true;
                                                     }
-                                                    @endphp
-                                                    @php
-                                                    $tooltipText = $info['tooltip'];
-                                                    if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
-                                                    $remainingMinutes = 180 - ($diffHours * 60);
-                                                    $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " .
-                                                    ($remainingMinutes % 60) . "m lagi)";
-                                                    }
-                                                    @endphp
-                                                    <button
-                                                        onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                                        class="status-button {{ $info['class'] }} relative"
-                                                        title="{{ $tooltipText }}" @if($disabled) disabled @endif>
-                                                        <i class="fas {{ $info['icon'] }}"></i>
-                                                        <span class="status-tooltip">{{ $info['label'] }}</span>
-                                                    </button>
-                                                    @endforeach
+                                                    elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
+                                                        ($diffHours>= 3 && $targetIdx == $currentIdx) {
+                                                        $disabled = true;
+                                                        }
+                                                        @endphp
+                                                        @php
+                                                        $tooltipText = $info['tooltip'];
+                                                        if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
+                                                        $remainingMinutes = 180 - ($diffHours * 60);
+                                                        $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j
+                                                        " .
+                                                        ($remainingMinutes % 60) . "m lagi)";
+                                                        }
+                                                        @endphp
+                                                        <button
+                                                            onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                                            class="status-button {{ $info['class'] }} relative"
+                                                            title="{{ $tooltipText }}" @if($disabled) disabled @endif>
+                                                            <i class="fas {{ $info['icon'] }}"></i>
+                                                            <span class="status-tooltip">{{ $info['label'] }}</span>
+                                                        </button>
+                                                        <div class="flex items-center space-x-2">
+                                                            @php
+                                                            $statusList = [
+                                                            'processing' => [
+                                                            'icon' => 'fa-check',
+                                                            'class' => 'confirm',
+                                                            'label' => 'Proses',
+                                                            'tooltip' => 'Proses',
+                                                            ],
+                                                            'shipped' => [
+                                                            'icon' => 'fa-truck',
+                                                            'class' => 'ship',
+                                                            'label' => 'Kirim',
+                                                            'tooltip' => 'Kirim',
+                                                            ],
+                                                            'delivered' => [
+                                                            'icon' => 'fa-check-double',
+                                                            'class' => 'complete',
+                                                            'label' => 'Selesai',
+                                                            'tooltip' => 'Selesai',
+                                                            ],
+                                                            'cancelled' => [
+                                                            'icon' => 'fa-times',
+                                                            'class' => 'cancel',
+                                                            'label' => 'Batalkan',
+                                                            'tooltip' => 'Batalkan',
+                                                            ],
+                                                            ];
+                                                            $statusOrder = ['pending', 'processing', 'shipped',
+                                                            'delivered'];
+                                                            $currentIdx = array_search($order->status, $statusOrder);
+                                                            if ($currentIdx === false) { $currentIdx = -1; }
+                                                            @endphp
+                                                            @foreach($statusList as $status => $info)
+                                                            @php
+                                                            $targetIdx = array_search($status, $statusOrder);
+                                                            if ($targetIdx === false) { $targetIdx = -1; }
+                                                            $disabled = false;
+
+                                                            if (in_array($order->status, ['delivered', 'cancelled'])) {
+                                                            $disabled = true;
+                                                            }
+                                                            elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
+                                                                ($targetIdx==$currentIdx) { $disabled=true; } @endphp
+                                                                @php $tooltipText=$info['tooltip']; @endphp <button
+                                                                onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                                                class="status-button {{ $info['class'] }} relative"
+                                                                title="{{ $tooltipText }}" @if($disabled) disabled
+                                                                @endif>
+                                                                <i class="fas {{ $info['icon'] }}"></i>
+                                                                <span class="status-tooltip">{{ $info['label'] }}</span>
+                                                                </button>
+                                                                @endforeach
+                                                        </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @empty
+                        <div class="px-6 py-12 text-center">
+                            <i class="fas fa-shopping-cart text-gray-400 text-6xl mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pesanan Ditemukan</h3>
+                            <p class="text-gray-600 mb-6">
+                                @if(request()->hasAny(['search', 'status']))
+                                Tidak ada pesanan yang sesuai dengan kriteria filter Anda.
+                                @else
+                                Belum ada pesanan untuk produk Anda. Pesanan akan muncul di sini ketika pelanggan
+                                membeli produk
+                                Anda.
+                                @endif
+                            </p>
+                            @if(request()->hasAny(['search', 'status']))
+                            <a href="{{ route('seller.orders.index') }}"
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                <i class="fas fa-times mr-2"></i>
+                                Bersihkan Filter
+                            </a>
+                            @endif
+                        </div>
+                        @endforelse
                     </div>
-                </div>
-                @empty
-                <div class="px-6 py-12 text-center">
-                    <i class="fas fa-shopping-cart text-gray-400 text-6xl mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pesanan Ditemukan</h3>
-                    <p class="text-gray-600 mb-6">
-                        @if(request()->hasAny(['search', 'status']))
-                        Tidak ada pesanan yang sesuai dengan kriteria filter Anda.
-                        @else
-                        Belum ada pesanan untuk produk Anda. Pesanan akan muncul di sini ketika pelanggan membeli produk
-                        Anda.
-                        @endif
-                    </p>
-                    @if(request()->hasAny(['search', 'status']))
-                    <a href="{{ route('seller.orders.index') }}"
-                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                        <i class="fas fa-times mr-2"></i>
-                        Bersihkan Filter
-                    </a>
+
+                    <!-- Pagination -->
+                    @if($orders->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-200">
+                        {{ $orders->appends(request()->query())->links() }}
+                    </div>
                     @endif
                 </div>
-                @endforelse
-            </div>
-
-            <!-- Pagination -->
-            @if($orders->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $orders->appends(request()->query())->links() }}
-            </div>
-            @endif
-        </div>
-    </div>
-</div>
-
-
-<div id="orderModal"
-    class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
-    <div class="relative mx-auto border max-w-6xl w-full shadow-lg rounded-md bg-white overflow-hidden"
-        style="max-height: 90vh;">
-        <div class="flex flex-col">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-                <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Detail Pesanan</h3>
-                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 p-1">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div id="orderModalContent" class="overflow-y-auto p-4" style="max-height: calc(90vh - 80px);">
-
             </div>
         </div>
-    </div>
-</div>
 
-<script>
-    let currentOrderId = null;
+
+        <div id="orderModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center h-full w-full hidden z-[9999] p-4">
+            <div class="relative mx-auto border max-w-6xl w-full shadow-lg rounded-md bg-white overflow-hidden"
+                style="max-height: 90vh;">
+                <div class="flex flex-col">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+                        <h3 id="orderModalTitle" class="text-lg font-medium text-gray-900">Detail Pesanan</h3>
+                        <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 p-1">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="orderModalContent" class="overflow-y-auto p-4" style="max-height: calc(90vh - 80px);">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentOrderId = null;
 
     function viewOrderDetails(orderId) {
         currentOrderId = orderId;
@@ -877,8 +988,6 @@
         }
     });
 
-    setTimeout(function() {
-        location.reload();
-    }, 300000);
-</script>
-@endsection
+
+        </script>
+        @endsection

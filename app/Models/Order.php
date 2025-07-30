@@ -86,7 +86,7 @@ class Order extends Model
         ]);
     }
 
-    // Helper method untuk mengecek apakah status bisa diupdate dalam 3 jam
+    // Helper method untuk mengecek apakah status bisa diupdate
     public function canUpdateStatus($targetStatus)
     {
         // Jika status sudah delivered/cancelled, tidak bisa diupdate
@@ -107,11 +107,8 @@ class Order extends Model
             return false;
         }
 
-        // Jika ingin ke status yang sama dan sudah 3 jam, tidak bisa
-        $statusUpdatedAt = $this->status_updated_at ?? $this->created_at;
-        $diffHours = $statusUpdatedAt->diffInHours(now());
-        
-        if ($diffHours >= 3 && $targetIdx == $currentIdx) {
+        // Jika ingin ke status yang sama, tidak bisa
+        if ($targetIdx == $currentIdx) {
             return false;
         }
 
