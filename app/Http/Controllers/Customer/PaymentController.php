@@ -1,0 +1,85 @@
+<?php
+namespace App\Http\Controllers\Customer;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Transaction;
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class PaymentController extends Controller
+{
+    // Daftar pembayaran customer (unpaid & paid)
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $transactions = Transaction::whereHas('order.cart', function($q) use ($user) {
+            $q->where('iduser', $user->id);
+        })
+        ->with(['order.cart.cartDetails.product.images'])
+        ->orderByDesc('created_at')
+        ->get();
+        return view('customer.payments.index', compact('transactions'));
+    }
+
+    // Redirect ke Duitku untuk pembayaran
+    public function pay(Transaction $transaction)
+    {
+        $user = Auth::user();
+        if ($transaction->order->cart->iduser !== $user->id) abort(403);
+        if ($transaction->isPaid()) return redirect()->route('customer.payments.index')->with('success', 'Sudah dibayar');
+
+        // Duitku API
+        $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+        $merchantCode = 'DS15538'; // Ganti sesuai merchantCode Duitku kamu
+        $paymentAmount = (int) $transaction->amount;
+        $paymentMethod = null; // null = semua channel
+        $merchantOrderId = $transaction->transaction_number;
+        $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
+        $email = $user->email;
+        $phoneNumber = $user->phone ?? '';
+        $callbackUrl = route('customer.payments.callback');
+        $returnUrl = route('customer.payments.index');
+        $signature = md5($merchantCode . $merchantOrderId . $paymentAmount . $apiKey);
+
+        $params = [
+            'merchantCode' => $merchantCode,
+            'paymentAmount' => $paymentAmount,
+            'paymentMethod' => $paymentMethod,
+            'merchantOrderId' => $merchantOrderId,
+            'productDetails' => $productDetails,
+            'email' => $email,
+            'phoneNumber' => $phoneNumber,
+            'callbackUrl' => $callbackUrl,
+            'returnUrl' => $returnUrl,
+            'signature' => $signature,
+            'expiryPeriod' => 60 // menit
+        ];
+
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
+        if ($response->successful() && isset($response['paymentUrl'])) {
+            return redirect($response['paymentUrl']);
+        }
+        Log::error('Duitku error', ['response' => $response->json()]);
+        return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
+    }
+
+    // Callback Duitku (update status pembayaran)
+    public function callback(Request $request)
+    {
+        $merchantOrderId = $request->merchantOrderId;
+        $resultCode = $request->resultCode;
+        $transaction = Transaction::where('transaction_number', $merchantOrderId)->first();
+        if (!$transaction) return response('Order not found', 404);
+        if ($resultCode == '00') {
+            $transaction->markAsPaid();
+            $transaction->order->updateStatus('processing');
+        } else {
+            $transaction->markAsFailed();
+        }
+        return response('OK', 200);
+    }
+}

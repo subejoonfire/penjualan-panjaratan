@@ -129,6 +129,9 @@
                 <a href="{{ route('customer.orders.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.orders.*') ? 'active' : '' }}">
                     <i class="fas fa-list-alt"></i>
                 </a>
+                <a href="{{ route('customer.payments.index') }}" class="mobile-nav-item {{ request()->routeIs('customer.payments.*') ? 'active' : '' }}">
+                    <i class="fas fa-credit-card"></i>
+                </a>
                 @endif
                 <!-- Notifikasi & Cart -->
                 <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : (auth()->user()->isSeller() ? route('seller.notifications.index') : route('customer.notifications.index')) }}" class="mobile-nav-item relative {{ request()->routeIs(auth()->user()->role.'.notifications.*') ? 'active' : '' }}">
@@ -337,6 +340,11 @@
                                 class="fas fa-list-alt text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
                             <span
                                 class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
+                        </a>
+                        <a href="{{ route('customer.payments.index') }}"
+                            class="group flex flex-col items-center {{ request()->routeIs('customer.payments.*') ? 'text-blue-600' : 'text-gray-600' }}">
+                            <i class="fas fa-credit-card text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
+                            <span class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Pembayaran</span>
                         </a>
                         @endif
                     </div>

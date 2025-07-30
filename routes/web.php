@@ -120,6 +120,10 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('/wishlist/add/{product}', [\App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
     Route::delete('/wishlist/remove/{product}', [\App\Http\Controllers\WishlistController::class, 'remove'])->name('wishlist.remove');
     Route::post('/wishlist/toggle/{product}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::get('payments', [\App\Http\Controllers\Customer\PaymentController::class, 'index'])->name('customer.payments.index');
+    Route::get('payments/pay/{transaction}', [\App\Http\Controllers\Customer\PaymentController::class, 'pay'])->name('customer.payments.pay');
+    Route::post('payments/callback', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('customer.payments.callback');
+    Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('customer.checkout.direct');
 });
 
 Route::middleware('auth')->group(function () {

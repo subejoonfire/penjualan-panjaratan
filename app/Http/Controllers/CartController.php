@@ -388,6 +388,11 @@ class CartController extends Controller
                 'readstatus' => false
             ]);
 
+            if (($request->payment_method ?? 'cod') !== 'cod') {
+                DB::commit();
+                return redirect()->route('customer.payments.pay', $transaction);
+            }
+
             DB::commit();
 
             if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
@@ -454,5 +459,48 @@ class CartController extends Controller
         $total = $items->sum('subtotal');
 
         return response()->json(['items' => $items, 'total' => $total]);
+    }
+
+    public function directCheckout(Request $request, $productId)
+    {
+        $user = Auth::user();
+        $request->validate(['quantity' => 'required|integer|min:1']);
+        $product = \App\Models\Product::findOrFail($productId);
+        if ($product->productstock < $request->quantity) {
+            return response()->json(['success' => false, 'message' => 'Stok tidak cukup']);
+        }
+        // Buat order & transaction khusus produk ini
+        $subtotal = $product->productprice * $request->quantity;
+        $shippingCost = 15000;
+        $total = $subtotal + $shippingCost;
+        $date = now()->format('Ymd');
+        $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
+        $order = \App\Models\Order::create([
+            'idcart' => null,
+            'order_number' => $orderNumber,
+            'grandtotal' => $total,
+            'shipping_address' => $user->defaultAddress()?->address ?? '',
+            'status' => 'pending',
+            'notes' => null
+        ]);
+        $transactionNumber = 'TRX-' . $date . '-' . strtoupper(uniqid());
+        $transaction = \App\Models\Transaction::create([
+            'idorder' => $order->id,
+            'transaction_number' => $transactionNumber,
+            'amount' => $total,
+            'payment_method' => 'bank_transfer',
+            'transactionstatus' => 'pending'
+        ]);
+        // Simpan detail produk ke detail transaction (jika ada modelnya)
+        if (class_exists('App\\Models\\DetailTransaction')) {
+            \App\Models\DetailTransaction::create([
+                'idtransaction' => $transaction->id,
+                'idproduct' => $product->id,
+                'quantity' => $request->quantity,
+                'price' => $product->productprice
+            ]);
+        }
+        // Redirect ke pembayaran Duitku
+        return response()->json(['success' => true, 'redirect_url' => route('customer.payments.pay', $transaction)]);
     }
 }
