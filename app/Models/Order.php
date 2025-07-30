@@ -107,11 +107,11 @@ class Order extends Model
             return false;
         }
 
-        // Jika ingin ke status yang sama atau sebelumnya dan sudah 3 jam, tidak bisa
+        // Jika ingin ke status yang sama dan sudah 3 jam, tidak bisa
         $statusUpdatedAt = $this->status_updated_at ?? $this->created_at;
         $diffHours = $statusUpdatedAt->diffInHours(now());
         
-        if ($diffHours >= 3 && $targetIdx <= $currentIdx) {
+        if ($diffHours >= 3 && $targetIdx == $currentIdx) {
             return false;
         }
 

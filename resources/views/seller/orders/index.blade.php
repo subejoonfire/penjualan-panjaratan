@@ -435,13 +435,13 @@
                                             elseif ($targetIdx < $currentIdx) {
                                                 $disabled = true;
                                             }
-                                            elseif ($diffHours >= 3 && $targetIdx <= $currentIdx) {
+                                            elseif ($diffHours >= 3 && $targetIdx == $currentIdx) {
                                                 $disabled = true;
                                             }
                                         @endphp
                                         @php
                                             $tooltipText = $info['tooltip'];
-                                            if ($disabled && $diffHours >= 3 && $targetIdx <= $currentIdx) {
+                                            if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
                                                 $remainingMinutes = 180 - ($diffHours * 60);
                                                 $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)";
                                             }
@@ -601,13 +601,13 @@
                                                             elseif ($targetIdx < $currentIdx) {
                                                                 $disabled = true;
                                                             }
-                                                            elseif ($diffHours >= 3 && $targetIdx <= $currentIdx) {
+                                                            elseif ($diffHours >= 3 && $targetIdx == $currentIdx) {
                                                                 $disabled = true;
                                                             }
                                                         @endphp
                                                         @php
                                                             $tooltipText = $info['tooltip'];
-                                                            if ($disabled && $diffHours >= 3 && $targetIdx <= $currentIdx) {
+                                                            if ($disabled && $diffHours >= 3 && $targetIdx == $currentIdx) {
                                                                 $remainingMinutes = 180 - ($diffHours * 60);
                                                                 $tooltipText .= " (Tunggu " . floor($remainingMinutes / 60) . "j " . ($remainingMinutes % 60) . "m lagi)";
                                                             }
