@@ -443,40 +443,33 @@
                                 ];
                                 $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                 $currentIdx = array_search($order->status, $statusOrder);
-                                if ($currentIdx === false) {
-                                $currentIdx = -1; // Jika status tidak ditemukan
-                                }
-                                $canUpdate = $order->canBeUpdated();
-                                $canBack = false;
+                                if ($currentIdx === false) { $currentIdx = -1; }
                                 $now = now();
                                 $updatedAt = $order->updated_at;
                                 $diffHours = $updatedAt->diffInHours($now);
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
-                                // Disable if:
-                                // 1. Status already delivered/cancelled
-                                // 2. Status want to go back (new status idx < current status idx) // 3. More than 3
-                                    hours since last update (except forward) $targetIdx=array_search($status,
-                                    $statusOrder); if ($targetIdx===false) { $targetIdx=-1; // Jika status tidak
-                                    ditemukan } $disabled=false; if (in_array($order->status, ['delivered',
-                                    'cancelled'])) {
+                                $targetIdx = array_search($status, $statusOrder);
+                                if ($targetIdx === false) { $targetIdx = -1; }
+                                $disabled = false;
+                                if (in_array($order->status, ['delivered', 'cancelled'])) {
+                                $disabled = true;
+                                } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
+                                    $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !==
+                                    'cancelled' && $order->status !== 'delivered' &&
+                                    $order->created_at->diffInMinutes($order->updated_at) > 0 && $order->status !==
+                                    'pending') {
                                     $disabled = true;
-                                    } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif ($diffHours>= 3 &&
-                                        $targetIdx > $currentIdx && $order->status !== 'pending' && $order->status !==
-                                        'cancelled' && $order->status !== 'delivered' &&
-                                        $order->created_at->diffInMinutes($order->updated_at) > 0 && $order->status !==
-                                        'pending') {
-                                        $disabled = true;
-                                        }
-                                        @endphp
-                                        <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                            class="status-button {{ $info['class'] }} relative"
-                                            title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
-                                            <i class="fas {{ $info['icon'] }}"></i>
-                                            <span class="status-tooltip">{{ $info['label'] }}</span>
-                                        </button>
-                                        @endforeach
+                                    }
+                                    @endphp
+                                    <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                        class="status-button {{ $info['class'] }} relative"
+                                        title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
+                                        <i class="fas {{ $info['icon'] }}"></i>
+                                        <span class="status-tooltip">{{ $info['label'] }}</span>
+                                    </button>
+                                    @endforeach
                             </div>
                         </div>
                     </div>
@@ -617,43 +610,34 @@
                                                 ];
                                                 $statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                                                 $currentIdx = array_search($order->status, $statusOrder);
-                                                if ($currentIdx === false) {
-                                                $currentIdx = -1; // Jika status tidak ditemukan
-                                                }
-                                                $canUpdate = $order->canBeUpdated();
-                                                $canBack = false;
+                                                if ($currentIdx === false) { $currentIdx = -1; }
                                                 $now = now();
                                                 $updatedAt = $order->updated_at;
                                                 $diffHours = $updatedAt->diffInHours($now);
                                                 @endphp
                                                 @foreach($statusList as $status => $info)
                                                 @php
-                                                // Disable if:
-                                                // 1. Status already delivered/cancelled
-                                                // 2. Status want to go back (new status idx < current status idx) // 3.
-                                                    More than 3 hours since last update (except forward)
-                                                    $targetIdx=array_search($status, $statusOrder); if
-                                                    ($targetIdx===false) { $targetIdx=-1; // Jika status tidak ditemukan
-                                                    } $disabled=false; if (in_array($order->status, ['delivered',
-                                                    'cancelled'])) {
+                                                $targetIdx = array_search($status, $statusOrder);
+                                                if ($targetIdx === false) { $targetIdx = -1; }
+                                                $disabled = false;
+                                                if (in_array($order->status, ['delivered', 'cancelled'])) {
+                                                $disabled = true;
+                                                } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
+                                                    ($diffHours>= 3 && $targetIdx > $currentIdx && $order->status !==
+                                                    'pending' && $order->status !== 'cancelled' && $order->status !==
+                                                    'delivered' && $order->created_at->diffInMinutes($order->updated_at)
+                                                    > 0) {
                                                     $disabled = true;
-                                                    } elseif ($targetIdx < $currentIdx) { $disabled=true; } elseif
-                                                        ($diffHours>= 3 && $targetIdx > $currentIdx && $order->status
-                                                        !== 'pending' && $order->status !== 'cancelled' &&
-                                                        $order->status !== 'delivered' &&
-                                                        $order->created_at->diffInMinutes($order->updated_at) > 0) {
-                                                        $disabled = true;
-                                                        }
-                                                        @endphp
-                                                        <button
-                                                            onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
-                                                            class="status-button {{ $info['class'] }} relative"
-                                                            title="{{ $info['tooltip'] }}" @if($disabled) disabled
-                                                            @endif>
-                                                            <i class="fas {{ $info['icon'] }}"></i>
-                                                            <span class="status-tooltip">{{ $info['label'] }}</span>
-                                                        </button>
-                                                        @endforeach
+                                                    }
+                                                    @endphp
+                                                    <button
+                                                        onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
+                                                        class="status-button {{ $info['class'] }} relative"
+                                                        title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
+                                                        <i class="fas {{ $info['icon'] }}"></i>
+                                                        <span class="status-tooltip">{{ $info['label'] }}</span>
+                                                    </button>
+                                                    @endforeach
                                             </div>
                                         </div>
                                     </div>
