@@ -125,6 +125,23 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <ul class="list-disc list-inside text-sm">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Footer -->
         <div class="text-center">
             <p class="text-xs text-gray-500">

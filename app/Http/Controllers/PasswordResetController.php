@@ -61,8 +61,8 @@ class PasswordResetController extends Controller
                 return back()->withErrors(['identifier' => 'Format nomor WhatsApp tidak valid. Gunakan 10-13 digit angka.'])->withInput();
             }
             
-            // Check if it's a valid Indonesian mobile number
-            $validPrefixes = ['62', '08', '8'];
+            // Check if it's a valid Indonesian mobile number (more flexible)
+            $validPrefixes = ['62', '08', '8', '0'];
             $isValidPrefix = false;
             
             foreach ($validPrefixes as $prefix) {
@@ -73,10 +73,10 @@ class PasswordResetController extends Controller
             }
             
             if (!$isValidPrefix) {
-                return back()->withErrors(['identifier' => 'Format nomor WhatsApp tidak valid. Gunakan format 08xxx atau 62xxx.'])->withInput();
+                return back()->withErrors(['identifier' => 'Format nomor WhatsApp tidak valid. Gunakan format 08xxx, 8xxx, atau 62xxx.'])->withInput();
             }
             
-            // Pastikan format 62xxx
+            // Normalize phone number to 62xxx format
             if (substr($phone, 0, 1) === '0') {
                 $phone = '62' . substr($phone, 1);
             } elseif (substr($phone, 0, 2) !== '62') {
@@ -84,23 +84,44 @@ class PasswordResetController extends Controller
             }
             
             $identifier = $phone;
+            
+            // Log the normalized phone number for debugging
+            Log::info('Phone number normalized', [
+                'original' => $request->identifier,
+                'normalized' => $identifier
+            ]);
         }
 
-        // Cari user berdasarkan email atau phone dengan cache untuk performance
+        // Cari user berdasarkan email atau phone dengan multiple format checking
         $user = null;
         if ($method === 'email') {
-            $user = cache()->remember("user_email_{$identifier}", 300, function () use ($identifier) {
-                return User::where('email', $identifier)->first();
-            });
+            $user = User::where('email', $identifier)->first();
             if (!$user) {
                 return back()->withErrors(['identifier' => 'Email tidak ditemukan dalam sistem.'])->withInput();
             }
         } else {
-            $user = cache()->remember("user_phone_{$identifier}", 300, function () use ($identifier) {
-                return User::where('phone', $identifier)->first();
-            });
-            if (!$user) {
-                return back()->withErrors(['identifier' => 'Nomor WhatsApp tidak ditemukan dalam sistem.'])->withInput();
+            // Use helper method from User model
+            $user = User::findByPhone($identifier);
+            
+            // Log for debugging
+            Log::info('Searching for phone number', [
+                'original' => $identifier,
+                'normalized' => User::normalizePhone($identifier)
+            ]);
+            
+            if ($user) {
+                Log::info('User found with phone', [
+                    'user_id' => $user->id,
+                    'phone' => $user->phone
+                ]);
+            } else {
+                // Log all users with phone numbers for debugging
+                $allUsers = User::whereNotNull('phone')->get(['id', 'phone', 'email']);
+                Log::info('All users with phone numbers', [
+                    'users' => $allUsers->toArray()
+                ]);
+                
+                return back()->withErrors(['identifier' => 'Nomor WhatsApp tidak ditemukan dalam sistem. Silakan cek format nomor Anda.'])->withInput();
             }
         }
 
@@ -307,16 +328,13 @@ class PasswordResetController extends Controller
         $identifier = $resetData['identifier'];
         $method = $resetData['method'];
 
-        // Cari user dengan cache untuk performance
+        // Cari user dengan multiple format checking
         $user = null;
         if ($method === 'email') {
-            $user = cache()->remember("user_email_{$identifier}", 300, function () use ($identifier) {
-                return User::where('email', $identifier)->first();
-            });
+            $user = User::where('email', $identifier)->first();
         } else {
-            $user = cache()->remember("user_phone_{$identifier}", 300, function () use ($identifier) {
-                return User::where('phone', $identifier)->first();
-            });
+            // Use helper method from User model
+            $user = User::findByPhone($identifier);
         }
 
         if (!$user) {
