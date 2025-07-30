@@ -472,7 +472,8 @@
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
-                                $disabled = $order->status === $status;
+                                $targetIdx = array_search($status, $statusOrder);
+                                $disabled = $targetIdx !== false && $targetIdx <= $currentIdx;
                                 @endphp
                                 <button onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
                                     class="status-button {{ $info['class'] }} relative" title="{{ $info['tooltip'] }}" @if($disabled) disabled @endif>
@@ -628,7 +629,8 @@
                                 @endphp
                                 @foreach($statusList as $status => $info)
                                 @php
-                                $disabled = $order->status === $status;
+                                $targetIdx = array_search($status, $statusOrder);
+                                $disabled = $targetIdx !== false && $targetIdx <= $currentIdx;
                                 @endphp
                                 <button
                                     onclick="confirmUpdateStatus('{{ $order->id }}', '{{ $status }}')"
