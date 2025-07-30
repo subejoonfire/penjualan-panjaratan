@@ -144,23 +144,21 @@
                                 </div>
                                 <!-- Quantity Controls & Subtotal -->
                                 <div class="flex flex-col items-center gap-3">
-                                    <form action="{{ route('customer.cart.update', $detail) }}" method="POST"
-                                        class="flex items-center gap-2">
-                                        @csrf
-                                        @method('PUT')
+                                    <div class="flex items-center gap-2">
                                         <button type="button" onclick="decreaseQuantity(this)"
                                             class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                             <i class="fas fa-minus text-sm"></i>
                                         </button>
-                                        <input type="number" name="quantity" value="{{ $detail->quantity }}" min="1"
+                                        <input type="number" value="{{ $detail->quantity }}" min="1"
                                             max="{{ $detail->product->productstock }}"
                                             class="w-12 text-center border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 text-sm"
-                                            onchange="this.form.submit()">
+                                            data-detail-id="{{ $detail->id }}"
+                                            onchange="updateQuantity(this)">
                                         <button type="button" onclick="increaseQuantity(this)"
                                             class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300">
                                             <i class="fas fa-plus text-sm"></i>
                                         </button>
-                                    </form>
+                                    </div>
                                     <div class="text-right min-w-[80px]">
                                         <p class="text-base md:text-lg font-medium text-gray-900">
                                             Rp {{ number_format($detail->quantity * $detail->productprice) }}

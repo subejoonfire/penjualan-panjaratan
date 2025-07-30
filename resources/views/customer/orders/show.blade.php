@@ -299,8 +299,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="reviewForm" action="" method="POST">
-                @csrf
+            <div>
                 <div class="mb-4">
                     <p id="productName" class="text-sm text-gray-600 mb-2"></p>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
@@ -311,11 +310,11 @@
                             </button>
                             @endfor
                     </div>
-                    <input type="hidden" name="rating" id="ratingInput" value="0">
+                    <input type="hidden" id="ratingInput" value="0">
                 </div>
                 <div class="mb-4">
                     <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Komentar</label>
-                    <textarea id="comment" name="comment" rows="4" required
+                    <textarea id="comment" rows="4" required
                         class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         placeholder="Bagikan pengalaman Anda dengan produk ini..."></textarea>
                 </div>
@@ -324,11 +323,11 @@
                         class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
                         Batal
                     </button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    <button type="button" onclick="submitReviewModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                         Kirim Ulasan
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -336,16 +335,18 @@
 <script>
     let currentRating = 0;
 
+    let currentProductId = null;
+    
     function openReviewModal(productId, productName) {
+        currentProductId = productId;
         document.getElementById('productName').textContent = 'Produk: ' + productName;
-        document.getElementById('reviewForm').action = '/customer/products/' + productId + '/reviews';
         document.getElementById('reviewModal').classList.remove('hidden');
         resetRating();
     }
 
     function closeReviewModal() {
         document.getElementById('reviewModal').classList.add('hidden');
-        document.getElementById('reviewForm').reset();
+        document.getElementById('comment').value = '';
         resetRating();
     }
 
@@ -418,6 +419,80 @@
                 });
             });
         }
+    }
+
+    function submitReviewModal() {
+        if (!currentProductId) {
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Product ID tidak ditemukan',
+                confirmText: 'OK',
+                showCancel: false
+            });
+            return;
+        }
+
+        const rating = document.getElementById('ratingInput').value;
+        const comment = document.getElementById('comment').value;
+
+        if (rating == 0) {
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Silakan pilih rating terlebih dahulu',
+                confirmText: 'OK',
+                showCancel: false
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('rating', rating);
+        formData.append('productreviews', comment);
+
+        fetch(`${window.location.origin}/customer/products/${currentProductId}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showModalNotification({
+                    type: 'success',
+                    title: 'Berhasil!',
+                    message: data.message || 'Ulasan berhasil dikirim',
+                    confirmText: 'OK',
+                    showCancel: false,
+                    onConfirm: () => {
+                        closeReviewModal();
+                        window.location.reload();
+                    }
+                });
+            } else {
+                showModalNotification({
+                    type: 'error',
+                    title: 'Gagal!',
+                    message: data.message || 'Gagal mengirim ulasan',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Review error:', error);
+            showModalNotification({
+                type: 'error',
+                title: 'Error!',
+                message: 'Terjadi kesalahan saat mengirim ulasan',
+                confirmText: 'OK',
+                showCancel: false
+            });
+        });
     }
 </script>
 @endsection

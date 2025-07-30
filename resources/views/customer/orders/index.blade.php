@@ -140,14 +140,9 @@
                             @if($order->status === 'pending')
                             <button type="button"
                                 class="w-full bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 text-xs"
-                                onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm{{ $order->id }}').submit(); })">
+                                onclick="cancelOrder({{ $order->id }})">
                                 Batalkan Pesanan
                             </button>
-                            <form id="cancelOrderForm{{ $order->id }}"
-                                action="{{ route('customer.orders.cancel', $order) }}" method="POST" class="hidden">
-                                @csrf
-                                @method('PUT')
-                            </form>
                             @endif
                         </div>
                     </div>
@@ -246,15 +241,9 @@
                                 @if($order->status === 'pending')
                                 <div class="mt-2 space-x-2">
                                     <button type="button" class="text-sm text-red-600 hover:text-red-700"
-                                        onclick="confirmAction('Apakah Anda yakin ingin membatalkan pesanan ini?', function() { document.getElementById('cancelOrderForm{{ $order->id }}').submit(); })">
+                                        onclick="cancelOrder({{ $order->id }})">
                                         Batalkan Pesanan
                                     </button>
-                                    <form id="cancelOrderForm{{ $order->id }}"
-                                        action="{{ route('customer.orders.cancel', $order) }}" method="POST"
-                                        class="hidden">
-                                        @csrf
-                                        @method('PUT')
-                                    </form>
                                 </div>
                                 @elseif($order->status === 'delivered')
                                 <div class="mt-2">
@@ -305,4 +294,51 @@
         @endif
     </div>
 </div>
+
+<script>
+    function cancelOrder(orderId) {
+        if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+            fetch(`${window.location.origin}/customer/orders/${orderId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showModalNotification({
+                        type: 'success',
+                        title: 'Berhasil!',
+                        message: data.message || 'Pesanan berhasil dibatalkan',
+                        confirmText: 'OK',
+                        showCancel: false,
+                        onConfirm: () => {
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    showModalNotification({
+                        type: 'error',
+                        title: 'Gagal!',
+                        message: data.message || 'Gagal membatalkan pesanan',
+                        confirmText: 'OK',
+                        showCancel: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Cancel order error:', error);
+                showModalNotification({
+                    type: 'error',
+                    title: 'Error!',
+                    message: 'Terjadi kesalahan saat membatalkan pesanan',
+                    confirmText: 'OK',
+                    showCancel: false
+                });
+            });
+        }
+    }
+</script>
 @endsection
