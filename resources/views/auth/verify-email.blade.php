@@ -1,36 +1,140 @@
-@extends('layouts.app')
-@section('title', 'Verifikasi Email')
-@section('content')
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Verifikasi Email - Penjualan Panjaratan</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full space-y-8 p-8">
+        <!-- Header -->
+        <div>
+            <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
+                <i class="fas fa-store text-white text-xl"></i>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Verifikasi Email Anda
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Kode verifikasi telah dikirim ke 
+                <span class="font-medium text-blue-600">{{ $user->email }}</span>
+            </p>
+        </div>
+
+        <!-- Main Form -->
+        <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div class="p-8 space-y-6">
+                <!-- Alert Messages -->
+                @if(session('success'))
+                    <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm">{{ session('success') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm">{{ $errors->first() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Verification Form -->
+                <form method="POST" action="{{ route('verification.email.check') }}" class="space-y-6">
+                    @csrf
+                    
+                    <!-- Input Kode Verifikasi -->
+                    <div>
+                        <label for="token" class="block text-sm font-medium text-gray-700">Kode Verifikasi</label>
+                        <div class="mt-1 relative">
+                            <input id="token" name="token" type="text" maxlength="6" required autofocus
+                                   class="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm text-center text-lg font-mono tracking-widest" 
+                                   placeholder="000000"
+                                   autocomplete="off">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                <i class="fas fa-check text-blue-500 group-hover:text-blue-400"></i>
+                            </span>
+                            Verifikasi Email
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Resend Code Form -->
+                <form method="POST" action="{{ route('verification.email.send') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <i class="fas fa-redo mr-2"></i>
+                        Kirim Ulang Kode
+                    </button>
+                </form>
+
+                <!-- Info -->
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        <p class="text-sm text-blue-700">
+                            Tidak menerima email? Periksa folder spam Anda
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
         <div class="text-center">
-            <h2 class="text-3xl font-extrabold text-gray-900">Verifikasi Email Anda</h2>
-            <p class="mt-2 text-sm text-gray-600">Kode verifikasi telah dikirim ke <span class="font-semibold">{{ $user->email }}</span></p>
+            <p class="text-xs text-gray-500">
+                &copy; {{ date('Y') }} Harlan Muradi. All rights reserved.
+            </p>
         </div>
     </div>
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            @if(session('success'))
-                <div class="mb-4 text-green-700 bg-green-100 border border-green-200 rounded p-2 text-sm">{{ session('success') }}</div>
-            @endif
-            @if($errors->any())
-                <div class="mb-4 text-red-700 bg-red-100 border border-red-200 rounded p-2 text-sm">{{ $errors->first() }}</div>
-            @endif
-            <form method="POST" action="{{ route('verification.email.check') }}" class="space-y-6">
-                @csrf
-                <div>
-                    <label for="token" class="block text-sm font-medium text-gray-700">Kode Verifikasi</label>
-                    <input id="token" name="token" type="text" maxlength="6" required autofocus class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Verifikasi Email</button>
-                </div>
-            </form>
-            <form method="POST" action="{{ route('verification.email.send') }}" class="mt-4">
-                @csrf
-                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Kirim Ulang Kode</button>
-            </form>
-        </div>
-    </div>
-</div>
-@endsection
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tokenInput = document.getElementById('token');
+        
+        // Auto format input untuk kode verifikasi
+        tokenInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            e.target.value = value;
+        });
+        
+        // Auto focus
+        tokenInput.focus();
+    });
+    </script>
+</body>
+
+</html>

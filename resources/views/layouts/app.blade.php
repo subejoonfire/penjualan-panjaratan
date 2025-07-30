@@ -51,7 +51,7 @@
             </div>
         </nav>
         <!-- Mobile Guest Nav Bar -->
-        <nav class="mobile-nav-bar" style="display:none">
+        <nav class="mobile-nav-bar">
             <a href="/" class="mobile-nav-item group">
                 <i class="fas fa-store text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
                 <span
@@ -72,7 +72,7 @@
         @endguest
         @auth
         @php $notVerified = auth()->user()->role === 'customer' && (!auth()->user()->isEmailVerified() || !auth()->user()->isWaVerified()); @endphp
-        <nav class="mobile-nav-bar" style="display:none">
+        <nav class="mobile-nav-bar">
             @if($notVerified)
                 <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i>
