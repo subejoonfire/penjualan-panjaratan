@@ -38,7 +38,24 @@
                 </div>
                 <div>
                     <p class="text-sm text-green-700 font-medium">Metode Pembayaran</p>
-                    <p class="text-green-900">{{ $transaction->payment_method ?? 'Transfer Bank' }}</p>
+                    <p class="text-green-900">
+                        @switch($transaction->payment_method)
+                            @case('bank_transfer')
+                                Transfer Bank
+                                @break
+                            @case('credit_card')
+                                Kartu Kredit
+                                @break
+                            @case('e_wallet')
+                                E-Wallet
+                                @break
+                            @case('cod')
+                                Bayar di Tempat
+                                @break
+                            @default
+                                {{ $transaction->payment_method ?? 'Transfer Bank' }}
+                        @endswitch
+                    </p>
                 </div>
                 <div>
                     <p class="text-sm text-green-700 font-medium">Total Transaksi</p>

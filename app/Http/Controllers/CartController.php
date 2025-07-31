@@ -375,6 +375,19 @@ class CartController extends Controller
                 return back()->withErrors(['payment_method' => 'Metode pembayaran harus dipilih'])->withInput();
             }
 
+            // Map payment method codes to database enum values
+            $paymentMethodMapping = [
+                'VA' => 'bank_transfer',    // Virtual Account
+                'DA' => 'e_wallet',         // DANA
+                'OV' => 'e_wallet',         // OVO
+                'BT' => 'bank_transfer',    // Bank Transfer
+                'CC' => 'credit_card',      // Credit Card
+                'COD' => 'cod',             // Cash on Delivery
+                'cod' => 'cod',             // Cash on Delivery (lowercase)
+            ];
+
+            $paymentMethod = $paymentMethodMapping[$request->payment_method] ?? 'bank_transfer';
+
             // Log checkout data for debugging
             \Log::info('Validating checkout data', [
                 'address_id' => $request->address_id,
@@ -501,7 +514,7 @@ class CartController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $request->payment_method,
+                'payment_method' => $paymentMethod,
                 'transactionstatus' => 'pending'
             ]);
 
@@ -525,7 +538,7 @@ class CartController extends Controller
             DB::commit();
 
             // Jika COD, langsung ke halaman order
-            if ($request->payment_method === 'cod') {
+            if ($paymentMethod === 'cod') {
                 return redirect()->route('customer.orders.show', $order)
                     ->with('success', 'Pesanan berhasil dibuat');
             }

@@ -276,7 +276,24 @@
                                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Metode Pembayaran</p>
                                             <div class="flex items-center mt-1">
                                                 <i class="fas fa-credit-card text-blue-500 mr-1 sm:mr-2 text-xs sm:text-sm"></i>
-                                                <p class="text-xs sm:text-sm font-medium text-gray-900">{{ $transaction->payment_method ?? 'Transfer Bank' }}</p>
+                                                <p class="text-xs sm:text-sm font-medium text-gray-900">
+                                                    @switch($transaction->payment_method)
+                                                        @case('bank_transfer')
+                                                            Transfer Bank
+                                                            @break
+                                                        @case('credit_card')
+                                                            Kartu Kredit
+                                                            @break
+                                                        @case('e_wallet')
+                                                            E-Wallet
+                                                            @break
+                                                        @case('cod')
+                                                            Bayar di Tempat
+                                                            @break
+                                                        @default
+                                                            {{ $transaction->payment_method ?? 'Transfer Bank' }}
+                                                    @endswitch
+                                                </p>
                                             </div>
                                         </div>
 

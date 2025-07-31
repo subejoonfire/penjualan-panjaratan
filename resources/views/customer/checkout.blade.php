@@ -225,6 +225,16 @@
                                         <div class="text-xs text-gray-500">E-wallet</div>
                                     </div>
                                 </label>
+
+                                <label
+                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                    <input type="radio" name="payment_method" value="COD"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
+                                        <div class="text-xs text-gray-500">Bayar di tempat</div>
+                                    </div>
+                                </label>
                                 @endif
                             </div>
                             @error('payment_method')

@@ -62,7 +62,24 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <p class="text-sm text-gray-600">Metode Pembayaran</p>
-            <p class="font-medium">{{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}</p>
+            <p class="font-medium">
+                @switch($order->transaction->payment_method)
+                    @case('bank_transfer')
+                        Transfer Bank
+                        @break
+                    @case('credit_card')
+                        Kartu Kredit
+                        @break
+                    @case('e_wallet')
+                        E-Wallet
+                        @break
+                    @case('cod')
+                        Bayar di Tempat
+                        @break
+                    @default
+                        {{ ucfirst(str_replace('_', ' ', $order->transaction->payment_method)) }}
+                @endswitch
+            </p>
         </div>
         <div>
             <p class="text-sm text-gray-600">Status Pembayaran</p>

@@ -39,8 +39,15 @@ class PaymentController extends Controller
             $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
             $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
             $paymentAmount = (int) $transaction->amount;
-            // Duitku butuh paymentMethod, default ke 'VC' (Virtual Account) jika null
-            $paymentMethod = $transaction->payment_method ?: 'VC';
+            // Map database enum values to Duitku payment method codes
+            $duitkuPaymentMethodMapping = [
+                'bank_transfer' => 'VC',    // Virtual Account
+                'e_wallet' => 'EW',         // E-Wallet
+                'credit_card' => 'CC',      // Credit Card
+                'cod' => 'COD',             // Cash on Delivery
+            ];
+
+            $paymentMethod = $duitkuPaymentMethodMapping[$transaction->payment_method] ?? 'VC';
             $merchantOrderId = $transaction->transaction_number;
             $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
             $email = $user->email;

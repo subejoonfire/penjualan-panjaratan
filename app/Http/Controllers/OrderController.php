@@ -122,9 +122,22 @@ class OrderController extends Controller
 
         $request->validate([
             'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
+            'payment_method' => 'required|string',
             'notes' => 'nullable|string|max:500'
         ]);
+
+        // Map payment method codes to database enum values
+        $paymentMethodMapping = [
+            'VA' => 'bank_transfer',    // Virtual Account
+            'DA' => 'e_wallet',         // DANA
+            'OV' => 'e_wallet',         // OVO
+            'BT' => 'bank_transfer',    // Bank Transfer
+            'CC' => 'credit_card',      // Credit Card
+            'COD' => 'cod',             // Cash on Delivery
+            'cod' => 'cod',             // Cash on Delivery (lowercase)
+        ];
+
+        $paymentMethod = $paymentMethodMapping[$request->payment_method] ?? 'bank_transfer';
 
         DB::beginTransaction();
 
@@ -169,7 +182,7 @@ class OrderController extends Controller
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $request->payment_method,
+                'payment_method' => $paymentMethod,
                 'transactionstatus' => 'pending'
             ]);
 
