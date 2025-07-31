@@ -107,6 +107,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::delete('/cart/remove/{cartDetail}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+    Route::get('/checkout/direct/{cartId}', [CartController::class, 'checkout'])->name('checkout.direct.view');
     Route::post('/checkout', [CartController::class, 'processCheckout'])->name('checkout.process');
     Route::get('/orders', [CustomerDashboardController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{order}', [CustomerDashboardController::class, 'orderDetail'])->name('orders.show');

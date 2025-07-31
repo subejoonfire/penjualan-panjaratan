@@ -235,43 +235,38 @@ class CartController extends Controller
     /**
      * Show checkout page
      */
-    public function checkout()
+    public function checkout($cartId = null)
     {
         $user = Auth::user();
-        $cart = $user->activeCart;
-
-        if (!$cart || $cart->cartDetails()->count() === 0) {
-            return redirect()->route('customer.cart.index')->with('error', 'Keranjang belanja kosong');
+        if ($cartId) {
+            // Direct checkout (single product)
+            $cart = Cart::where('id', $cartId)->where('iduser', $user->id)->first();
+            if (!$cart || $cart->cartDetails()->count() === 0) {
+                return redirect()->route('customer.cart.index')->with('error', 'Keranjang checkout direct kosong');
+            }
+        } else {
+            // Normal cart checkout
+            $cart = $user->activeCart;
+            if (!$cart || $cart->cartDetails()->count() === 0) {
+                return redirect()->route('customer.cart.index')->with('error', 'Keranjang belanja kosong');
+            }
         }
 
         $cartDetails = $cart->cartDetails()->with(['product.images'])->get();
-
-        // Check stock for all items
         foreach ($cartDetails as $detail) {
             if ($detail->product->productstock < $detail->quantity) {
                 return redirect()->route('customer.cart.index')
                     ->with('error', 'Stok tidak mencukupi untuk ' . $detail->product->productname);
             }
         }
-
         $subtotal = $cartDetails->sum(function ($detail) {
             return $detail->quantity * $detail->productprice;
         });
-
-        $shippingCost = 15000; // Fixed shipping cost
+        $shippingCost = 15000;
         $total = $subtotal + $shippingCost;
-
         $addresses = $user->addresses;
         $defaultAddress = $user->defaultAddress();
-
-        return view('customer.checkout', compact(
-            'cartDetails',
-            'subtotal',
-            'shippingCost',
-            'total',
-            'addresses',
-            'defaultAddress'
-        ));
+        return view('customer.checkout', compact('cartDetails', 'subtotal', 'shippingCost', 'total', 'addresses', 'defaultAddress', 'cartId'));
     }
 
     /**
@@ -281,7 +276,12 @@ class CartController extends Controller
     {
         try {
             $user = Auth::user();
-            $cart = $user->activeCart;
+            $cart = null;
+            if ($request->filled('cart_id')) {
+                $cart = Cart::where('id', $request->cart_id)->where('iduser', $user->id)->first();
+            } else {
+                $cart = $user->activeCart;
+            }
 
             if (!$cart || $cart->cartDetails()->count() === 0) {
                 if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
@@ -501,10 +501,10 @@ class CartController extends Controller
                 'productprice' => $product->productprice
             ]);
 
-            // Redirect ke halaman checkout
+            // Redirect ke halaman checkout direct
             return response()->json([
                 'success' => true, 
-                'redirect_url' => route('customer.checkout')
+                'redirect_url' => route('checkout.direct.view', ['cartId' => $tempCart->id])
             ]);
 
         } catch (\Exception $e) {

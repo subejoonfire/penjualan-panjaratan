@@ -13,6 +13,9 @@
 
         <form id="checkoutForm" method="POST" action="{{ route('customer.checkout.process') }}">
             @csrf
+            @if(isset($cartId) && $cartId)
+                <input type="hidden" name="cart_id" value="{{ $cartId }}">
+            @endif
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
 
                 <!-- Order Details & Shipping -->
