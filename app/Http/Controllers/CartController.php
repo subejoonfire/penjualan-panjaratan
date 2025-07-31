@@ -268,9 +268,19 @@ class CartController extends Controller
         $request->merge(['amount' => $total]);
         
         try {
-            $paymentMethods = $paymentController->getPaymentMethods($request)->getData();
-            if (isset($paymentMethods['paymentFee'])) {
-                $paymentMethods = $paymentMethods['paymentFee'];
+            $response = $paymentController->getPaymentMethods($request);
+            $paymentMethodsData = $response->getData();
+            
+            // Handle both array and object responses
+            if (is_object($paymentMethodsData)) {
+                $paymentMethodsData = (array) $paymentMethodsData;
+            }
+            
+            // Check if there's an error in the response
+            if (isset($paymentMethodsData['error'])) {
+                $paymentMethods = [];
+            } elseif (isset($paymentMethodsData['paymentFee'])) {
+                $paymentMethods = $paymentMethodsData['paymentFee'];
             } else {
                 $paymentMethods = [];
             }

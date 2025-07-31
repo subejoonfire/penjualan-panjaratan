@@ -379,48 +379,55 @@
     }
 
     function cancelOrder(orderId) {
-        if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
-            fetch(`${window.location.origin}/customer/orders/${orderId}/cancel`, {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showModalNotification({
-                        type: 'success',
-                        title: 'Berhasil!',
-                        message: data.message || 'Pesanan berhasil dibatalkan',
-                        confirmText: 'OK',
-                        showCancel: false,
-                        onConfirm: () => {
-                            window.location.reload();
-                        }
-                    });
-                } else {
+        showModalNotification({
+            type: 'warning',
+            title: 'Konfirmasi Pembatalan',
+            message: 'Apakah Anda yakin ingin membatalkan pesanan ini?',
+            confirmText: 'Ya, Batalkan',
+            cancelText: 'Tidak',
+            onConfirm: () => {
+                fetch(`${window.location.origin}/customer/orders/${orderId}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showModalNotification({
+                            type: 'success',
+                            title: 'Berhasil!',
+                            message: data.message || 'Pesanan berhasil dibatalkan',
+                            confirmText: 'OK',
+                            showCancel: false,
+                            onConfirm: () => {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        showModalNotification({
+                            type: 'error',
+                            title: 'Gagal!',
+                            message: data.message || 'Gagal membatalkan pesanan',
+                            confirmText: 'OK',
+                            showCancel: false
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Cancel order error:', error);
                     showModalNotification({
                         type: 'error',
-                        title: 'Gagal!',
-                        message: data.message || 'Gagal membatalkan pesanan',
+                        title: 'Error!',
+                        message: 'Terjadi kesalahan saat membatalkan pesanan',
                         confirmText: 'OK',
                         showCancel: false
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Cancel order error:', error);
-                showModalNotification({
-                    type: 'error',
-                    title: 'Error!',
-                    message: 'Terjadi kesalahan saat membatalkan pesanan',
-                    confirmText: 'OK',
-                    showCancel: false
                 });
-            });
-        }
+            }
+        });
     }
 
     function submitReviewModal() {
