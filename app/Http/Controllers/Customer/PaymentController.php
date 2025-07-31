@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
@@ -35,9 +36,8 @@ class PaymentController extends Controller
 
         // Duitku API
         $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
-        $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
+        $merchantCode = 'DS24203';
         $paymentAmount = (int) $transaction->amount;
-        // Duitku butuh paymentMethod, default ke 'VC' (Virtual Account) jika null
         $paymentMethod = $transaction->payment_method ?: 'VC';
         $merchantOrderId = $transaction->transaction_number;
         $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
@@ -45,12 +45,12 @@ class PaymentController extends Controller
         $phoneNumber = $user->phone ?? '';
         $callbackUrl = route('customer.payments.callback');
         $returnUrl = route('customer.payments.index');
-        // Perbaiki signature sesuai dokumentasi Duitku
         $signature = md5($merchantCode . $merchantOrderId . $paymentAmount . $apiKey);
         $expiryPeriod = 60;
         $additionalParam = '';
         $merchantUserInfo = $user->nickname ?? $user->username;
         $customerVaName = $user->nickname ?? $user->username;
+        
         // Item details
         $itemDetails = [];
         $subtotal = 0;
@@ -75,10 +75,10 @@ class PaymentController extends Controller
                 $subtotal += ((int) $dt->price) * (int) $dt->quantity;
             }
         }
+        
         // Tambahkan ongkir sebagai item jika paymentAmount > subtotal
         $shippingCost = 0;
         if ($transaction->order && $transaction->order->shipping_address) {
-            // Ambil shipping cost dari order/cart
             $shippingCost = $transaction->order->grandtotal - $subtotal;
             if ($shippingCost > 0) {
                 $itemDetails[] = [
@@ -88,6 +88,7 @@ class PaymentController extends Controller
                 ];
             }
         }
+        
         // Customer detail
         $address = $user->defaultAddress()?->address ?? $transaction->order->shipping_address;
         $customerDetail = [
@@ -111,6 +112,7 @@ class PaymentController extends Controller
                 'countryCode' => 'ID'
             ]
         ];
+        
         $params = [
             'merchantCode' => $merchantCode,
             'paymentAmount' => $paymentAmount,
@@ -129,12 +131,14 @@ class PaymentController extends Controller
             'signature' => $signature,
             'expiryPeriod' => $expiryPeriod
         ];
+        
         $response = Http::withHeaders(['Content-Type' => 'application/json'])
             ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
-        // dd($response);
+        
         if ($response->successful() && isset($response['paymentUrl'])) {
             return redirect($response['paymentUrl']);
         }
+        
         Log::error('Duitku error', ['response' => $response->json(), 'params' => $params]);
         return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
     }
@@ -144,10 +148,10 @@ class PaymentController extends Controller
      */
     public function getPaymentMethods(Request $request)
     {
-        $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a'; // Ganti sesuai API key Duitku kamu
-        $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
+        $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+        $merchantCode = 'DS24203';
         $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
-        $amount = (int) ($request->amount ?? 10000); // Nominal contoh, bisa diganti sesuai kebutuhan
+        $amount = (int) ($request->amount ?? 10000);
         $datetime = now()->format('Y-m-d H:i:s');
         $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
         $params = [
@@ -156,13 +160,15 @@ class PaymentController extends Controller
             'datetime' => $datetime,
             'signature' => $signature
         ];
-        $response = \Illuminate\Support\Facades\Http::withHeaders([
+        
+        $response = Http::withHeaders([
             'Content-Type' => 'application/json'
         ])->post($url, $params);
         
         if ($response->successful()) {
             return $response->json();
         }
+        
         return ['error' => 'Gagal mengambil metode pembayaran'];
     }
 
@@ -172,14 +178,18 @@ class PaymentController extends Controller
         $merchantOrderId = $request->merchantOrderId;
         $resultCode = $request->resultCode;
         $transaction = Transaction::where('transaction_number', $merchantOrderId)->first();
-        if (!$transaction)
+        
+        if (!$transaction) {
             return response('Order not found', 404);
+        }
+        
         if ($resultCode == '00') {
             $transaction->markAsPaid();
             $transaction->order->updateStatus('processing');
         } else {
             $transaction->markAsFailed();
         }
+        
         return response('OK', 200);
     }
 }
