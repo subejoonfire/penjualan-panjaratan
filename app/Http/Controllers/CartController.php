@@ -267,6 +267,7 @@ class CartController extends Controller
         $request = new \Illuminate\Http\Request();
         $request->merge(['amount' => $total]);
         
+        $paymentMethods = [];
         try {
             $response = $paymentController->getPaymentMethods($request);
             $paymentMethodsData = $response->getData();
@@ -278,13 +279,17 @@ class CartController extends Controller
             
             // Check if there's an error in the response
             if (isset($paymentMethodsData['error'])) {
+                \Log::info('Duitku payment methods error: ' . $paymentMethodsData['error']);
                 $paymentMethods = [];
-            } elseif (isset($paymentMethodsData['paymentFee'])) {
+            } elseif (isset($paymentMethodsData['paymentFee']) && is_array($paymentMethodsData['paymentFee'])) {
                 $paymentMethods = $paymentMethodsData['paymentFee'];
+                \Log::info('Duitku payment methods loaded: ' . count($paymentMethods) . ' methods');
             } else {
+                \Log::info('Duitku payment methods not found, using fallback');
                 $paymentMethods = [];
             }
         } catch (\Exception $e) {
+            \Log::error('Error getting payment methods: ' . $e->getMessage());
             $paymentMethods = [];
         }
 

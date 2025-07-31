@@ -153,18 +153,20 @@ class PaymentController extends Controller
             'signature' => $signature
         ];
         
+        $paymentMethods = [];
         try {
             $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'Content-Type' => 'application/json'
             ])->post($url, $params);
             
-            $paymentMethods = [];
             if ($response->successful() && isset($response['paymentFee'])) {
                 $paymentMethods = $response['paymentFee'];
+                \Log::info('Duitku checkout payment methods loaded: ' . count($paymentMethods) . ' methods');
+            } else {
+                \Log::warning('Duitku checkout payment methods failed, using fallback');
             }
         } catch (\Exception $e) {
-            // If Duitku API fails, use fallback methods
-            $paymentMethods = [];
+            \Log::error('Duitku checkout payment methods exception: ' . $e->getMessage());
         }
         
         // Get cart data

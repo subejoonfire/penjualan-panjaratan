@@ -124,13 +124,20 @@
                             <div class="space-y-3 sm:space-y-4">
                                 @if(isset($paymentMethods) && count($paymentMethods) > 0)
                                     @foreach($paymentMethods as $method)
+                                    @php
+                                        // Handle both array and object formats
+                                        $method = is_object($method) ? (array) $method : $method;
+                                        $paymentMethod = $method['paymentMethod'] ?? 'bank_transfer';
+                                        $paymentName = $method['paymentName'] ?? 'Transfer Bank';
+                                        $paymentDescription = $method['paymentDescription'] ?? 'Transfer melalui bank';
+                                    @endphp
                                     <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                        <input type="radio" name="payment_method" value="{{ $method['paymentMethod'] ?? 'bank_transfer' }}" 
+                                        <input type="radio" name="payment_method" value="{{ $paymentMethod }}" 
                                             class="text-blue-600 focus:ring-blue-500 border-gray-300" 
                                             {{ $loop->first ? 'checked' : '' }}>
                                         <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">{{ $method['paymentName'] ?? 'Transfer Bank' }}</div>
-                                            <div class="text-xs text-gray-500">{{ $method['paymentDescription'] ?? 'Transfer melalui bank' }}</div>
+                                            <div class="text-sm font-medium text-gray-900">{{ $paymentName }}</div>
+                                            <div class="text-xs text-gray-500">{{ $paymentDescription }}</div>
                                         </div>
                                     </label>
                                     @endforeach
