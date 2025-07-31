@@ -158,9 +158,17 @@ class PaymentController extends Controller
             ]);
             
             // Debug: show response
-            dd('Duitku Response:', $responseData);
+            // dd('Duitku Response:', $responseData);
             
             if ($response->successful() && isset($responseData['paymentUrl'])) {
+                // Log successful payment URL
+                Log::info('Payment URL generated successfully', [
+                    'payment_url' => $responseData['paymentUrl'],
+                    'transaction_id' => $transaction->id,
+                    'status_code' => $responseData['statusCode'],
+                    'status_message' => $responseData['statusMessage']
+                ]);
+                
                 // Show loading page first, then redirect
                 return view('customer.payments.loading', [
                     'paymentUrl' => $responseData['paymentUrl'],
@@ -168,8 +176,13 @@ class PaymentController extends Controller
                 ]);
             }
 
-            Log::error('Duitku error', ['response' => $responseData, 'params' => $params]);
-            return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
+            Log::error('Duitku error', [
+                'response' => $responseData, 
+                'params' => $params,
+                'http_code' => $response->status(),
+                'successful' => $response->successful()
+            ]);
+            return back()->with('error', 'Gagal menghubungkan ke pembayaran: ' . ($responseData['statusMessage'] ?? 'Unknown error'));
         } catch (\Exception $e) {
             Log::error('Duitku connection error', ['error' => $e->getMessage()]);
             return back()->with('error', 'Gagal menghubungkan ke pembayaran: ' . $e->getMessage());

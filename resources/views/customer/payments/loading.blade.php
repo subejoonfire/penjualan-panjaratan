@@ -26,6 +26,7 @@
                 <div>Order: #{{ $transaction->order->order_number }}</div>
                 <div>Total: Rp {{ number_format($transaction->amount) }}</div>
                 <div>Metode: {{ $transaction->getPaymentMethodLabelAttribute() }}</div>
+                <div>Payment URL: {{ $paymentUrl }}</div>
             </div>
         </div>
         
@@ -54,18 +55,23 @@
 
 <script>
     // Debug payment URL
-    console.log('Payment URL:', '{{ $paymentUrl }}');
+    const paymentUrl = '{{ $paymentUrl }}';
+    console.log('Payment URL:', paymentUrl);
     
     // Auto redirect after 3 seconds
     setTimeout(function() {
-        console.log('Auto redirecting to:', '{{ $paymentUrl }}');
+        console.log('Auto redirecting to:', paymentUrl);
         redirectToPayment();
     }, 3000);
     
     function redirectToPayment() {
-        const paymentUrl = '{{ $paymentUrl }}';
         console.log('Redirecting to:', paymentUrl);
-        window.location.href = paymentUrl;
+        if (paymentUrl && paymentUrl !== '') {
+            window.location.href = paymentUrl;
+        } else {
+            console.error('Payment URL is empty or invalid');
+            alert('Error: Payment URL tidak valid');
+        }
     }
 </script>
 @endsection
