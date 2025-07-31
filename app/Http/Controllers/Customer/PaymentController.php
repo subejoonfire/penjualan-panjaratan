@@ -38,16 +38,46 @@ class PaymentController extends Controller
             // Duitku API
             $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
             $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
-            $paymentAmount = (int) $transaction->amount;
-            // Map database enum values to Duitku payment method codes
-            $duitkuPaymentMethodMapping = [
-                'bank_transfer' => 'VC',    // Virtual Account
-                'e_wallet' => 'EW',         // E-Wallet
-                'credit_card' => 'CC',      // Credit Card
-                'cod' => 'COD',             // Cash on Delivery
-            ];
+            
+            // Calculate item total (without shipping)
+            $itemTotal = 0;
+            $itemDetails = [];
+            if ($transaction->order->cart) {
+                foreach ($transaction->order->cart->cartDetails as $detail) {
+                    $itemTotal += (int) ($detail->productprice * $detail->quantity);
+                    $itemDetails[] = [
+                        'name' => $detail->product->productname,
+                        'price' => (int) $detail->productprice,
+                        'quantity' => (int) $detail->quantity
+                    ];
+                }
+            } else {
+                // direct checkout (tanpa cart)
+                $dt = $transaction->order->detailTransactions()->first();
+                if ($dt && $dt->product) {
+                    $itemTotal = (int) ($dt->price * $dt->quantity);
+                    $itemDetails[] = [
+                        'name' => $dt->product->productname,
+                        'price' => (int) $dt->price,
+                        'quantity' => (int) $dt->quantity
+                    ];
+                }
+            }
 
-            $paymentMethod = $duitkuPaymentMethodMapping[$transaction->payment_method] ?? 'VC';
+            // Add shipping as separate item
+            $shippingCost = (int) ($transaction->amount - $itemTotal);
+            if ($shippingCost > 0) {
+                $itemDetails[] = [
+                    'name' => 'Ongkos Kirim',
+                    'price' => $shippingCost,
+                    'quantity' => 1
+                ];
+            }
+
+            $paymentAmount = (int) $transaction->amount;
+            
+            // Use the stored Duitku payment method code directly
+            $paymentMethod = $transaction->payment_method;
             $merchantOrderId = $transaction->transaction_number;
             $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
             $email = $user->email;
@@ -60,27 +90,6 @@ class PaymentController extends Controller
             $additionalParam = '';
             $merchantUserInfo = $user->nickname ?? $user->username;
             $customerVaName = $user->nickname ?? $user->username;
-            // Item details
-            $itemDetails = [];
-            if ($transaction->order->cart) {
-                foreach ($transaction->order->cart->cartDetails as $detail) {
-                    $itemDetails[] = [
-                        'name' => $detail->product->productname,
-                        'price' => (int) $detail->productprice,
-                        'quantity' => (int) $detail->quantity
-                    ];
-                }
-            } else {
-                // direct checkout (tanpa cart)
-                $dt = $transaction->order->detailTransactions()->first();
-                if ($dt && $dt->product) {
-                    $itemDetails[] = [
-                        'name' => $dt->product->productname,
-                        'price' => (int) $dt->price,
-                        'quantity' => (int) $dt->quantity
-                    ];
-                }
-            }
             // Customer detail
             $address = $user->defaultAddress()?->address ?? $transaction->order->shipping_address;
             $customerDetail = [

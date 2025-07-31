@@ -375,18 +375,8 @@ class CartController extends Controller
                 return back()->withErrors(['payment_method' => 'Metode pembayaran harus dipilih'])->withInput();
             }
 
-            // Map payment method codes to database enum values
-            $paymentMethodMapping = [
-                'VA' => 'bank_transfer',    // Virtual Account
-                'DA' => 'e_wallet',         // DANA
-                'OV' => 'e_wallet',         // OVO
-                'BT' => 'bank_transfer',    // Bank Transfer
-                'CC' => 'credit_card',      // Credit Card
-                'COD' => 'cod',             // Cash on Delivery
-                'cod' => 'cod',             // Cash on Delivery (lowercase)
-            ];
-
-            $paymentMethod = $paymentMethodMapping[$request->payment_method] ?? 'bank_transfer';
+            // Store the original Duitku payment method code
+            $paymentMethod = $request->payment_method;
 
             // Log checkout data for debugging
             \Log::info('Validating checkout data', [
@@ -537,8 +527,8 @@ class CartController extends Controller
 
             DB::commit();
 
-            // Jika COD, langsung ke halaman order
-            if ($paymentMethod === 'cod') {
+            // Jika COD/Retail, langsung ke halaman order
+            if (in_array($paymentMethod, ['FT', 'IR', 'DN', 'COD'])) {
                 return redirect()->route('customer.orders.show', $order)
                     ->with('success', 'Pesanan berhasil dibuat');
             }

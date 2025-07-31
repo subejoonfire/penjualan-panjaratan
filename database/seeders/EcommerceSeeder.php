@@ -318,7 +318,7 @@ class EcommerceSeeder extends Seeder
                 'idorder' => $order->id,
                 'transaction_number' => 'TRX-' . date('Ymd') . '-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
                 'transactionstatus' => $faker->randomElement(['pending', 'paid', 'failed']),
-                'payment_method' => $faker->randomElement(['bank_transfer', 'credit_card', 'e_wallet', 'cod']),
+                'payment_method' => $faker->randomElement(['VA', 'BT', 'DA', 'OV', 'VC', 'FT']),
                 'amount' => $order->grandtotal,
                 'paid_at' => $faker->boolean(70) ? $faker->dateTimeBetween('-30 days', 'now') : null,
             ]);

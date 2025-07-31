@@ -126,18 +126,8 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:500'
         ]);
 
-        // Map payment method codes to database enum values
-        $paymentMethodMapping = [
-            'VA' => 'bank_transfer',    // Virtual Account
-            'DA' => 'e_wallet',         // DANA
-            'OV' => 'e_wallet',         // OVO
-            'BT' => 'bank_transfer',    // Bank Transfer
-            'CC' => 'credit_card',      // Credit Card
-            'COD' => 'cod',             // Cash on Delivery
-            'cod' => 'cod',             // Cash on Delivery (lowercase)
-        ];
-
-        $paymentMethod = $paymentMethodMapping[$request->payment_method] ?? 'bank_transfer';
+        // Store the original Duitku payment method code
+        $paymentMethod = $request->payment_method;
 
         DB::beginTransaction();
 

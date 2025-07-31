@@ -50,27 +50,22 @@
             <div>
                 <p class="text-sm text-gray-600">Metode Pembayaran</p>
                 <div class="flex items-center mt-1">
-                    @switch($transaction->payment_method)
-                        @case('bank_transfer')
-                            <i class="fas fa-university text-blue-600 mr-2"></i>
-                            <span class="text-sm text-gray-900">Transfer Bank</span>
-                            @break
-                        @case('credit_card')
-                            <i class="fas fa-credit-card text-green-600 mr-2"></i>
-                            <span class="text-sm text-gray-900">Kartu Kredit</span>
-                            @break
-                        @case('e_wallet')
-                            <i class="fas fa-wallet text-purple-600 mr-2"></i>
-                            <span class="text-sm text-gray-900">E-Wallet</span>
-                            @break
-                        @case('cod')
-                            <i class="fas fa-money-bill text-orange-600 mr-2"></i>
-                            <span class="text-sm text-gray-900">Bayar di Tempat</span>
-                            @break
-                        @default
-                            <i class="fas fa-question text-gray-600 mr-2"></i>
-                            <span class="text-sm text-gray-900">{{ $transaction->payment_method }}</span>
-                    @endswitch
+                    @if(in_array($transaction->payment_method, ['VA', 'BT', 'B1', 'A1', 'I1', 'M2', 'AG', 'BC', 'BR', 'NC', 'BV']))
+                        <i class="fas fa-university text-blue-600 mr-2"></i>
+                        <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
+                    @elseif(in_array($transaction->payment_method, ['DA', 'OV', 'SP', 'SA', 'SL', 'LA', 'LQ', 'OL', 'JP', 'GQ', 'NQ']))
+                        <i class="fas fa-wallet text-purple-600 mr-2"></i>
+                        <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
+                    @elseif($transaction->payment_method === 'VC')
+                        <i class="fas fa-credit-card text-green-600 mr-2"></i>
+                        <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
+                    @elseif(in_array($transaction->payment_method, ['FT', 'IR', 'DN']))
+                        <i class="fas fa-money-bill text-orange-600 mr-2"></i>
+                        <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
+                    @else
+                        <i class="fas fa-question text-gray-600 mr-2"></i>
+                        <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
+                    @endif
                 </div>
             </div>
             <div>

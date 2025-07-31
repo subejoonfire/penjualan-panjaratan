@@ -68,10 +68,39 @@ class Transaction extends Model
     public function getPaymentMethodLabelAttribute()
     {
         $methods = [
-            'bank_transfer' => 'Transfer Bank',
-            'credit_card' => 'Kartu Kredit',
-            'e_wallet' => 'E-Wallet',
-            'cod' => 'Cash on Delivery'
+            // Virtual Account methods
+            'VA' => 'MAYBANK VA',
+            'BT' => 'PERMATA VA',
+            'B1' => 'CIMB NIAGA VA',
+            'A1' => 'ATM BERSAMA VA',
+            'I1' => 'BNI VA',
+            'M2' => 'MANDIRI VA H2H',
+            'AG' => 'ARTHA GRAHA VA',
+            'BC' => 'BCA VA',
+            'BR' => 'BRI VA',
+            'NC' => 'BNC VA',
+            'BV' => 'BSI VA',
+            
+            // E-Wallet methods
+            'DA' => 'DANA',
+            'OV' => 'OVO',
+            'SP' => 'SHOPEEPAY QRIS',
+            'SA' => 'SHOPEEPAY APP',
+            'SL' => 'SHOPEEPAY LINK',
+            'LA' => 'LINKAJA APP PCT',
+            'LQ' => 'LINKAJA QRIS',
+            'OL' => 'OVO LINK',
+            'JP' => 'JENIUS PAY',
+            'GQ' => 'GUDANG VOUCHER QRIS',
+            'NQ' => 'NOBU QRIS',
+            
+            // Credit Card
+            'VC' => 'CREDIT CARD',
+            
+            // Retail/COD
+            'FT' => 'RETAIL',
+            'IR' => 'INDOMARET',
+            'DN' => 'INDODANA PAYLATER',
         ];
 
         return $methods[$this->payment_method] ?? $this->payment_method;

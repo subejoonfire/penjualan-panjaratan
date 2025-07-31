@@ -25,24 +25,7 @@
             <div class="text-sm text-gray-600 space-y-1">
                 <div>Order: #{{ $transaction->order->order_number }}</div>
                 <div>Total: Rp {{ number_format($transaction->amount) }}</div>
-                <div>Metode: 
-                    @switch($transaction->payment_method)
-                        @case('bank_transfer')
-                            Transfer Bank
-                            @break
-                        @case('credit_card')
-                            Kartu Kredit
-                            @break
-                        @case('e_wallet')
-                            E-Wallet
-                            @break
-                        @case('cod')
-                            Bayar di Tempat
-                            @break
-                        @default
-                            {{ ucfirst(str_replace('_', ' ', $transaction->payment_method)) }}
-                    @endswitch
-                </div>
+                <div>Metode: {{ $transaction->getPaymentMethodLabelAttribute() }}</div>
             </div>
         </div>
         

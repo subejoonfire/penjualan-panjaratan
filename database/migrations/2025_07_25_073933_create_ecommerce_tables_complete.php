@@ -98,7 +98,7 @@ return new class extends Migration
             $table->foreignId('idorder')->constrained('orders')->onDelete('cascade'); // Relasi ke orders
             $table->string('transaction_number', 50)->unique(); // Nomor transaksi
             $table->enum('transactionstatus', ['pending', 'paid', 'failed', 'refunded'])->default('pending'); // Status transaksi
-            $table->enum('payment_method', ['bank_transfer', 'credit_card', 'e_wallet', 'cod'])->default('bank_transfer'); // Metode pembayaran
+            $table->string('payment_method', 10)->default('VA'); // Metode pembayaran (Duitku payment method codes)
             $table->decimal('amount', 12, 2); // Jumlah pembayaran
             $table->timestamp('paid_at')->nullable(); // Waktu pembayaran
             $table->timestamps();
