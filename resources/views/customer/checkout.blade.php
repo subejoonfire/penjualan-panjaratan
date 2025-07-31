@@ -11,6 +11,43 @@
             <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Review pesanan dan selesaikan pembelian Anda</p>
         </div>
 
+        <!-- Error Messages -->
+        @if(session('error'))
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Error</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p>{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        @if($errors->any())
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Ada kesalahan dalam form</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <form id="checkoutForm" method="POST" action="{{ route('customer.checkout.process') }}">
             @csrf
             @if(isset($cartId) && $cartId)
@@ -439,12 +476,42 @@
         const buttonText = document.getElementById('checkoutBtnText');
         const originalText = buttonText.innerHTML;
         
+        // Validate form before submission
+        const form = document.getElementById('checkoutForm');
+        const addressId = form.querySelector('input[name="address_id"]:checked');
+        const manualAddress = form.querySelector('textarea[name="shipping_address"]');
+        const paymentMethod = form.querySelector('input[name="payment_method"]:checked');
+        
+        // Check if address is selected or manual address is filled
+        let hasValidAddress = false;
+        if (addressId && addressId.value) {
+            hasValidAddress = true;
+        } else if (manualAddress && manualAddress.value.trim()) {
+            hasValidAddress = true;
+        }
+        
+        if (!hasValidAddress) {
+            showNotification('error', 'Error!', 'Silakan pilih alamat pengiriman atau masukkan alamat manual');
+            return;
+        }
+        
+        if (!paymentMethod) {
+            showNotification('error', 'Error!', 'Silakan pilih metode pembayaran');
+            return;
+        }
+        
         // Disable button and show loading
         button.disabled = true;
         buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
         
         // Get form data
-        const formData = new FormData(document.getElementById('checkoutForm'));
+        const formData = new FormData(form);
+        
+        // Debug: Log form data
+        console.log('Form data being sent:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
         
         fetch('{{ route("customer.checkout.process") }}', {
             method: 'POST',
@@ -454,21 +521,34 @@
             },
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showNotification('success', 'Berhasil!', data.message || 'Pesanan berhasil dibuat', () => {
                     window.location.href = data.redirect_url || '/customer/orders';
                 });
             } else {
-                showNotification('error', 'Gagal!', data.message || 'Gagal membuat pesanan');
+                let errorMessage = data.message || 'Gagal membuat pesanan';
+                
+                // Handle validation errors
+                if (data.errors) {
+                    const errorList = Object.values(data.errors).flat();
+                    errorMessage = errorList.join(', ');
+                }
+                
+                showNotification('error', 'Gagal!', errorMessage);
                 buttonText.innerHTML = originalText;
                 button.disabled = false;
             }
         })
         .catch(error => {
             console.error('Checkout error:', error);
-            showNotification('error', 'Error!', 'Terjadi kesalahan saat memproses checkout');
+            showNotification('error', 'Error!', 'Terjadi kesalahan saat memproses checkout. Silakan coba lagi.');
             buttonText.innerHTML = originalText;
             button.disabled = false;
         });

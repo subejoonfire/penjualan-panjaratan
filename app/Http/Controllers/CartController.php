@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
@@ -275,8 +276,31 @@ class CartController extends Controller
     public function processCheckout(Request $request)
     {
         try {
+            // Log checkout process start
+            \Log::info('Checkout process started', ['user_id' => Auth::id()]);
+            
+            // Log all request data for debugging
+            \Log::info('Request data received', [
+                'method' => $request->method(),
+                'headers' => $request->headers->all(),
+                'all_data' => $request->all(),
+                'has_csrf_token' => $request->has('_token'),
+                'content_type' => $request->header('Content-Type'),
+                'accept' => $request->header('Accept')
+            ]);
+            
             $user = Auth::user();
+            
+            if (!$user) {
+                \Log::warning('Unauthenticated checkout attempt');
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Silakan login terlebih dahulu']);
+                }
+                return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+            }
+            
             $cart = null;
+            
             if ($request->filled('cart_id')) {
                 $cart = Cart::where('id', $request->cart_id)->where('iduser', $user->id)->first();
             } else {
@@ -284,40 +308,136 @@ class CartController extends Controller
             }
 
             if (!$cart || $cart->cartDetails()->count() === 0) {
+                \Log::warning('Empty cart checkout attempt', ['user_id' => $user->id, 'cart_id' => $cart?->id]);
                 if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                     return response()->json(['success' => false, 'message' => 'Keranjang belanja kosong']);
                 }
                 return back()->with('error', 'Keranjang belanja kosong');
             }
 
-            $request->validate([
+            \Log::info('Using active cart', ['cart_id' => $cart->id]);
+
+            // Check if required fields are present
+            if (!$request->has('payment_method')) {
+                \Log::warning('Missing payment method in request', ['user_id' => $user->id]);
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Metode pembayaran harus dipilih']);
+                }
+                return back()->withErrors(['payment_method' => 'Metode pembayaran harus dipilih'])->withInput();
+            }
+
+            // Validate request data
+            $validator = \Validator::make($request->all(), [
                 'address_id' => 'nullable|exists:user_addresses,id',
                 'shipping_address' => 'nullable|string',
                 'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
                 'notes' => 'nullable|string|max:500'
+            ], [
+                'payment_method.required' => 'Metode pembayaran harus dipilih',
+                'payment_method.in' => 'Metode pembayaran tidak valid'
+            ]);
+
+            if ($validator->fails()) {
+                \Log::warning('Checkout validation failed', [
+                    'user_id' => $user->id,
+                    'errors' => $validator->errors()->toArray()
+                ]);
+                
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Data checkout tidak valid',
+                        'errors' => $validator->errors()
+                    ]);
+                }
+                return back()->withErrors($validator)->withInput();
+            }
+
+            // Log checkout data for debugging
+            \Log::info('Validating checkout data', [
+                'address_id' => $request->address_id,
+                'payment_method' => $request->payment_method,
+                'has_shipping_address' => $request->filled('shipping_address'),
+                'shipping_address_value' => $request->shipping_address,
+                'all_request_data' => $request->all()
             ]);
 
             // Get shipping address
             $shippingAddress = '';
+            $hasValidAddress = false;
+            
+            // Check if user has selected a saved address
             if ($request->filled('address_id')) {
                 $address = $user->addresses()->find($request->address_id);
                 if ($address) {
                     $shippingAddress = $address->address;
+                    $hasValidAddress = true;
+                    \Log::info('Using saved address', ['address_id' => $request->address_id, 'user_id' => $user->id]);
+                } else {
+                    \Log::warning('Selected address not found', ['address_id' => $request->address_id, 'user_id' => $user->id]);
                 }
-            } elseif ($request->filled('shipping_address')) {
-                $shippingAddress = $request->shipping_address;
-            } else {
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
+            }
+            
+            // Check if user has entered manual address
+            if (!$hasValidAddress && $request->filled('shipping_address')) {
+                $manualAddress = trim($request->shipping_address);
+                if (!empty($manualAddress)) {
+                    $shippingAddress = $manualAddress;
+                    $hasValidAddress = true;
+                    \Log::info('Using manual address', ['user_id' => $user->id]);
                 }
-                return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
             }
 
-            if (empty($shippingAddress)) {
+            if (!$hasValidAddress || empty($shippingAddress)) {
+                \Log::warning('Missing shipping address', [
+                    'user_id' => $user->id,
+                    'address_id' => $request->address_id,
+                    'has_shipping_address' => $request->filled('shipping_address'),
+                    'shipping_address_value' => $request->shipping_address,
+                    'has_valid_address' => $hasValidAddress,
+                    'shipping_address_final' => $shippingAddress
+                ]);
+                
                 if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                     return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
                 }
-                return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
+                return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi'])->withInput();
+            }
+
+            \Log::info('Shipping address validated successfully', [
+                'user_id' => $user->id,
+                'shipping_address' => $shippingAddress
+            ]);
+
+            // Validate payment method
+            $validPaymentMethods = ['bank_transfer', 'credit_card', 'e_wallet', 'cod'];
+            if (!in_array($request->payment_method, $validPaymentMethods)) {
+                \Log::warning('Invalid payment method', [
+                    'user_id' => $user->id,
+                    'payment_method' => $request->payment_method
+                ]);
+                
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
+                }
+                return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
+            }
+
+            // Check if at least one address option is provided
+            $hasAddressId = $request->filled('address_id');
+            $hasManualAddress = $request->filled('shipping_address') && !empty(trim($request->shipping_address));
+            
+            if (!$hasAddressId && !$hasManualAddress) {
+                \Log::warning('No address provided', [
+                    'user_id' => $user->id,
+                    'has_address_id' => $hasAddressId,
+                    'has_manual_address' => $hasManualAddress
+                ]);
+                
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Silakan pilih alamat pengiriman atau masukkan alamat manual']);
+                }
+                return back()->withErrors(['shipping_address' => 'Silakan pilih alamat pengiriman atau masukkan alamat manual'])->withInput();
             }
 
             DB::beginTransaction();
@@ -423,10 +543,21 @@ class CartController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollback();
+            
+            // Log the error
+            \Log::error('Checkout process failed', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => $e->getMessage()]);
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Terjadi kesalahan saat memproses checkout: ' . $e->getMessage()
+                ]);
             }
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat memproses checkout: ' . $e->getMessage())->withInput();
         }
     }
 
