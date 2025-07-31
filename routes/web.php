@@ -127,7 +127,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('payments/callback', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('payments.callback');
     Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('checkout.direct');
     Route::get('payment-methods', [\App\Http\Controllers\Customer\PaymentController::class, 'getPaymentMethods']);
-    Route::get('checkout', [\App\Http\Controllers\Customer\PaymentController::class, 'checkout'])->name('customer.checkout');
+
     
     // Address routes
     Route::post('/addresses', [\App\Http\Controllers\Customer\AddressController::class, 'store'])->name('addresses.store');
