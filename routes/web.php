@@ -125,6 +125,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('/wishlist/toggle/{product}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
     Route::get('payments', [\App\Http\Controllers\Customer\PaymentController::class, 'index'])->name('payments.index');
     Route::get('payments/pay/{transaction}', [\App\Http\Controllers\Customer\PaymentController::class, 'pay'])->name('payments.pay');
+    Route::get('payments/{transaction}/status', [\App\Http\Controllers\Customer\PaymentController::class, 'checkStatus'])->name('payments.status');
     Route::post('payments/callback', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('payments.callback');
     Route::post('callback/duitku', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('duitku.callback');
     Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('checkout.direct');

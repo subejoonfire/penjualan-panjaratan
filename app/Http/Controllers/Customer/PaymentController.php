@@ -38,9 +38,6 @@ class PaymentController extends Controller
                 'payment_method' => $transaction->payment_method
             ]);
             
-            // Debug: check if method is called
-            // dd('PaymentController@pay method called', $transaction->toArray());
-            
             if ($transaction->order->cart->iduser !== $user->id)
                 abort(403);
             if ($transaction->isPaid())
@@ -48,7 +45,7 @@ class PaymentController extends Controller
 
             // Duitku API
             $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
-            $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
+            $merchantCode = 'DS24203';
             
             // Calculate item total (without shipping)
             $itemTotal = 0;
@@ -93,14 +90,20 @@ class PaymentController extends Controller
             $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
             $email = $user->email;
             $phoneNumber = $user->phone ?? '';
-            $callbackUrl = route('duitku.callback');
+            
+            // Use absolute URL for callback to ensure it works with ngrok
+            $callbackUrl = url('/callback/duitku');
             $returnUrl = route('customer.payments.index');
-            // Perbaiki signature sesuai dokumentasi Duitku
+            
+            // Fix signature format according to Duitku documentation
+            // For inquiry: md5(merchantCode + merchantOrderId + paymentAmount + apiKey)
             $signature = md5($merchantCode . $merchantOrderId . $paymentAmount . $apiKey);
+            
             $expiryPeriod = 60;
             $additionalParam = '';
             $merchantUserInfo = $user->nickname ?? $user->username;
             $customerVaName = $user->nickname ?? $user->username;
+            
             // Customer detail
             $address = $user->defaultAddress()?->address ?? $transaction->order->shipping_address;
             $customerDetail = [
@@ -124,6 +127,7 @@ class PaymentController extends Controller
                     'countryCode' => 'ID'
                 ]
             ];
+            
             $params = [
                 'merchantCode' => $merchantCode,
                 'paymentAmount' => $paymentAmount,
@@ -143,7 +147,15 @@ class PaymentController extends Controller
                 'expiryPeriod' => $expiryPeriod
             ];
 
+            // Log request parameters for debugging
+            Log::info('Duitku inquiry request', [
+                'params' => $params,
+                'signature_input' => $merchantCode . $merchantOrderId . $paymentAmount . $apiKey,
+                'generated_signature' => $signature
+            ]);
+
             $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->timeout(30) // Add timeout
                 ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
 
             $responseData = $response->json();
@@ -154,11 +166,9 @@ class PaymentController extends Controller
                 'has_payment_url' => isset($responseData['paymentUrl']),
                 'payment_url' => $responseData['paymentUrl'] ?? 'not_found',
                 'status_code' => $response->status(),
-                'successful' => $response->successful()
+                'successful' => $response->successful(),
+                'http_status' => $response->status()
             ]);
-            
-            // Debug: show response
-            // dd('Duitku Response:', $responseData);
             
             if ($response->successful() && isset($responseData['paymentUrl'])) {
                 // Log successful payment URL
@@ -176,15 +186,31 @@ class PaymentController extends Controller
                 ]);
             }
 
+            // Handle specific error cases
+            $errorMessage = 'Gagal menghubungkan ke pembayaran';
+            if (isset($responseData['statusMessage'])) {
+                $errorMessage .= ': ' . $responseData['statusMessage'];
+            } elseif (isset($responseData['message'])) {
+                $errorMessage .= ': ' . $responseData['message'];
+            } elseif (!$response->successful()) {
+                $errorMessage .= ': HTTP ' . $response->status();
+            }
+
             Log::error('Duitku error', [
                 'response' => $responseData, 
                 'params' => $params,
                 'http_code' => $response->status(),
-                'successful' => $response->successful()
+                'successful' => $response->successful(),
+                'error_message' => $errorMessage
             ]);
-            return back()->with('error', 'Gagal menghubungkan ke pembayaran: ' . ($responseData['statusMessage'] ?? 'Unknown error'));
+            
+            return back()->with('error', $errorMessage);
         } catch (\Exception $e) {
-            Log::error('Duitku connection error', ['error' => $e->getMessage()]);
+            Log::error('Duitku connection error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'transaction_id' => $transaction->id ?? 'unknown'
+            ]);
             return back()->with('error', 'Gagal menghubungkan ke pembayaran: ' . $e->getMessage());
         }
     }
@@ -208,7 +234,7 @@ class PaymentController extends Controller
         try {
             $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'Content-Type' => 'application/json'
-            ])->post($url, $params);
+            ])->timeout(30)->post($url, $params);
 
             if ($response->successful() && isset($response['paymentFee'])) {
                 $paymentMethods = $response['paymentFee'];
@@ -234,6 +260,7 @@ class PaymentController extends Controller
 
         return view('customer.checkout', compact('cart', 'cartDetails', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost', 'total', 'paymentMethods'));
     }
+    
     public function getPaymentMethods(Request $request)
     {
         $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
@@ -251,7 +278,7 @@ class PaymentController extends Controller
 
         $response = \Illuminate\Support\Facades\Http::withHeaders([
             'Content-Type' => 'application/json'
-        ])->post($url, $params);
+        ])->timeout(30)->post($url, $params);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -265,6 +292,31 @@ class PaymentController extends Controller
         }
     }
 
+    // Check payment status
+    public function checkStatus(Transaction $transaction)
+    {
+        try {
+            $user = Auth::user();
+            
+            // Check if transaction belongs to user
+            if ($transaction->order->cart->iduser !== $user->id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'status' => $transaction->transactionstatus,
+                'message' => 'Status pembayaran berhasil dicek'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error checking payment status', [
+                'error' => $e->getMessage(),
+                'transaction_id' => $transaction->id ?? 'unknown'
+            ]);
+            return response()->json(['success' => false, 'message' => 'Gagal mengecek status pembayaran'], 500);
+        }
+    }
+
     // Callback Duitku (update status pembayaran)
     public function callback(Request $request)
     {
@@ -272,22 +324,35 @@ class PaymentController extends Controller
             // Log callback request
             Log::info('Duitku callback received', [
                 'request_data' => $request->all(),
-                'headers' => $request->headers->all()
+                'headers' => $request->headers->all(),
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
             ]);
             
             $merchantOrderId = $request->merchantOrderId;
             $resultCode = $request->resultCode;
             $signature = $request->signature;
 
-            // Verify signature
+            // Verify signature - use the same format as callback documentation
             $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
             $merchantCode = 'DS24203';
+            // For callback: md5(merchantCode + merchantOrderId + apiKey)
             $expectedSignature = md5($merchantCode . $merchantOrderId . $apiKey);
+
+            Log::info('Duitku callback signature verification', [
+                'merchantOrderId' => $merchantOrderId,
+                'resultCode' => $resultCode,
+                'received_signature' => $signature,
+                'expected_signature' => $expectedSignature,
+                'signature_input' => $merchantCode . $merchantOrderId . $apiKey,
+                'signature_match' => $signature === $expectedSignature
+            ]);
 
             if ($signature !== $expectedSignature) {
                 Log::error('Duitku callback signature mismatch', [
                     'expected' => $expectedSignature,
-                    'received' => $signature
+                    'received' => $signature,
+                    'merchantOrderId' => $merchantOrderId
                 ]);
                 return response('Invalid signature', 400);
             }
@@ -341,6 +406,7 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             Log::error('Duitku callback error', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all()
             ]);
             return response('Internal server error', 500);
