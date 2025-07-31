@@ -352,17 +352,64 @@ class CartController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
-            // Validasi payment_method terhadap config Duitku
-            $validPaymentMethods = config('duitku.payment_methods', []);
-            if (!in_array($request->payment_method, $validPaymentMethods)) {
-                \Log::warning('Invalid payment method', [
-                    'user_id' => $user->id,
-                    'payment_method' => $request->payment_method
-                ]);
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
+            // Validasi payment_method terhadap API Duitku
+            $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+            $merchantCode = 'DS24203';
+            $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+            $amount = (int) ($request->amount ?? 10000);
+            $datetime = now()->format('Y-m-d H:i:s');
+            $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
+            $params = [
+                'merchantcode' => $merchantCode,
+                'amount' => $amount,
+                'datetime' => $datetime,
+                'signature' => $signature
+            ];
+            
+            try {
+                $response = \Illuminate\Support\Facades\Http::withHeaders([
+                    'Content-Type' => 'application/json'
+                ])->post($url, $params);
+                
+                if ($response->successful() && isset($response['paymentFee'])) {
+                    $validPaymentMethods = collect($response['paymentFee'])->pluck('paymentMethod')->toArray();
+                    
+                    if (!in_array($request->payment_method, $validPaymentMethods)) {
+                        \Log::warning('Invalid payment method', [
+                            'user_id' => $user->id,
+                            'payment_method' => $request->payment_method,
+                            'valid_methods' => $validPaymentMethods
+                        ]);
+                        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                            return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
+                        }
+                        return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
+                    }
+                } else {
+                    \Log::warning('Failed to get payment methods from Duitku', [
+                        'response' => $response->json()
+                    ]);
+                    // Fallback: allow common payment methods
+                    $fallbackMethods = ['VA', 'DA', 'OV', 'VC', 'BT'];
+                    if (!in_array($request->payment_method, $fallbackMethods)) {
+                        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                            return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
+                        }
+                        return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
+                    }
                 }
-                return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
+            } catch (\Exception $e) {
+                \Log::error('Error getting payment methods from Duitku', [
+                    'error' => $e->getMessage()
+                ]);
+                // Fallback: allow common payment methods
+                $fallbackMethods = ['VA', 'DA', 'OV', 'VC', 'BT'];
+                if (!in_array($request->payment_method, $fallbackMethods)) {
+                    if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                        return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
+                    }
+                    return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
+                }
             }
 
             // Log checkout data for debugging

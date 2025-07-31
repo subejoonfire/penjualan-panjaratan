@@ -176,7 +176,7 @@ class PaymentController extends Controller
         $response = \Illuminate\Support\Facades\Http::withHeaders([
             'Content-Type' => 'application/json'
         ])->post($url, $params);
-        dd($response);
+        
         if ($response->successful()) {
             return $response->json();
         }
