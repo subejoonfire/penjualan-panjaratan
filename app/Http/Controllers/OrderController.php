@@ -201,8 +201,8 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('orders.show', $order)
-                ->with('success', 'Pesanan berhasil dibuat');
+            // Redirect ke method pay() untuk memproses pembayaran
+            return redirect()->route('customer.payments.pay', $transaction);
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', $e->getMessage());

@@ -536,13 +536,13 @@ class CartController extends Controller
 
             DB::commit();
 
-            // Jika COD/Retail, langsung ke halaman order
-            if (in_array($paymentMethod, ['FT', 'IR', 'DN'])) {
+            // Jika COD, langsung ke halaman order
+            if ($paymentMethod === 'COD') {
                 return redirect()->route('customer.orders.show', $order)
                     ->with('success', 'Pesanan berhasil dibuat');
             }
 
-            // Jika bukan COD, redirect ke halaman pembayaran
+            // Jika bukan COD, redirect ke halaman pembayaran menggunakan method pay()
             if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                 return response()->json([
                     'success' => true,
@@ -550,8 +550,9 @@ class CartController extends Controller
                     'redirect_url' => route('customer.payments.pay', $transaction)
                 ]);
             }
-            return redirect()->route('customer.payments.pay', $transaction)
-                ->with('success', 'Pesanan berhasil dibuat');
+
+            // Redirect ke method pay() untuk memproses pembayaran
+            return redirect()->route('customer.payments.pay', $transaction);
         } catch (\Exception $e) {
             DB::rollback();
 
