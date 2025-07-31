@@ -98,6 +98,7 @@ Route::middleware(['auth', 'role:seller'])->prefix('seller')->name('seller.')->g
     Route::put('/notifications/{notification}/read', [SellerDashboardController::class, 'markAsRead'])->name('notifications.read');
     Route::put('/notifications/mark-all-read', [SellerDashboardController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
+Route::get('/checkout/direct/{cartId}', [CartController::class, 'checkout'])->name('checkout.direct.view');
 
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
@@ -107,7 +108,6 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::delete('/cart/remove/{cartDetail}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
-    Route::get('/checkout/direct/{cartId}', [CartController::class, 'checkout'])->name('checkout.direct.view');
     Route::post('/checkout', [CartController::class, 'processCheckout'])->name('checkout.process');
     Route::get('/orders', [CustomerDashboardController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{order}', [CustomerDashboardController::class, 'orderDetail'])->name('orders.show');
@@ -129,7 +129,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('checkout.direct');
     Route::get('payment-methods', [\App\Http\Controllers\Customer\PaymentController::class, 'getPaymentMethods']);
 
-    
+
     // Address routes
     Route::post('/addresses', [\App\Http\Controllers\Customer\AddressController::class, 'store'])->name('addresses.store');
     Route::put('/addresses/{address}', [\App\Http\Controllers\Customer\AddressController::class, 'update'])->name('addresses.update');
