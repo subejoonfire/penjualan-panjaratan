@@ -201,22 +201,31 @@ class PaymentController extends Controller
                 'signature' => $signature
             ];
             
+            \Log::info('Requesting Duitku payment methods', ['amount' => $amount, 'datetime' => $datetime]);
+            
             $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'Content-Type' => 'application/json'
             ])->post($url, $params);
             
             if ($response->successful()) {
                 $data = $response->json();
-                return response()->json($data);
+                \Log::info('Duitku response received', ['status' => $response->status(), 'data_keys' => array_keys($data)]);
+                
+                if (isset($data['paymentFee']) && is_array($data['paymentFee'])) {
+                    return response()->json($data);
+                } else {
+                    \Log::warning('Duitku response missing paymentFee', ['data' => $data]);
+                    return response()->json(['error' => 'Payment methods not available']);
+                }
             } else {
-                Log::error('Duitku payment methods error', [
+                \Log::error('Duitku payment methods error', [
                     'response' => $response->json(),
                     'status' => $response->status()
                 ]);
                 return response()->json(['error' => 'Gagal mengambil metode pembayaran dari Duitku']);
             }
         } catch (\Exception $e) {
-            Log::error('Duitku payment methods exception', ['error' => $e->getMessage()]);
+            \Log::error('Duitku payment methods exception', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Gagal mengambil metode pembayaran: ' . $e->getMessage()]);
         }
     }

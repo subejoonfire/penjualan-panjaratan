@@ -281,16 +281,21 @@ class CartController extends Controller
             if (isset($paymentMethodsData['error'])) {
                 \Log::info('Duitku payment methods error: ' . $paymentMethodsData['error']);
                 $paymentMethods = [];
-            } elseif (isset($paymentMethodsData['paymentFee']) && is_array($paymentMethodsData['paymentFee'])) {
+            } elseif (isset($paymentMethodsData['paymentFee']) && is_array($paymentMethodsData['paymentFee']) && count($paymentMethodsData['paymentFee']) > 0) {
                 $paymentMethods = $paymentMethodsData['paymentFee'];
                 \Log::info('Duitku payment methods loaded: ' . count($paymentMethods) . ' methods');
             } else {
-                \Log::info('Duitku payment methods not found, using fallback');
+                \Log::info('Duitku payment methods not found or empty, using fallback');
                 $paymentMethods = [];
             }
         } catch (\Exception $e) {
             \Log::error('Error getting payment methods: ' . $e->getMessage());
             $paymentMethods = [];
+        }
+        
+        // Ensure we always have fallback methods
+        if (empty($paymentMethods)) {
+            \Log::info('Using fallback payment methods');
         }
 
         return view('customer.checkout', compact('cartDetails', 'subtotal', 'shippingCost', 'total', 'addresses', 'defaultAddress', 'cartId', 'paymentMethods'));

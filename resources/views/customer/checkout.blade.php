@@ -282,27 +282,6 @@
     </div>
 </div>
 
-<!-- Loading Modal -->
-<div id="loadingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm mx-auto">
-            <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Memproses Pesanan</h3>
-            <p class="text-sm text-gray-600 mb-4">Mohon tunggu sebentar...</p>
-            <div class="space-y-2">
-                <div class="flex items-center justify-center text-xs text-gray-500">
-                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                    <span>Membuat pesanan...</span>
-                </div>
-                <div class="flex items-center justify-center text-xs text-gray-500">
-                    <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
-                    <span>Mengalihkan ke pembayaran...</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 @endsection
 
 @section('scripts')
@@ -329,8 +308,11 @@
 
         // Handle form submission
         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-            // Show loading modal
-            document.getElementById('loadingModal').classList.remove('hidden');
+            // Disable button to prevent double submission
+            const button = document.getElementById('checkoutBtn');
+            const buttonText = document.getElementById('checkoutBtnText');
+            button.disabled = true;
+            buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
         });
 
         // Handle address form submission
