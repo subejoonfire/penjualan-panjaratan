@@ -169,11 +169,8 @@ class PaymentController extends Controller
                     'status_message' => $responseData['statusMessage']
                 ]);
                 
-                // Show loading page first, then redirect
-                return view('customer.payments.loading', [
-                    'paymentUrl' => $responseData['paymentUrl'],
-                    'transaction' => $transaction
-                ]);
+                // Redirect langsung ke payment URL
+                return redirect($responseData['paymentUrl']);
             }
 
             Log::error('Duitku error', [
