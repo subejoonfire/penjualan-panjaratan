@@ -101,22 +101,15 @@
 
                             <!-- Manual Address Input -->
                             <div class="mt-4 sm:mt-6">
-                                <label class="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
-                                    <input type="radio" name="address_type" value="manual" id="manual_address"
-                                        class="mt-0.5 sm:mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" 
-                                        {{ $addresses->count() === 0 ? 'checked' : '' }}>
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Masukkan alamat baru</div>
-                                    </div>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="address_option" value="manual" id="manualRadio"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <span class="text-sm font-medium text-gray-900">Masukkan alamat manual</span>
                                 </label>
-
-                                <div class="mt-3 sm:mt-4 manual-address {{ $addresses->count() > 0 ? 'hidden' : '' }}">
+                                <div id="manualAddressInput" class="mt-3 sm:mt-4 hidden">
                                     <textarea name="shipping_address" rows="3"
                                         class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        placeholder="Masukkan alamat pengiriman lengkap...">{{ old('shipping_address') }}</textarea>
-                                    @error('shipping_address')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                        placeholder="Masukkan alamat lengkap pengiriman...">{{ old('shipping_address') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -129,37 +122,52 @@
                         </div>
                         <div class="p-3 sm:p-6">
                             <div class="space-y-3 sm:space-y-4">
-                                <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="bank_transfer" class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Transfer Bank</div>
-                                        <div class="text-xs text-gray-500">Transfer melalui bank</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="credit_card" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Kartu Kredit</div>
-                                        <div class="text-xs text-gray-500">Visa, Mastercard, dll</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="e_wallet" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">E-Wallet</div>
-                                        <div class="text-xs text-gray-500">OVO, DANA, GoPay, dll</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="cod" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
-                                        <div class="text-xs text-gray-500">Bayar saat barang diterima</div>
-                                    </div>
-                                </label>
+                                @if(isset($paymentMethods) && count($paymentMethods) > 0)
+                                    @foreach($paymentMethods as $method)
+                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                        <input type="radio" name="payment_method" value="{{ $method['paymentMethod'] ?? 'bank_transfer' }}" 
+                                            class="text-blue-600 focus:ring-blue-500 border-gray-300" 
+                                            {{ $loop->first ? 'checked' : '' }}>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">{{ $method['paymentName'] ?? 'Transfer Bank' }}</div>
+                                            <div class="text-xs text-gray-500">{{ $method['paymentDescription'] ?? 'Transfer melalui bank' }}</div>
+                                        </div>
+                                    </label>
+                                    @endforeach
+                                @else
+                                    <!-- Fallback payment methods -->
+                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                        <input type="radio" name="payment_method" value="bank_transfer" class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">Transfer Bank</div>
+                                            <div class="text-xs text-gray-500">Transfer melalui bank</div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                        <input type="radio" name="payment_method" value="credit_card" class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">Kartu Kredit</div>
+                                            <div class="text-xs text-gray-500">Visa, Mastercard, dll</div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                        <input type="radio" name="payment_method" value="e_wallet" class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">E-Wallet</div>
+                                            <div class="text-xs text-gray-500">OVO, DANA, GoPay, dll</div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                        <input type="radio" name="payment_method" value="cod" class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
+                                            <div class="text-xs text-gray-500">Bayar saat barang diterima</div>
+                                        </div>
+                                    </label>
+                                @endif
                             </div>
                             @error('payment_method')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -218,15 +226,8 @@
                             </a>
                         </div>
 
-                        <!-- Security Info -->
-                        <div class="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-shield-alt text-green-500 mr-2"></i>
-                                <span class="text-sm text-gray-600">Checkout aman</span>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">
-                                Informasi pembayaran Anda dienkripsi dan aman.
-                            </p>
+                        <div class="mt-3 sm:mt-4 text-center">
+                            <span class="text-sm text-gray-600">Checkout aman</span>
                         </div>
                     </div>
                 </div>
@@ -241,26 +242,24 @@
         <div class="mt-3">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-900">Tambah Alamat Baru</h3>
-                <button type="button" onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
             <form id="addressForm">
+                @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap</label>
-                    <textarea name="address" rows="4" required
+                    <textarea name="address" rows="3" required
                         class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         placeholder="Masukkan alamat lengkap..."></textarea>
                 </div>
-                
                 <div class="mb-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="is_default" class="text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <span class="ml-2 text-sm text-gray-700">Set sebagai alamat default</span>
+                        <span class="ml-2 text-sm text-gray-700">Jadikan alamat default</span>
                     </label>
                 </div>
-                
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeAddressModal()"
                         class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
@@ -268,7 +267,7 @@
                     </button>
                     <button type="submit"
                         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-                        Simpan Alamat
+                        Simpan
                     </button>
                 </div>
             </form>
@@ -276,57 +275,44 @@
     </div>
 </div>
 
-<!-- Notification Modal -->
-<div id="notificationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-            <div id="notificationIcon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4">
-                <i id="notificationIconClass" class="text-2xl"></i>
-            </div>
-            <h3 id="notificationTitle" class="text-lg font-medium text-gray-900 mb-2"></h3>
-            <p id="notificationMessage" class="text-sm text-gray-500 mb-4"></p>
-            <div class="flex justify-center">
-                <button id="notificationConfirmBtn" onclick="closeNotificationModal()"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-                    OK
-                </button>
+<!-- Loading Modal -->
+<div id="loadingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm mx-auto">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Memproses Pesanan</h3>
+            <p class="text-sm text-gray-600 mb-4">Mohon tunggu sebentar...</p>
+            <div class="space-y-2">
+                <div class="flex items-center justify-center text-xs text-gray-500">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    <span>Membuat pesanan...</span>
+                </div>
+                <div class="flex items-center justify-center text-xs text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
+                    <span>Mengalihkan ke pembayaran...</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@endsection
+
+@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle address selection
-        const addressRadios = document.querySelectorAll('input[name="address_id"]');
-        const manualRadio = document.querySelector('input[name="address_type"][value="manual"]');
-        const manualAddressDiv = document.querySelector('.manual-address');
-        const shippingAddressTextarea = document.querySelector('textarea[name="shipping_address"]');
+        // Handle manual address input toggle
+        const manualRadio = document.getElementById('manualRadio');
+        const manualAddressInput = document.getElementById('manualAddressInput');
         
-        // Show/hide manual address input
         function toggleManualAddress() {
-            if (manualRadio && manualRadio.checked) {
-                manualAddressDiv.classList.remove('hidden');
-                shippingAddressTextarea.required = true;
-                // Clear address_id selection
-                addressRadios.forEach(radio => radio.checked = false);
+            if (manualRadio.checked) {
+                manualAddressInput.classList.remove('hidden');
             } else {
-                manualAddressDiv.classList.add('hidden');
-                shippingAddressTextarea.required = false;
+                manualAddressInput.classList.add('hidden');
             }
         }
         
-        // Handle saved address selection
-        addressRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.checked) {
-                    manualRadio.checked = false;
-                    toggleManualAddress();
-                }
-            });
-        });
-        
-        // Handle manual address selection
         if (manualRadio) {
             manualRadio.addEventListener('change', toggleManualAddress);
         }
@@ -336,8 +322,8 @@
 
         // Handle form submission
         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            processCheckout();
+            // Show loading modal
+            document.getElementById('loadingModal').classList.remove('hidden');
         });
 
         // Handle address form submission
@@ -372,16 +358,17 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showNotification('success', 'Berhasil!', data.message);
                 closeAddressModal();
                 loadAddresses();
+                // Show success message
+                alert('Alamat berhasil disimpan');
             } else {
-                showNotification('error', 'Gagal!', data.message);
+                alert('Gagal menyimpan alamat: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error saving address:', error);
-            showNotification('error', 'Error!', 'Terjadi kesalahan saat menyimpan alamat');
+            alert('Terjadi kesalahan saat menyimpan alamat');
         });
     }
 
@@ -432,86 +419,6 @@
             });
             addressList.innerHTML = html;
         }
-    }
-
-    function processCheckout() {
-        const button = document.getElementById('checkoutBtn');
-        const buttonText = document.getElementById('checkoutBtnText');
-        const originalText = buttonText.innerHTML;
-        
-        // Disable button and show loading
-        button.disabled = true;
-        buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
-        
-        // Get form data
-        const formData = new FormData(document.getElementById('checkoutForm'));
-        
-        fetch('{{ route("customer.checkout.process") }}', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('success', 'Berhasil!', data.message || 'Pesanan berhasil dibuat', () => {
-                    window.location.href = data.redirect_url || '/customer/orders';
-                });
-            } else {
-                showNotification('error', 'Gagal!', data.message || 'Gagal membuat pesanan');
-                buttonText.innerHTML = originalText;
-                button.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Checkout error:', error);
-            showNotification('error', 'Error!', 'Terjadi kesalahan saat memproses checkout');
-            buttonText.innerHTML = originalText;
-            button.disabled = false;
-        });
-    }
-
-    function showNotification(type, title, message, onConfirm = null) {
-        const modal = document.getElementById('notificationModal');
-        const icon = document.getElementById('notificationIcon');
-        const iconClass = document.getElementById('notificationIconClass');
-        const titleEl = document.getElementById('notificationTitle');
-        const messageEl = document.getElementById('notificationMessage');
-        const confirmBtn = document.getElementById('notificationConfirmBtn');
-
-        // Set icon and colors based on type
-        if (type === 'success') {
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-green-100';
-            iconClass.className = 'fas fa-check text-green-600 text-2xl';
-        } else if (type === 'error') {
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-red-100';
-            iconClass.className = 'fas fa-times text-red-600 text-2xl';
-        } else {
-            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-blue-100';
-            iconClass.className = 'fas fa-info text-blue-600 text-2xl';
-        }
-
-        titleEl.textContent = title;
-        messageEl.textContent = message;
-
-        // Set confirm button action
-        if (onConfirm) {
-            confirmBtn.onclick = () => {
-                closeNotificationModal();
-                onConfirm();
-            };
-        } else {
-            confirmBtn.onclick = closeNotificationModal;
-        }
-
-        modal.classList.remove('hidden');
-    }
-
-    function closeNotificationModal() {
-        document.getElementById('notificationModal').classList.add('hidden');
     }
 </script>
 @endsection

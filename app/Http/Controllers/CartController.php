@@ -238,6 +238,7 @@ class CartController extends Controller
     public function checkout($cartId = null)
     {
         $user = Auth::user();
+        
         if ($cartId) {
             // Direct checkout (single product)
             $cart = Cart::where('id', $cartId)->where('iduser', $user->id)->first();
@@ -252,21 +253,32 @@ class CartController extends Controller
             }
         }
 
-        $cartDetails = $cart->cartDetails()->with(['product.images'])->get();
-        foreach ($cartDetails as $detail) {
-            if ($detail->product->productstock < $detail->quantity) {
-                return redirect()->route('customer.cart.index')
-                    ->with('error', 'Stok tidak mencukupi untuk ' . $detail->product->productname);
-            }
-        }
+        $cartDetails = $cart->cartDetails()->with('product.images', 'product.seller')->get();
+        $addresses = $user->addresses ?? collect();
+        $defaultAddress = $addresses->where('is_default', true)->first();
         $subtotal = $cartDetails->sum(function ($detail) {
             return $detail->quantity * $detail->productprice;
         });
         $shippingCost = 15000;
         $total = $subtotal + $shippingCost;
-        $addresses = $user->addresses;
-        $defaultAddress = $user->defaultAddress();
-        return view('customer.checkout', compact('cartDetails', 'subtotal', 'shippingCost', 'total', 'addresses', 'defaultAddress', 'cartId'));
+
+        // Get payment methods from Duitku
+        $paymentController = new \App\Http\Controllers\Customer\PaymentController();
+        $request = new \Illuminate\Http\Request();
+        $request->merge(['amount' => $total]);
+        
+        try {
+            $paymentMethods = $paymentController->getPaymentMethods($request)->getData();
+            if (isset($paymentMethods['paymentFee'])) {
+                $paymentMethods = $paymentMethods['paymentFee'];
+            } else {
+                $paymentMethods = [];
+            }
+        } catch (\Exception $e) {
+            $paymentMethods = [];
+        }
+
+        return view('customer.checkout', compact('cartDetails', 'subtotal', 'shippingCost', 'total', 'addresses', 'defaultAddress', 'cartId', 'paymentMethods'));
     }
 
     /**
@@ -284,9 +296,6 @@ class CartController extends Controller
             }
 
             if (!$cart || $cart->cartDetails()->count() === 0) {
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Keranjang belanja kosong']);
-                }
                 return back()->with('error', 'Keranjang belanja kosong');
             }
 
@@ -307,16 +316,10 @@ class CartController extends Controller
             } elseif ($request->filled('shipping_address')) {
                 $shippingAddress = $request->shipping_address;
             } else {
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
-                }
                 return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
             }
 
             if (empty($shippingAddress)) {
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
-                }
                 return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
             }
 
@@ -399,33 +402,16 @@ class CartController extends Controller
 
             // Jika COD, langsung ke halaman order
             if ($request->payment_method === 'cod') {
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Pesanan berhasil dibuat',
-                        'redirect_url' => route('customer.orders.show', $order)
-                    ]);
-                }
                 return redirect()->route('customer.orders.show', $order)
                     ->with('success', 'Pesanan berhasil dibuat');
             }
 
             // Jika bukan COD, redirect ke halaman pembayaran
-            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Pesanan berhasil dibuat',
-                    'redirect_url' => route('customer.payments.pay', $transaction)
-                ]);
-            }
             return redirect()->route('customer.payments.pay', $transaction)
                 ->with('success', 'Pesanan berhasil dibuat');
                 
         } catch (\Exception $e) {
             DB::rollback();
-            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => $e->getMessage()]);
-            }
             return back()->with('error', $e->getMessage());
         }
     }

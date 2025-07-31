@@ -113,14 +113,26 @@ class PaymentController extends Controller
             'signature' => $signature,
             'expiryPeriod' => $expiryPeriod
         ];
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])
-            ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
-        // dd($response);
-        if ($response->successful() && isset($response['paymentUrl'])) {
-            return redirect($response['paymentUrl']);
+        
+        try {
+            $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
+            
+            if ($response->successful() && isset($response['paymentUrl'])) {
+                // Show loading page first, then redirect
+                return view('customer.payments.loading', [
+                    'paymentUrl' => $response['paymentUrl'],
+                    'transaction' => $transaction
+                ]);
+            }
+            
+            Log::error('Duitku error', ['response' => $response->json(), 'params' => $params]);
+            return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
+            
+        } catch (\Exception $e) {
+            Log::error('Duitku connection error', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Gagal menghubungkan ke pembayaran: ' . $e->getMessage());
         }
-        Log::error('Duitku error', ['response' => $response->json(), 'params' => $params]);
-        return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
     }
 
     /**
@@ -140,11 +152,22 @@ class PaymentController extends Controller
             'datetime' => $datetime,
             'signature' => $signature
         ];
-        $response = \Illuminate\Support\Facades\Http::withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($url, $params);
-        $paymentMethods = $response->successful() && isset($response['paymentFee']) ? $response['paymentFee'] : [];
-        // ...ambil data cart, addresses, dsb seperti sebelumnya
+        
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Content-Type' => 'application/json'
+            ])->post($url, $params);
+            
+            $paymentMethods = [];
+            if ($response->successful() && isset($response['paymentFee'])) {
+                $paymentMethods = $response['paymentFee'];
+            }
+        } catch (\Exception $e) {
+            // If Duitku API fails, use fallback methods
+            $paymentMethods = [];
+        }
+        
+        // Get cart data
         $user = auth()->user();
         $cart = $user->activeCart;
         $cartDetails = $cart ? $cart->cartDetails()->with('product.images', 'product.seller')->get() : collect();
@@ -153,6 +176,7 @@ class PaymentController extends Controller
         $subtotal = $cartDetails->sum(function ($detail) { return $detail->quantity * $detail->productprice; });
         $shippingCost = 15000;
         $total = $subtotal + $shippingCost;
+        
         return view('customer.checkout', compact('cart', 'cartDetails', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost', 'total', 'paymentMethods'));
     }
 
@@ -173,30 +197,96 @@ class PaymentController extends Controller
             'datetime' => $datetime,
             'signature' => $signature
         ];
-        $response = \Illuminate\Support\Facades\Http::withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($url, $params);
-        dd($response);
-        if ($response->successful()) {
-            return $response->json();
+        
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Content-Type' => 'application/json'
+            ])->post($url, $params);
+            
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal mengambil metode pembayaran: ' . $e->getMessage()]);
         }
-        return ['error' => 'Gagal mengambil metode pembayaran'];
+        
+        return response()->json(['error' => 'Gagal mengambil metode pembayaran']);
     }
 
     // Callback Duitku (update status pembayaran)
     public function callback(Request $request)
     {
-        $merchantOrderId = $request->merchantOrderId;
-        $resultCode = $request->resultCode;
-        $transaction = Transaction::where('transaction_number', $merchantOrderId)->first();
-        if (!$transaction)
-            return response('Order not found', 404);
-        if ($resultCode == '00') {
-            $transaction->markAsPaid();
-            $transaction->order->updateStatus('processing');
-        } else {
-            $transaction->markAsFailed();
+        try {
+            $merchantOrderId = $request->merchantOrderId;
+            $resultCode = $request->resultCode;
+            $signature = $request->signature;
+            
+            // Verify signature
+            $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+            $merchantCode = 'DS24203';
+            $expectedSignature = md5($merchantCode . $merchantOrderId . $apiKey);
+            
+            if ($signature !== $expectedSignature) {
+                Log::error('Duitku callback signature mismatch', [
+                    'expected' => $expectedSignature,
+                    'received' => $signature
+                ]);
+                return response('Invalid signature', 400);
+            }
+            
+            $transaction = Transaction::where('transaction_number', $merchantOrderId)->first();
+            if (!$transaction) {
+                Log::error('Duitku callback: Transaction not found', ['merchantOrderId' => $merchantOrderId]);
+                return response('Order not found', 404);
+            }
+            
+            if ($resultCode == '00') {
+                // Payment successful
+                $transaction->update(['transactionstatus' => 'paid']);
+                $transaction->order->update(['status' => 'processing']);
+                
+                // Create success notification
+                \App\Models\Notification::create([
+                    'iduser' => $transaction->order->cart->iduser,
+                    'title' => 'Pembayaran Berhasil',
+                    'notification' => 'Pembayaran untuk pesanan #' . $transaction->order->order_number . ' berhasil',
+                    'type' => 'payment',
+                    'readstatus' => false
+                ]);
+                
+                Log::info('Duitku callback: Payment successful', [
+                    'transaction_id' => $transaction->id,
+                    'order_number' => $transaction->order->order_number
+                ]);
+            } else {
+                // Payment failed
+                $transaction->update(['transactionstatus' => 'failed']);
+                $transaction->order->update(['status' => 'cancelled']);
+                
+                // Create failed notification
+                \App\Models\Notification::create([
+                    'iduser' => $transaction->order->cart->iduser,
+                    'title' => 'Pembayaran Gagal',
+                    'notification' => 'Pembayaran untuk pesanan #' . $transaction->order->order_number . ' gagal',
+                    'type' => 'payment',
+                    'readstatus' => false
+                ]);
+                
+                Log::info('Duitku callback: Payment failed', [
+                    'transaction_id' => $transaction->id,
+                    'order_number' => $transaction->order->order_number,
+                    'result_code' => $resultCode
+                ]);
+            }
+            
+            return response('OK', 200);
+            
+        } catch (\Exception $e) {
+            Log::error('Duitku callback error', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+            return response('Internal server error', 500);
         }
-        return response('OK', 200);
     }
 }
