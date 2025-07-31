@@ -11,6 +11,19 @@
             <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Review pesanan dan selesaikan pembelian Anda</p>
         </div>
 
+        <!-- Error/Success Messages -->
+        @if(session('error'))
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+        @endif
+
+        @if(session('success'))
+        <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+        @endif
+
         <form id="checkoutForm" method="POST" action="{{ route('customer.checkout.process') }}">
             @csrf
             @if(isset($cartId) && $cartId)
@@ -308,11 +321,31 @@
 
         // Handle form submission
         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            // Validate form before submission
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            const addressSelected = document.querySelector('input[name="address_id"]:checked') || 
+                                 document.querySelector('textarea[name="shipping_address"]').value.trim();
+            
+            if (!paymentMethod) {
+                e.preventDefault();
+                alert('Silakan pilih metode pembayaran');
+                return false;
+            }
+            
+            if (!addressSelected) {
+                e.preventDefault();
+                alert('Silakan pilih atau masukkan alamat pengiriman');
+                return false;
+            }
+            
             // Disable button to prevent double submission
             const button = document.getElementById('checkoutBtn');
             const buttonText = document.getElementById('checkoutBtnText');
             button.disabled = true;
             buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+            
+            // Allow form to submit normally
+            return true;
         });
 
         // Handle address form submission

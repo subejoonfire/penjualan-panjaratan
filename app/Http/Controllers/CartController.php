@@ -263,12 +263,14 @@ class CartController extends Controller
         $total = $subtotal + $shippingCost;
 
         // Get payment methods from Duitku
-        $paymentController = new \App\Http\Controllers\Customer\PaymentController();
-        $request = new \Illuminate\Http\Request();
-        $request->merge(['amount' => $total]);
-        
         $paymentMethods = [];
         try {
+            $paymentController = new \App\Http\Controllers\Customer\PaymentController();
+            $request = new \Illuminate\Http\Request();
+            $request->merge(['amount' => $total]);
+            
+            \Log::info('Requesting payment methods from Duitku', ['amount' => $total]);
+            
             $response = $paymentController->getPaymentMethods($request);
             $paymentMethodsData = $response->getData();
             
@@ -277,15 +279,21 @@ class CartController extends Controller
                 $paymentMethodsData = (array) $paymentMethodsData;
             }
             
+            \Log::info('Payment methods response received', [
+                'has_error' => isset($paymentMethodsData['error']),
+                'has_payment_fee' => isset($paymentMethodsData['paymentFee']),
+                'payment_fee_count' => isset($paymentMethodsData['paymentFee']) ? count($paymentMethodsData['paymentFee']) : 0
+            ]);
+            
             // Check if there's an error in the response
             if (isset($paymentMethodsData['error'])) {
-                \Log::info('Duitku payment methods error: ' . $paymentMethodsData['error']);
+                \Log::warning('Duitku payment methods error: ' . $paymentMethodsData['error']);
                 $paymentMethods = [];
             } elseif (isset($paymentMethodsData['paymentFee']) && is_array($paymentMethodsData['paymentFee']) && count($paymentMethodsData['paymentFee']) > 0) {
                 $paymentMethods = $paymentMethodsData['paymentFee'];
-                \Log::info('Duitku payment methods loaded: ' . count($paymentMethods) . ' methods');
+                \Log::info('Duitku payment methods loaded successfully', ['count' => count($paymentMethods)]);
             } else {
-                \Log::info('Duitku payment methods not found or empty, using fallback');
+                \Log::warning('Duitku payment methods not found or empty, using fallback');
                 $paymentMethods = [];
             }
         } catch (\Exception $e) {
@@ -307,17 +315,28 @@ class CartController extends Controller
     public function processCheckout(Request $request)
     {
         try {
+            \Log::info('Checkout process started', ['user_id' => Auth::id()]);
+            
             $user = Auth::user();
             $cart = null;
             if ($request->filled('cart_id')) {
                 $cart = Cart::where('id', $request->cart_id)->where('iduser', $user->id)->first();
+                \Log::info('Using specific cart', ['cart_id' => $request->cart_id]);
             } else {
                 $cart = $user->activeCart;
+                \Log::info('Using active cart', ['cart_id' => $cart ? $cart->id : null]);
             }
 
             if (!$cart || $cart->cartDetails()->count() === 0) {
+                \Log::warning('Empty cart during checkout', ['user_id' => $user->id]);
                 return back()->with('error', 'Keranjang belanja kosong');
             }
+
+            \Log::info('Validating checkout data', [
+                'address_id' => $request->address_id,
+                'payment_method' => $request->payment_method,
+                'has_shipping_address' => $request->filled('shipping_address')
+            ]);
 
             $request->validate([
                 'address_id' => 'nullable|exists:user_addresses,id',
@@ -332,24 +351,34 @@ class CartController extends Controller
                 $address = $user->addresses()->find($request->address_id);
                 if ($address) {
                     $shippingAddress = $address->address;
+                    \Log::info('Using saved address', ['address_id' => $request->address_id]);
                 }
             } elseif ($request->filled('shipping_address')) {
                 $shippingAddress = $request->shipping_address;
+                \Log::info('Using manual address');
             } else {
+                \Log::warning('No shipping address provided');
                 return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
             }
 
             if (empty($shippingAddress)) {
+                \Log::warning('Empty shipping address');
                 return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
             }
 
             DB::beginTransaction();
 
             $cartDetails = $cart->cartDetails()->with('product')->get();
+            \Log::info('Cart details loaded', ['item_count' => $cartDetails->count()]);
 
             // Check stock again
             foreach ($cartDetails as $detail) {
                 if ($detail->product->productstock < $detail->quantity) {
+                    \Log::warning('Insufficient stock', [
+                        'product' => $detail->product->productname,
+                        'requested' => $detail->quantity,
+                        'available' => $detail->product->productstock
+                    ]);
                     throw new \Exception('Stok tidak mencukupi untuk ' . $detail->product->productname);
                 }
             }
@@ -360,6 +389,12 @@ class CartController extends Controller
 
             $shippingCost = 15000;
             $total = $subtotal + $shippingCost;
+
+            \Log::info('Order calculation', [
+                'subtotal' => $subtotal,
+                'shipping_cost' => $shippingCost,
+                'total' => $total
+            ]);
 
             // Generate order number with date format
             $date = now()->format('Ymd');
@@ -378,6 +413,8 @@ class CartController extends Controller
                 $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
             }
 
+            \Log::info('Creating order', ['order_number' => $orderNumber]);
+
             // Create order
             $order = Order::create([
                 'idcart' => $cart->id,
@@ -391,6 +428,8 @@ class CartController extends Controller
             // Generate transaction number with date format
             $transactionCount = Transaction::whereDate('created_at', today())->count() + 1;
             $transactionNumber = 'TRX-' . $date . '-' . str_pad($transactionCount, 6, '0', STR_PAD_LEFT);
+
+            \Log::info('Creating transaction', ['transaction_number' => $transactionNumber]);
 
             // Create transaction
             $transaction = Transaction::create([
@@ -420,6 +459,12 @@ class CartController extends Controller
 
             DB::commit();
 
+            \Log::info('Checkout completed successfully', [
+                'order_id' => $order->id,
+                'transaction_id' => $transaction->id,
+                'payment_method' => $request->payment_method
+            ]);
+
             // Jika COD, langsung ke halaman order
             if ($request->payment_method === 'cod') {
                 return redirect()->route('customer.orders.show', $order)
@@ -432,7 +477,12 @@ class CartController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', $e->getMessage());
+            \Log::error('Checkout process failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Gagal membuat pesanan: ' . $e->getMessage());
         }
     }
 
