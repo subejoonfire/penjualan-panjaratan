@@ -11,23 +11,47 @@
             <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Review pesanan dan selesaikan pembelian Anda</p>
         </div>
 
-        <!-- Error/Success Messages -->
+        <!-- Error Messages -->
         @if(session('error'))
-        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Error</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p>{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
         @endif
 
-        @if(session('success'))
-        <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
+        @if($errors->any())
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Ada kesalahan dalam form</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
         @endif
 
         <form id="checkoutForm" method="POST" action="{{ route('customer.checkout.process') }}">
             @csrf
             @if(isset($cartId) && $cartId)
-                <input type="hidden" name="cart_id" value="{{ $cartId }}">
+            <input type="hidden" name="cart_id" value="{{ $cartId }}">
             @endif
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
 
@@ -36,7 +60,8 @@
                     <!-- Order Items -->
                     <div class="bg-white shadow rounded-lg overflow-hidden">
                         <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
-                            <h3 class="text-base sm:text-lg font-medium text-gray-900">Item Pesanan ({{ $cartDetails->count() }})</h3>
+                            <h3 class="text-base sm:text-lg font-medium text-gray-900">Item Pesanan ({{
+                                $cartDetails->count() }})</h3>
                         </div>
                         <div class="divide-y divide-gray-200">
                             @foreach($cartDetails as $detail)
@@ -48,15 +73,20 @@
                                             alt="{{ $detail->product->productname }}"
                                             class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover">
                                         @else
-                                        <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <div
+                                            class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                                             <i class="fas fa-image text-gray-400 text-sm sm:text-base"></i>
                                         </div>
                                         @endif
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="text-sm font-medium text-gray-900 truncate">{{ $detail->product->productname }}</h4>
-                                        <p class="text-xs sm:text-sm text-gray-600">Seller: {{ $detail->product->seller->nickname ?? $detail->product->seller->username }}</p>
-                                        <p class="text-xs sm:text-sm text-gray-600">Qty: {{ $detail->quantity }} × Rp {{ number_format($detail->productprice) }}</p>
+                                        <h4 class="text-sm font-medium text-gray-900 truncate">{{
+                                            $detail->product->productname }}</h4>
+                                        <p class="text-xs sm:text-sm text-gray-600">Seller: {{
+                                            $detail->product->seller->nickname ?? $detail->product->seller->username }}
+                                        </p>
+                                        <p class="text-xs sm:text-sm text-gray-600">Qty: {{ $detail->quantity }} × Rp {{
+                                            number_format($detail->productprice) }}</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-sm font-medium text-gray-900">
@@ -71,9 +101,10 @@
 
                     <!-- Shipping Address -->
                     <div class="bg-white shadow rounded-lg">
-                        <div class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
+                        <div
+                            class="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 class="text-base sm:text-lg font-medium text-gray-900">Alamat Pengiriman</h3>
-                            <button type="button" onclick="openAddressModal()" 
+                            <button type="button" onclick="openAddressModal()"
                                 class="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition">
                                 <i class="fas fa-plus mr-1"></i>Tambah Alamat
                             </button>
@@ -81,34 +112,36 @@
                         <div class="p-3 sm:p-6">
                             <div id="addressList" class="space-y-3 sm:space-y-4">
                                 @if($addresses->count() > 0)
-                                    @foreach($addresses as $address)
-                                    <label class="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
-                                        <input type="radio" name="address_id" value="{{ $address->id }}"
-                                            class="mt-0.5 sm:mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" 
-                                            {{ ($defaultAddress && $defaultAddress->id === $address->id) || (!$defaultAddress && $loop->first) ? 'checked' : '' }}>
-                                        <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                Alamat {{ $loop->iteration }}
-                                                @if($address->is_default)
-                                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                                    Default
-                                                </span>
-                                                @endif
-                                            </div>
-                                            <div class="text-xs sm:text-sm text-gray-600 mt-1">
-                                                {{ $address->address }}
-                                            </div>
+                                @foreach($addresses as $address)
+                                <label class="flex items-start space-x-2 sm:space-x-3 cursor-pointer">
+                                    <input type="radio" name="address_id" value="{{ $address->id }}"
+                                        class="mt-0.5 sm:mt-1 text-blue-600 focus:ring-blue-500 border-gray-300" {{
+                                        ($defaultAddress && $defaultAddress->id === $address->id) || (!$defaultAddress
+                                    && $loop->first) ? 'checked' : '' }}>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Alamat {{ $loop->iteration }}
+                                            @if($address->is_default)
+                                            <span
+                                                class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                Default
+                                            </span>
+                                            @endif
                                         </div>
-                                    </label>
-                                    @endforeach
-                                @else
-                                    <div class="text-center py-4">
-                                        <p class="text-gray-500 text-sm">Belum ada alamat tersimpan</p>
-                                        <button type="button" onclick="openAddressModal()" 
-                                            class="mt-2 text-sm text-blue-600 hover:text-blue-700">
-                                            Tambah alamat pertama
-                                        </button>
+                                        <div class="text-xs sm:text-sm text-gray-600 mt-1">
+                                            {{ $address->address }}
+                                        </div>
                                     </div>
+                                </label>
+                                @endforeach
+                                @else
+                                <div class="text-center py-4">
+                                    <p class="text-gray-500 text-sm">Belum ada alamat tersimpan</p>
+                                    <button type="button" onclick="openAddressModal()"
+                                        class="mt-2 text-sm text-blue-600 hover:text-blue-700">
+                                        Tambah alamat pertama
+                                    </button>
+                                </div>
                                 @endif
                             </div>
 
@@ -136,57 +169,66 @@
                         <div class="p-3 sm:p-6">
                             <div class="space-y-3 sm:space-y-4">
                                 @if(isset($paymentMethods) && count($paymentMethods) > 0)
-                                    @foreach($paymentMethods as $method)
-                                    @php
-                                        // Handle both array and object formats
-                                        $method = is_object($method) ? (array) $method : $method;
-                                        $paymentMethod = $method['paymentMethod'] ?? 'bank_transfer';
-                                        $paymentName = $method['paymentName'] ?? 'Transfer Bank';
-                                        $paymentDescription = $method['paymentDescription'] ?? 'Transfer melalui bank';
-                                    @endphp
-                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                        <input type="radio" name="payment_method" value="{{ $paymentMethod }}" 
-                                            class="text-blue-600 focus:ring-blue-500 border-gray-300" 
-                                            {{ $loop->first ? 'checked' : '' }}>
-                                        <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">{{ $paymentName }}</div>
-                                            <div class="text-xs text-gray-500">{{ $paymentDescription }}</div>
-                                        </div>
-                                    </label>
-                                    @endforeach
+                                @foreach($paymentMethods as $method)
+                                @php
+                                // Handle both array and object formats
+                                $method = is_object($method) ? (array) $method : $method;
+                                $paymentMethod = $method['paymentMethod'] ?? 'bank_transfer';
+                                $paymentName = $method['paymentName'] ?? 'Transfer Bank';
+                                $paymentDescription = $method['paymentDescription'] ?? 'Transfer melalui bank';
+                                @endphp
+                                <label
+                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                    <input type="radio" name="payment_method" value="{{ $paymentMethod }}"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300" {{ $loop->first ?
+                                    'checked' : '' }}>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">{{ $paymentName }}</div>
+                                        <div class="text-xs text-gray-500">{{ $paymentDescription }}</div>
+                                    </div>
+                                </label>
+                                @endforeach
                                 @else
-                                    <!-- Fallback payment methods -->
-                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                        <input type="radio" name="payment_method" value="bank_transfer" class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
-                                        <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">Transfer Bank</div>
-                                            <div class="text-xs text-gray-500">Transfer melalui bank</div>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                        <input type="radio" name="payment_method" value="credit_card" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                        <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">Kartu Kredit</div>
-                                            <div class="text-xs text-gray-500">Visa, Mastercard, dll</div>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                        <input type="radio" name="payment_method" value="e_wallet" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                        <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">E-Wallet</div>
-                                            <div class="text-xs text-gray-500">OVO, DANA, GoPay, dll</div>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                        <input type="radio" name="payment_method" value="cod" class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                        <div class="flex-1">
-                                            <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
-                                            <div class="text-xs text-gray-500">Bayar saat barang diterima</div>
-                                        </div>
-                                    </label>
+                                <!-- Fallback payment methods -->
+                                <label
+                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                    <input type="radio" name="payment_method" value="bank_transfer"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Transfer Bank</div>
+                                        <div class="text-xs text-gray-500">Transfer melalui bank</div>
+                                    </div>
+                                </label>
+
+                                <label
+                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                    <input type="radio" name="payment_method" value="credit_card"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Kartu Kredit</div>
+                                        <div class="text-xs text-gray-500">Visa, Mastercard, dll</div>
+                                    </div>
+                                </label>
+
+                                <label
+                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                    <input type="radio" name="payment_method" value="e_wallet"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">E-Wallet</div>
+                                        <div class="text-xs text-gray-500">OVO, DANA, GoPay, dll</div>
+                                    </div>
+                                </label>
+
+                                <label
+                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
+                                    <input type="radio" name="payment_method" value="cod"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
+                                        <div class="text-xs text-gray-500">Bayar saat barang diterima</div>
+                                    </div>
+                                </label>
                                 @endif
                             </div>
                             @error('payment_method')
@@ -215,7 +257,8 @@
 
                         <div class="space-y-2 sm:space-y-3">
                             <div class="flex justify-between">
-                                <span class="text-sm text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }} item)</span>
+                                <span class="text-sm text-gray-600">Subtotal ({{ $cartDetails->sum('quantity') }}
+                                    item)</span>
                                 <span class="text-sm font-medium">Rp {{ number_format($subtotal) }}</span>
                             </div>
                             <div class="flex justify-between">
@@ -225,7 +268,8 @@
                             <div class="border-t pt-2 sm:pt-3">
                                 <div class="flex justify-between">
                                     <span class="text-base sm:text-lg font-medium text-gray-900">Total</span>
-                                    <span class="text-base sm:text-lg font-medium text-gray-900">Rp {{ number_format($total) }}</span>
+                                    <span class="text-base sm:text-lg font-medium text-gray-900">Rp {{
+                                        number_format($total) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -276,7 +320,8 @@
                 </div>
                 <div class="mb-4">
                     <label class="flex items-center">
-                        <input type="checkbox" name="is_default" class="text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <input type="checkbox" name="is_default"
+                            class="text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <span class="ml-2 text-sm text-gray-700">Jadikan alamat default</span>
                     </label>
                 </div>
@@ -441,6 +486,129 @@
             });
             addressList.innerHTML = html;
         }
+    }
+
+    function processCheckout() {
+        const button = document.getElementById('checkoutBtn');
+        const buttonText = document.getElementById('checkoutBtnText');
+        const originalText = buttonText.innerHTML;
+        
+        // Validate form before submission
+        const form = document.getElementById('checkoutForm');
+        const addressId = form.querySelector('input[name="address_id"]:checked');
+        const manualAddress = form.querySelector('textarea[name="shipping_address"]');
+        const paymentMethod = form.querySelector('input[name="payment_method"]:checked');
+        
+        // Check if address is selected or manual address is filled
+        let hasValidAddress = false;
+        if (addressId && addressId.value) {
+            hasValidAddress = true;
+        } else if (manualAddress && manualAddress.value.trim()) {
+            hasValidAddress = true;
+        }
+        
+        if (!hasValidAddress) {
+            showNotification('error', 'Error!', 'Silakan pilih alamat pengiriman atau masukkan alamat manual');
+            return;
+        }
+        
+        if (!paymentMethod) {
+            showNotification('error', 'Error!', 'Silakan pilih metode pembayaran');
+            return;
+        }
+        
+        // Disable button and show loading
+        button.disabled = true;
+        buttonText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+        
+        // Get form data
+        const formData = new FormData(form);
+        
+        // Debug: Log form data
+        console.log('Form data being sent:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
+        
+        fetch('{{ route("customer.checkout.process") }}', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showNotification('success', 'Berhasil!', data.message || 'Pesanan berhasil dibuat', () => {
+                    window.location.href = data.redirect_url || '/customer/orders';
+                });
+            } else {
+                let errorMessage = data.message || 'Gagal membuat pesanan';
+                
+                // Handle validation errors
+                if (data.errors) {
+                    const errorList = Object.values(data.errors).flat();
+                    errorMessage = errorList.join(', ');
+                }
+                
+                showNotification('error', 'Gagal!', errorMessage);
+                buttonText.innerHTML = originalText;
+                button.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Checkout error:', error);
+            showNotification('error', 'Error!', 'Terjadi kesalahan saat memproses checkout. Silakan coba lagi.');
+            buttonText.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+
+    function showNotification(type, title, message, onConfirm = null) {
+        const modal = document.getElementById('notificationModal');
+        const icon = document.getElementById('notificationIcon');
+        const iconClass = document.getElementById('notificationIconClass');
+        const titleEl = document.getElementById('notificationTitle');
+        const messageEl = document.getElementById('notificationMessage');
+        const confirmBtn = document.getElementById('notificationConfirmBtn');
+
+        // Set icon and colors based on type
+        if (type === 'success') {
+            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-green-100';
+            iconClass.className = 'fas fa-check text-green-600 text-2xl';
+        } else if (type === 'error') {
+            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-red-100';
+            iconClass.className = 'fas fa-times text-red-600 text-2xl';
+        } else {
+            icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-blue-100';
+            iconClass.className = 'fas fa-info text-blue-600 text-2xl';
+        }
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+
+        // Set confirm button action
+        if (onConfirm) {
+            confirmBtn.onclick = () => {
+                closeNotificationModal();
+                onConfirm();
+            };
+        } else {
+            confirmBtn.onclick = closeNotificationModal;
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeNotificationModal() {
+        document.getElementById('notificationModal').classList.add('hidden');
     }
 </script>
 @endsection
