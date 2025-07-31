@@ -30,6 +30,17 @@ class PaymentController extends Controller
     {
         try {
             $user = Auth::user();
+            
+            // Log method call
+            Log::info('PaymentController@pay called', [
+                'transaction_id' => $transaction->id,
+                'user_id' => $user->id,
+                'payment_method' => $transaction->payment_method
+            ]);
+            
+            // Debug: check if method is called
+            dd('PaymentController@pay method called', $transaction->toArray());
+            
             if ($transaction->order->cart->iduser !== $user->id)
                 abort(403);
             if ($transaction->isPaid())
@@ -135,15 +146,24 @@ class PaymentController extends Controller
             $response = Http::withHeaders(['Content-Type' => 'application/json'])
                 ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
 
-            if ($response->successful() && isset($response['paymentUrl'])) {
+            $responseData = $response->json();
+            
+            // Log response untuk debugging
+            Log::info('Duitku response', [
+                'response' => $responseData,
+                'has_payment_url' => isset($responseData['paymentUrl']),
+                'payment_url' => $responseData['paymentUrl'] ?? 'not_found'
+            ]);
+            
+            if ($response->successful() && isset($responseData['paymentUrl'])) {
                 // Show loading page first, then redirect
                 return view('customer.payments.loading', [
-                    'paymentUrl' => $response['paymentUrl'],
+                    'paymentUrl' => $responseData['paymentUrl'],
                     'transaction' => $transaction
                 ]);
             }
 
-            Log::error('Duitku error', ['response' => $response->json(), 'params' => $params]);
+            Log::error('Duitku error', ['response' => $responseData, 'params' => $params]);
             return back()->with('error', 'Gagal menghubungkan ke pembayaran.');
         } catch (\Exception $e) {
             Log::error('Duitku connection error', ['error' => $e->getMessage()]);

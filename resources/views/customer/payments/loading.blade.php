@@ -53,13 +53,19 @@
 </div>
 
 <script>
+    // Debug payment URL
+    console.log('Payment URL:', '{{ $paymentUrl }}');
+    
     // Auto redirect after 3 seconds
     setTimeout(function() {
+        console.log('Auto redirecting to:', '{{ $paymentUrl }}');
         redirectToPayment();
     }, 3000);
     
     function redirectToPayment() {
-        window.location.href = '{{ $paymentUrl }}';
+        const paymentUrl = '{{ $paymentUrl }}';
+        console.log('Redirecting to:', paymentUrl);
+        window.location.href = paymentUrl;
     }
 </script>
 @endsection

@@ -552,6 +552,12 @@ class CartController extends Controller
             }
 
             // Redirect ke method pay() untuk memproses pembayaran
+            \Log::info('Redirecting to payment', [
+                'transaction_id' => $transaction->id,
+                'payment_method' => $paymentMethod,
+                'route' => route('customer.payments.pay', $transaction)
+            ]);
+            
             return redirect()->route('customer.payments.pay', $transaction);
         } catch (\Exception $e) {
             DB::rollback();
