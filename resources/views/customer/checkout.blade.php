@@ -306,6 +306,26 @@
     </div>
 </div>
 
+<!-- Notification Modal -->
+<div id="notificationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div id="notificationIcon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4">
+                <i id="notificationIconClass" class="text-2xl"></i>
+            </div>
+            <h3 id="notificationTitle" class="text-lg font-medium text-gray-900 mb-2"></h3>
+            <div class="mt-2 px-7 py-3">
+                <p id="notificationMessage" class="text-sm text-gray-500"></p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="notificationConfirmBtn" 
+                    class="w-full text-white text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2">
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Address Modal -->
 <div id="addressModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
@@ -507,10 +527,21 @@
         
         // Check if address is selected or manual address is filled
         let hasValidAddress = false;
+        let shippingAddress = '';
+        
         if (addressId && addressId.value) {
             hasValidAddress = true;
+            // Get address from selected address
+            const addressElement = document.querySelector(`input[name="address_id"][value="${addressId.value}"]`);
+            if (addressElement) {
+                const addressText = addressElement.closest('label').querySelector('.text-gray-600');
+                if (addressText) {
+                    shippingAddress = addressText.textContent.trim();
+                }
+            }
         } else if (manualAddress && manualAddress.value.trim()) {
             hasValidAddress = true;
+            shippingAddress = manualAddress.value.trim();
         }
         
         if (!hasValidAddress) {
@@ -530,6 +561,11 @@
         // Get form data
         const formData = new FormData(form);
         
+        // Add shipping address if not already present
+        if (!formData.get('shipping_address') && shippingAddress) {
+            formData.set('shipping_address', shippingAddress);
+        }
+        
         // Debug: Log form data
         console.log('Form data being sent:');
         for (let [key, value] of formData.entries()) {
@@ -545,15 +581,23 @@
             body: formData
         })
         .then(response => {
+            console.log('Response status:', response.status);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                });
             }
             return response.json();
         })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
                 showNotification('success', 'Berhasil!', data.message || 'Pesanan berhasil dibuat', () => {
-                    window.location.href = data.redirect_url || '/customer/orders';
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        window.location.href = '/customer/orders';
+                    }
                 });
             } else {
                 let errorMessage = data.message || 'Gagal membuat pesanan';
@@ -589,12 +633,18 @@
         if (type === 'success') {
             icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-green-100';
             iconClass.className = 'fas fa-check text-green-600 text-2xl';
+            confirmBtn.className = 'w-full bg-green-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300';
+            confirmBtn.textContent = 'Lanjutkan';
         } else if (type === 'error') {
             icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-red-100';
             iconClass.className = 'fas fa-times text-red-600 text-2xl';
+            confirmBtn.className = 'w-full bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300';
+            confirmBtn.textContent = 'Tutup';
         } else {
             icon.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 bg-blue-100';
             iconClass.className = 'fas fa-info text-blue-600 text-2xl';
+            confirmBtn.className = 'w-full bg-blue-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300';
+            confirmBtn.textContent = 'OK';
         }
 
         titleEl.textContent = title;

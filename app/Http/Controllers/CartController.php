@@ -630,33 +630,123 @@ class CartController extends Controller
     {
         try {
             $user = Auth::user();
-            $request->validate(['quantity' => 'required|integer|min:1']);
+            
+            // Validate request
+            $request->validate([
+                'quantity' => 'required|integer|min:1',
+                'payment_method' => 'required|string',
+                'shipping_address' => 'required|string'
+            ]);
+            
             $product = \App\Models\Product::findOrFail($productId);
+
+            // Check if product is active
+            if (!$product->is_active) {
+                return response()->json(['success' => false, 'message' => 'Produk tidak tersedia']);
+            }
 
             if ($product->productstock < $request->quantity) {
                 return response()->json(['success' => false, 'message' => 'Stok tidak cukup']);
             }
 
-            // Buat cart sementara untuk single item checkout
-            $tempCart = Cart::create([
-                'iduser' => $user->id,
-                'checkoutstatus' => 'active'
-            ]);
+            DB::beginTransaction();
 
-            // Tambahkan produk ke cart
-            $tempCart->cartDetails()->create([
-                'idproduct' => $product->id,
-                'quantity' => $request->quantity,
-                'productprice' => $product->productprice
-            ]);
+            try {
+                // Buat cart sementara untuk single item checkout
+                $tempCart = Cart::create([
+                    'iduser' => $user->id,
+                    'checkoutstatus' => 'active'
+                ]);
 
-            // Redirect ke halaman checkout direct
-            return response()->json([
-                'success' => true,
-                'redirect_url' => route('checkout.direct.view', ['cartId' => $tempCart->id])
-            ]);
+                // Tambahkan produk ke cart
+                $tempCart->cartDetails()->create([
+                    'idproduct' => $product->id,
+                    'quantity' => $request->quantity,
+                    'productprice' => $product->productprice
+                ]);
+
+                // Calculate totals
+                $subtotal = $request->quantity * $product->productprice;
+                $shippingCost = 15000;
+                $total = $subtotal + $shippingCost;
+
+                // Generate order number
+                $date = now()->format('Ymd');
+                $orderCount = Order::whereDate('created_at', today())->count() + 1;
+                $orderNumber = 'ORD-' . $date . '-' . str_pad($orderCount, 6, '0', STR_PAD_LEFT);
+
+                // Create order
+                $order = Order::create([
+                    'idcart' => $tempCart->id,
+                    'order_number' => $orderNumber,
+                    'grandtotal' => $total,
+                    'shipping_address' => $request->shipping_address,
+                    'status' => 'pending',
+                    'notes' => $request->notes ?? ''
+                ]);
+
+                // Generate transaction number
+                $transactionCount = Transaction::whereDate('created_at', today())->count() + 1;
+                $transactionNumber = 'TRX-' . $date . '-' . str_pad($transactionCount, 6, '0', STR_PAD_LEFT);
+
+                // Create transaction
+                $transaction = Transaction::create([
+                    'idorder' => $order->id,
+                    'transaction_number' => $transactionNumber,
+                    'amount' => $total,
+                    'payment_method' => $request->payment_method,
+                    'transactionstatus' => 'pending'
+                ]);
+
+                // Update cart status
+                $tempCart->update(['checkoutstatus' => 'completed']);
+
+                // Update product stock
+                $product->decrement('productstock', $request->quantity);
+
+                // Create notification
+                Notification::create([
+                    'iduser' => $user->id,
+                    'title' => 'Pesanan Dibuat',
+                    'notification' => 'Pesanan #' . $order->order_number . ' berhasil dibuat',
+                    'type' => 'order',
+                    'readstatus' => false
+                ]);
+
+                DB::commit();
+
+                // Jika COD, langsung ke halaman order
+                if ($request->payment_method === 'COD') {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Pesanan berhasil dibuat',
+                        'redirect_url' => route('customer.orders.show', $order)
+                    ]);
+                }
+
+                // Jika bukan COD, redirect ke halaman pembayaran
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pesanan berhasil dibuat',
+                    'redirect_url' => route('customer.payments.pay', $transaction)
+                ]);
+
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            \Log::error('Direct checkout failed', [
+                'user_id' => Auth::id(),
+                'product_id' => $productId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terjadi kesalahan saat memproses checkout: ' . $e->getMessage()
+            ]);
         }
     }
 }
