@@ -53,6 +53,7 @@ class PaymentController extends Controller
         $customerVaName = $user->nickname ?? $user->username;
         // Item details
         $itemDetails = [];
+        $subtotal = 0;
         if ($transaction->order->cart) {
             foreach ($transaction->order->cart->cartDetails as $detail) {
                 $itemDetails[] = [
@@ -60,6 +61,7 @@ class PaymentController extends Controller
                     'price' => (int) $detail->productprice,
                     'quantity' => (int) $detail->quantity
                 ];
+                $subtotal += ((int) $detail->productprice) * (int) $detail->quantity;
             }
         } else {
             // direct checkout (tanpa cart)
@@ -69,6 +71,20 @@ class PaymentController extends Controller
                     'name' => $dt->product->productname,
                     'price' => (int) $dt->price,
                     'quantity' => (int) $dt->quantity
+                ];
+                $subtotal += ((int) $dt->price) * (int) $dt->quantity;
+            }
+        }
+        // Tambahkan ongkir sebagai item jika paymentAmount > subtotal
+        $shippingCost = 0;
+        if ($transaction->order && $transaction->order->shipping_address) {
+            // Ambil shipping cost dari order/cart
+            $shippingCost = $transaction->order->grandtotal - $subtotal;
+            if ($shippingCost > 0) {
+                $itemDetails[] = [
+                    'name' => 'Ongkos Kirim',
+                    'price' => (int) $shippingCost,
+                    'quantity' => 1
                 ];
             }
         }
