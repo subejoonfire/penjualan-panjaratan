@@ -330,11 +330,10 @@ class CartController extends Controller
             $validator = \Validator::make($request->all(), [
                 'address_id' => 'nullable|exists:user_addresses,id',
                 'shipping_address' => 'nullable|string',
-                'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
+                'payment_method' => 'required|string',
                 'notes' => 'nullable|string|max:500'
             ], [
-                'payment_method.required' => 'Metode pembayaran harus dipilih',
-                'payment_method.in' => 'Metode pembayaran tidak valid'
+                'payment_method.required' => 'Metode pembayaran harus dipilih'
             ]);
 
             if ($validator->fails()) {
@@ -351,6 +350,19 @@ class CartController extends Controller
                     ]);
                 }
                 return back()->withErrors($validator)->withInput();
+            }
+
+            // Validasi payment_method terhadap config Duitku
+            $validPaymentMethods = config('duitku.payment_methods', []);
+            if (!in_array($request->payment_method, $validPaymentMethods)) {
+                \Log::warning('Invalid payment method', [
+                    'user_id' => $user->id,
+                    'payment_method' => $request->payment_method
+                ]);
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
+                }
+                return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
             }
 
             // Log checkout data for debugging
