@@ -267,7 +267,35 @@ class CartController extends Controller
         $total = $subtotal + $shippingCost;
         $addresses = $user->addresses;
         $defaultAddress = $user->defaultAddress();
-        return view('customer.checkout', compact('cartDetails', 'subtotal', 'shippingCost', 'total', 'addresses', 'defaultAddress', 'cartId'));
+        
+        // Ambil payment methods dari API Duitku
+        $paymentMethods = [];
+        try {
+            $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+            $merchantCode = 'DS24203';
+            $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+            $amount = $total;
+            $datetime = now()->format('Y-m-d H:i:s');
+            $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
+            $params = [
+                'merchantcode' => $merchantCode,
+                'amount' => $amount,
+                'datetime' => $datetime,
+                'signature' => $signature
+            ];
+            
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Content-Type' => 'application/json'
+            ])->post($url, $params);
+            
+            if ($response->successful() && isset($response['paymentFee'])) {
+                $paymentMethods = $response['paymentFee'];
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error getting payment methods', ['error' => $e->getMessage()]);
+        }
+        
+        return view('customer.checkout', compact('cartDetails', 'subtotal', 'shippingCost', 'total', 'addresses', 'defaultAddress', 'cartId', 'paymentMethods'));
     }
 
     /**
@@ -317,14 +345,7 @@ class CartController extends Controller
 
             \Log::info('Using active cart', ['cart_id' => $cart->id]);
 
-            // Check if required fields are present
-            if (!$request->has('payment_method')) {
-                \Log::warning('Missing payment method in request', ['user_id' => $user->id]);
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Metode pembayaran harus dipilih']);
-                }
-                return back()->withErrors(['payment_method' => 'Metode pembayaran harus dipilih'])->withInput();
-            }
+
 
             // Validate request data
             $validator = \Validator::make($request->all(), [
@@ -352,64 +373,13 @@ class CartController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
-            // Validasi payment_method terhadap API Duitku
-            $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
-            $merchantCode = 'DS24203';
-            $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
-            $amount = (int) ($request->amount ?? 10000);
-            $datetime = now()->format('Y-m-d H:i:s');
-            $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
-            $params = [
-                'merchantcode' => $merchantCode,
-                'amount' => $amount,
-                'datetime' => $datetime,
-                'signature' => $signature
-            ];
-            
-            try {
-                $response = \Illuminate\Support\Facades\Http::withHeaders([
-                    'Content-Type' => 'application/json'
-                ])->post($url, $params);
-                
-                if ($response->successful() && isset($response['paymentFee'])) {
-                    $validPaymentMethods = collect($response['paymentFee'])->pluck('paymentMethod')->toArray();
-                    
-                    if (!in_array($request->payment_method, $validPaymentMethods)) {
-                        \Log::warning('Invalid payment method', [
-                            'user_id' => $user->id,
-                            'payment_method' => $request->payment_method,
-                            'valid_methods' => $validPaymentMethods
-                        ]);
-                        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                            return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
-                        }
-                        return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
-                    }
-                } else {
-                    \Log::warning('Failed to get payment methods from Duitku', [
-                        'response' => $response->json()
-                    ]);
-                    // Fallback: allow common payment methods
-                    $fallbackMethods = ['VA', 'DA', 'OV', 'VC', 'BT'];
-                    if (!in_array($request->payment_method, $fallbackMethods)) {
-                        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                            return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
-                        }
-                        return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
-                    }
+            // Validasi payment_method - karena sudah dari API, kita trust saja
+            if (empty($request->payment_method)) {
+                \Log::warning('Empty payment method', ['user_id' => $user->id]);
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Metode pembayaran harus dipilih']);
                 }
-            } catch (\Exception $e) {
-                \Log::error('Error getting payment methods from Duitku', [
-                    'error' => $e->getMessage()
-                ]);
-                // Fallback: allow common payment methods
-                $fallbackMethods = ['VA', 'DA', 'OV', 'VC', 'BT'];
-                if (!in_array($request->payment_method, $fallbackMethods)) {
-                    if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                        return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
-                    }
-                    return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
-                }
+                return back()->withErrors(['payment_method' => 'Metode pembayaran harus dipilih'])->withInput();
             }
 
             // Log checkout data for debugging
@@ -417,8 +387,7 @@ class CartController extends Controller
                 'address_id' => $request->address_id,
                 'payment_method' => $request->payment_method,
                 'has_shipping_address' => $request->filled('shipping_address'),
-                'shipping_address_value' => $request->shipping_address,
-                'all_request_data' => $request->all()
+                'shipping_address_value' => $request->shipping_address
             ]);
 
             // Get shipping address
@@ -467,20 +436,6 @@ class CartController extends Controller
                 'user_id' => $user->id,
                 'shipping_address' => $shippingAddress
             ]);
-
-            // Validate payment method
-            $validPaymentMethods = ['bank_transfer', 'credit_card', 'e_wallet', 'cod'];
-            if (!in_array($request->payment_method, $validPaymentMethods)) {
-                \Log::warning('Invalid payment method', [
-                    'user_id' => $user->id,
-                    'payment_method' => $request->payment_method
-                ]);
-                
-                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Metode pembayaran tidak valid']);
-                }
-                return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid'])->withInput();
-            }
 
             // Check if at least one address option is provided
             $hasAddressId = $request->filled('address_id');
