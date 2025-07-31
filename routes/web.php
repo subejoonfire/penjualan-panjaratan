@@ -126,6 +126,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('payments', [\App\Http\Controllers\Customer\PaymentController::class, 'index'])->name('payments.index');
     Route::get('payments/pay/{transaction}', [\App\Http\Controllers\Customer\PaymentController::class, 'pay'])->name('payments.pay');
     Route::post('payments/callback', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('payments.callback');
+    Route::post('callback/duitku', [\App\Http\Controllers\Customer\PaymentController::class, 'callback'])->name('duitku.callback');
     Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('checkout.direct');
     Route::get('payment-methods', [\App\Http\Controllers\Customer\PaymentController::class, 'getPaymentMethods']);
 

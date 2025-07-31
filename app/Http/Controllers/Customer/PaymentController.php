@@ -93,7 +93,7 @@ class PaymentController extends Controller
             $productDetails = 'Pembayaran Pesanan #' . $transaction->order->order_number;
             $email = $user->email;
             $phoneNumber = $user->phone ?? '';
-            $callbackUrl = route('customer.payments.callback');
+            $callbackUrl = route('duitku.callback');
             $returnUrl = route('customer.payments.index');
             // Perbaiki signature sesuai dokumentasi Duitku
             $signature = md5($merchantCode . $merchantOrderId . $paymentAmount . $apiKey);
@@ -169,8 +169,11 @@ class PaymentController extends Controller
                     'status_message' => $responseData['statusMessage']
                 ]);
                 
-                // Redirect langsung ke payment URL
-                return redirect($responseData['paymentUrl']);
+                // Show loading page first, then redirect
+                return view('customer.payments.loading', [
+                    'paymentUrl' => $responseData['paymentUrl'],
+                    'transaction' => $transaction
+                ]);
             }
 
             Log::error('Duitku error', [
@@ -266,6 +269,12 @@ class PaymentController extends Controller
     public function callback(Request $request)
     {
         try {
+            // Log callback request
+            Log::info('Duitku callback received', [
+                'request_data' => $request->all(),
+                'headers' => $request->headers->all()
+            ]);
+            
             $merchantOrderId = $request->merchantOrderId;
             $resultCode = $request->resultCode;
             $signature = $request->signature;
