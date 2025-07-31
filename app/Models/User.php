@@ -123,14 +123,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Alias for unread notification count
-     */
-    public function getUnreadNotificationCountAttribute()
-    {
-        return $this->unreadNotifications()->count();
-    }
-
-    /**
      * Get recent notifications for navbar/dropdown
      */
     public function getRecentNotifications($limit = 20)
