@@ -504,7 +504,7 @@ class CartController extends Controller
             // Redirect ke halaman checkout
             return response()->json([
                 'success' => true, 
-                'redirect_url' => route('customer.cart.checkout')
+                'redirect_url' => route('checkout')
             ]);
 
         } catch (\Exception $e) {
