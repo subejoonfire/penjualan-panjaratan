@@ -293,7 +293,7 @@ class CartController extends Controller
             $request->validate([
                 'address_id' => 'nullable|exists:user_addresses,id',
                 'shipping_address' => 'nullable|string',
-                'payment_method' => 'nullable|in:bank_transfer,credit_card,e_wallet,cod',
+                'payment_method' => 'required|in:bank_transfer,credit_card,e_wallet,cod',
                 'notes' => 'nullable|string|max:500'
             ]);
 
@@ -307,6 +307,13 @@ class CartController extends Controller
             } elseif ($request->filled('shipping_address')) {
                 $shippingAddress = $request->shipping_address;
             } else {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
+                }
+                return back()->withErrors(['shipping_address' => 'Alamat pengiriman harus diisi']);
+            }
+
+            if (empty($shippingAddress)) {
                 if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                     return response()->json(['success' => false, 'message' => 'Alamat pengiriman harus diisi']);
                 }
@@ -363,19 +370,11 @@ class CartController extends Controller
             $transactionNumber = 'TRX-' . $date . '-' . str_pad($transactionCount, 6, '0', STR_PAD_LEFT);
 
             // Create transaction
-            $paymentMethodDuitku = $request->payment_method ?? 'VC';
-            $paymentMethodEnum = match (strtoupper($paymentMethodDuitku)) {
-                'VC', 'CREDITCARD', 'CREDIT_CARD' => 'credit_card',
-                'OV', 'OVO', 'DA', 'DANA', 'LA', 'LINKAJA', 'SP', 'SA', 'LQ', 'DN', 'OL', 'SHOPEEPAY', 'INDODANA' => 'e_wallet',
-                'VA', 'BT', 'B1', 'A1', 'I1', 'M2', 'AG', 'BR', 'BC', 'NC', 'BV', 'JP', 'NQ', 'GQ', 'FT' => 'bank_transfer',
-                'COD' => 'cod',
-                default => 'bank_transfer',
-            };
             $transaction = Transaction::create([
                 'idorder' => $order->id,
                 'transaction_number' => $transactionNumber,
                 'amount' => $total,
-                'payment_method' => $paymentMethodEnum,
+                'payment_method' => $request->payment_method,
                 'transactionstatus' => 'pending'
             ]);
 
@@ -396,21 +395,30 @@ class CartController extends Controller
                 'readstatus' => false
             ]);
 
-            if (($request->payment_method ?? 'cod') !== 'cod') {
-                DB::commit();
-                return redirect()->route('customer.payments.pay', $transaction);
-            }
-
             DB::commit();
 
+            // Jika COD, langsung ke halaman order
+            if ($request->payment_method === 'cod') {
+                if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Pesanan berhasil dibuat',
+                        'redirect_url' => route('customer.orders.show', $order)
+                    ]);
+                }
+                return redirect()->route('customer.orders.show', $order)
+                    ->with('success', 'Pesanan berhasil dibuat');
+            }
+
+            // Jika bukan COD, redirect ke halaman pembayaran
             if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Pesanan berhasil dibuat',
-                    'redirect_url' => route('customer.orders.show', $order)
+                    'redirect_url' => route('customer.payments.pay', $transaction)
                 ]);
             }
-            return redirect()->route('customer.orders.show', $order)
+            return redirect()->route('customer.payments.pay', $transaction)
                 ->with('success', 'Pesanan berhasil dibuat');
                 
         } catch (\Exception $e) {
@@ -471,44 +479,36 @@ class CartController extends Controller
 
     public function directCheckout(Request $request, $productId)
     {
-        $user = Auth::user();
-        $request->validate(['quantity' => 'required|integer|min:1']);
-        $product = \App\Models\Product::findOrFail($productId);
-        if ($product->productstock < $request->quantity) {
-            return response()->json(['success' => false, 'message' => 'Stok tidak cukup']);
-        }
-        // Buat order & transaction khusus produk ini
-        $subtotal = $product->productprice * $request->quantity;
-        $shippingCost = 15000;
-        $total = $subtotal + $shippingCost;
-        $date = now()->format('Ymd');
-        $orderNumber = 'ORD-' . $date . '-' . strtoupper(uniqid());
-        $order = \App\Models\Order::create([
-            'idcart' => null, // pastikan null, bukan string kosong
-            'order_number' => $orderNumber,
-            'grandtotal' => $total,
-            'shipping_address' => $user->defaultAddress()?->address ?? '',
-            'status' => 'pending',
-            'notes' => null
-        ]);
-        $transactionNumber = 'TRX-' . $date . '-' . strtoupper(uniqid());
-        $transaction = \App\Models\Transaction::create([
-            'idorder' => $order->id,
-            'transaction_number' => $transactionNumber,
-            'amount' => $total,
-            'payment_method' => 'bank_transfer',
-            'transactionstatus' => 'pending'
-        ]);
-        // Simpan detail produk ke detail transaction (jika ada modelnya)
-        if (class_exists('App\\Models\\DetailTransaction')) {
-            \App\Models\DetailTransaction::create([
-                'idtransaction' => $transaction->id,
+        try {
+            $user = Auth::user();
+            $request->validate(['quantity' => 'required|integer|min:1']);
+            $product = \App\Models\Product::findOrFail($productId);
+            
+            if ($product->productstock < $request->quantity) {
+                return response()->json(['success' => false, 'message' => 'Stok tidak cukup']);
+            }
+
+            // Buat cart sementara untuk single item checkout
+            $tempCart = Cart::create([
+                'iduser' => $user->id,
+                'checkoutstatus' => 'active'
+            ]);
+
+            // Tambahkan produk ke cart
+            $tempCart->cartDetails()->create([
                 'idproduct' => $product->id,
                 'quantity' => $request->quantity,
-                'price' => $product->productprice
+                'productprice' => $product->productprice
             ]);
+
+            // Redirect ke halaman checkout
+            return response()->json([
+                'success' => true, 
+                'redirect_url' => route('customer.cart.checkout')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
-        // Redirect ke pembayaran Duitku
-        return response()->json(['success' => true, 'redirect_url' => route('customer.payments.pay', $transaction)]);
     }
 }

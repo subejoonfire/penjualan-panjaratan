@@ -128,6 +128,13 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('checkout/direct/{productId}', [\App\Http\Controllers\CartController::class, 'directCheckout'])->name('checkout.direct');
     Route::get('payment-methods', [\App\Http\Controllers\Customer\PaymentController::class, 'getPaymentMethods']);
     Route::get('checkout', [\App\Http\Controllers\Customer\PaymentController::class, 'checkout'])->name('customer.checkout');
+    
+    // Address routes
+    Route::post('/addresses', [\App\Http\Controllers\Customer\AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/addresses/{address}', [\App\Http\Controllers\Customer\AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [\App\Http\Controllers\Customer\AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::put('/addresses/{address}/default', [\App\Http\Controllers\Customer\AddressController::class, 'setDefault'])->name('addresses.default');
+    Route::get('/addresses', [\App\Http\Controllers\Customer\AddressController::class, 'getAddresses'])->name('addresses.list');
 });
 
 Route::middleware('auth')->group(function () {
