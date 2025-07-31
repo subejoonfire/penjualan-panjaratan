@@ -187,46 +187,32 @@ class PaymentController extends Controller
      */
     public function getPaymentMethods(Request $request)
     {
-        try {
-            $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a'; // Ganti sesuai API key Duitku kamu
-            $merchantCode = 'DS24203'; // Ganti sesuai merchantCode Duitku kamu
-            $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
-            $amount = (int) ($request->amount ?? 10000); // Nominal contoh, bisa diganti sesuai kebutuhan
-            $datetime = now()->format('Y-m-d H:i:s');
-            $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
-            $params = [
-                'merchantcode' => $merchantCode,
-                'amount' => $amount,
-                'datetime' => $datetime,
-                'signature' => $signature
-            ];
-            
-            \Log::info('Requesting Duitku payment methods', ['amount' => $amount, 'datetime' => $datetime]);
-            
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Content-Type' => 'application/json'
-            ])->post($url, $params);
-            
-            if ($response->successful()) {
-                $data = $response->json();
-                \Log::info('Duitku response received', ['status' => $response->status(), 'data_keys' => array_keys($data)]);
-                
-                if (isset($data['paymentFee']) && is_array($data['paymentFee'])) {
-                    return response()->json($data);
-                } else {
-                    \Log::warning('Duitku response missing paymentFee', ['data' => $data]);
-                    return response()->json(['error' => 'Payment methods not available']);
-                }
+        $apiKey = '8ac867d0e05e06d2e26797b29aec2c7a';
+        $merchantCode = 'DS24203';
+        $url = 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+        $amount = (int) ($request->amount ?? 10000);
+        $datetime = now()->format('Y-m-d H:i:s');
+        $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
+        $params = [
+            'merchantcode' => $merchantCode,
+            'amount' => $amount,
+            'datetime' => $datetime,
+            'signature' => $signature
+        ];
+        
+        $response = \Illuminate\Support\Facades\Http::withHeaders([
+            'Content-Type' => 'application/json'
+        ])->post($url, $params);
+        
+        if ($response->successful()) {
+            $data = $response->json();
+            if (isset($data['paymentFee']) && is_array($data['paymentFee'])) {
+                return response()->json($data);
             } else {
-                \Log::error('Duitku payment methods error', [
-                    'response' => $response->json(),
-                    'status' => $response->status()
-                ]);
-                return response()->json(['error' => 'Gagal mengambil metode pembayaran dari Duitku']);
+                return response()->json(['error' => 'Payment methods not available']);
             }
-        } catch (\Exception $e) {
-            \Log::error('Duitku payment methods exception', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Gagal mengambil metode pembayaran: ' . $e->getMessage()]);
+        } else {
+            return response()->json(['error' => 'Gagal mengambil metode pembayaran dari Duitku']);
         }
     }
 
