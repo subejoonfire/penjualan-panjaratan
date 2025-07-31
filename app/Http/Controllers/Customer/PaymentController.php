@@ -39,7 +39,7 @@ class PaymentController extends Controller
             ]);
             
             // Debug: check if method is called
-            dd('PaymentController@pay method called', $transaction->toArray());
+            // dd('PaymentController@pay method called', $transaction->toArray());
             
             if ($transaction->order->cart->iduser !== $user->id)
                 abort(403);
@@ -152,8 +152,13 @@ class PaymentController extends Controller
             Log::info('Duitku response', [
                 'response' => $responseData,
                 'has_payment_url' => isset($responseData['paymentUrl']),
-                'payment_url' => $responseData['paymentUrl'] ?? 'not_found'
+                'payment_url' => $responseData['paymentUrl'] ?? 'not_found',
+                'status_code' => $response->status(),
+                'successful' => $response->successful()
             ]);
+            
+            // Debug: show response
+            dd('Duitku Response:', $responseData);
             
             if ($response->successful() && isset($responseData['paymentUrl'])) {
                 // Show loading page first, then redirect
