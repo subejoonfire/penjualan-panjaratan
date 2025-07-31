@@ -67,6 +67,7 @@ class Transaction extends Model
     // Helper method untuk mendapatkan payment method dalam bahasa Indonesia
     public function getPaymentMethodLabelAttribute()
     {
+        // Payment method labels sesuai dengan API Duitku
         $methods = [
             // Virtual Account methods
             'VA' => 'MAYBANK VA',

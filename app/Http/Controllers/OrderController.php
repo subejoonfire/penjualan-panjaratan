@@ -126,8 +126,14 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:500'
         ]);
 
-        // Store the original Duitku payment method code
+        // Store the original Duitku payment method code from API
         $paymentMethod = $request->payment_method;
+        
+        // Log the selected payment method for debugging
+        \Log::info('Selected payment method', [
+            'payment_method' => $paymentMethod,
+            'user_id' => auth()->id()
+        ]);
 
         DB::beginTransaction();
 

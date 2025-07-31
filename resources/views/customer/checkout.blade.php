@@ -195,46 +195,14 @@
                                 </label>
                                 @endforeach
                                 @else
-                                <!-- Fallback jika API error -->
-                                <label
-                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="VA"
-                                        class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Virtual Account</div>
-                                        <div class="text-xs text-gray-500">Transfer bank</div>
-                                    </div>
-                                </label>
-
-                                <label
-                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="DA"
-                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">DANA</div>
-                                        <div class="text-xs text-gray-500">E-wallet</div>
-                                    </div>
-                                </label>
-
-                                <label
-                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="OV"
-                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">OVO</div>
-                                        <div class="text-xs text-gray-500">E-wallet</div>
-                                    </div>
-                                </label>
-
-                                <label
-                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="COD"
-                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
-                                        <div class="text-xs text-gray-500">Bayar di tempat</div>
-                                    </div>
-                                </label>
+                                <!-- Loading state jika API belum siap -->
+                                <div class="text-center py-8">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                                    <p class="text-sm text-gray-600">Memuat metode pembayaran...</p>
+                                    <button type="button" onclick="location.reload()" class="mt-2 text-blue-600 hover:text-blue-800 text-sm">
+                                        Coba lagi
+                                    </button>
+                                </div>
                                 @endif
                             </div>
                             @error('payment_method')

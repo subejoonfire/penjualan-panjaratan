@@ -136,11 +136,8 @@ class PaymentController extends Controller
                 ->post('https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry', $params);
 
             if ($response->successful() && isset($response['paymentUrl'])) {
-                // Show loading page first, then redirect
-                return view('customer.payments.loading', [
-                    'paymentUrl' => $response['paymentUrl'],
-                    'transaction' => $transaction
-                ]);
+                // Redirect langsung ke halaman pembayaran Duitku
+                return redirect($response['paymentUrl']);
             }
 
             Log::error('Duitku error', ['response' => $response->json(), 'params' => $params]);

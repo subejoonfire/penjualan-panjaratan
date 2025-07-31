@@ -283,6 +283,9 @@ class CartController extends Controller
 
             if ($response->successful() && isset($response['paymentFee'])) {
                 $paymentMethods = $response['paymentFee'];
+                \Log::info('Payment methods loaded from API: ' . count($paymentMethods) . ' methods');
+            } else {
+                \Log::warning('Failed to load payment methods from API, response: ' . $response->body());
             }
         } catch (\Exception $e) {
             \Log::error('Error getting payment methods', ['error' => $e->getMessage()]);
@@ -375,8 +378,14 @@ class CartController extends Controller
                 return back()->withErrors(['payment_method' => 'Metode pembayaran harus dipilih'])->withInput();
             }
 
-            // Store the original Duitku payment method code
+            // Store the original Duitku payment method code from API
             $paymentMethod = $request->payment_method;
+            
+            // Log the selected payment method for debugging
+            \Log::info('Selected payment method', [
+                'payment_method' => $paymentMethod,
+                'user_id' => $user->id
+            ]);
 
             // Log checkout data for debugging
             \Log::info('Validating checkout data', [
@@ -528,7 +537,7 @@ class CartController extends Controller
             DB::commit();
 
             // Jika COD/Retail, langsung ke halaman order
-            if (in_array($paymentMethod, ['FT', 'IR', 'DN', 'COD'])) {
+            if (in_array($paymentMethod, ['FT', 'IR', 'DN'])) {
                 return redirect()->route('customer.orders.show', $order)
                     ->with('success', 'Pesanan berhasil dibuat');
             }

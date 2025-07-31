@@ -207,10 +207,10 @@
                                         <i class="fas fa-credit-card text-green-600 mr-2"></i>
                                         <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
                                     @elseif(in_array($transaction->payment_method, ['FT', 'IR', 'DN']))
-                                        <i class="fas fa-money-bill text-orange-600 mr-2"></i>
+                                        <i class="fas fa-store text-orange-600 mr-2"></i>
                                         <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
                                     @else
-                                        <i class="fas fa-question text-gray-600 mr-2"></i>
+                                        <i class="fas fa-credit-card text-gray-600 mr-2"></i>
                                         <span class="text-sm text-gray-900">{{ $transaction->getPaymentMethodLabelAttribute() }}</span>
                                     @endif
                                 </div>
