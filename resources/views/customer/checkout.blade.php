@@ -168,65 +168,61 @@
                         </div>
                         <div class="p-3 sm:p-6">
                             <div class="space-y-3 sm:space-y-4">
-                                @if(isset($paymentMethods) && count($paymentMethods) > 0)
-                                @foreach($paymentMethods as $method)
-                                @php
-                                // Handle both array and object formats
-                                $method = is_object($method) ? (array) $method : $method;
-                                $paymentMethod = $method['paymentMethod'] ?? 'bank_transfer';
-                                $paymentName = $method['paymentName'] ?? 'Transfer Bank';
-                                $paymentDescription = $method['paymentDescription'] ?? 'Transfer melalui bank';
-                                @endphp
+                                @if(count($paymentMethods) > 0)
+                                @foreach($paymentMethods as $index => $method)
                                 <label
                                     class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="{{ $paymentMethod }}"
-                                        class="text-blue-600 focus:ring-blue-500 border-gray-300" {{ $loop->first ?
-                                    'checked' : '' }}>
+                                    <input type="radio" name="payment_method" value="{{ $method['paymentMethod'] }}"
+                                        class="text-blue-600 focus:ring-blue-500 border-gray-300" {{ $index===0
+                                        ? 'checked' : '' }}>
                                     <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">{{ $paymentName }}</div>
-                                        <div class="text-xs text-gray-500">{{ $paymentDescription }}</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $method['paymentName'] }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            @if($method['totalFee'] > 0)
+                                            Biaya: Rp {{ number_format($method['totalFee']) }}
+                                            @else
+                                            Gratis biaya
+                                            @endif
+                                        </div>
                                     </div>
+                                    @if(isset($method['paymentImage']))
+                                    <div class="flex-shrink-0">
+                                        <img src="{{ $method['paymentImage'] }}" alt="{{ $method['paymentName'] }}"
+                                            class="w-8 h-8 object-contain">
+                                    </div>
+                                    @endif
                                 </label>
                                 @endforeach
                                 @else
-                                <!-- Fallback payment methods -->
+                                <!-- Fallback jika API error -->
                                 <label
                                     class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="bank_transfer"
+                                    <input type="radio" name="payment_method" value="VA"
                                         class="text-blue-600 focus:ring-blue-500 border-gray-300" checked>
                                     <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Transfer Bank</div>
-                                        <div class="text-xs text-gray-500">Transfer melalui bank</div>
+                                        <div class="text-sm font-medium text-gray-900">Virtual Account</div>
+                                        <div class="text-xs text-gray-500">Transfer bank</div>
                                     </div>
                                 </label>
 
                                 <label
                                     class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="credit_card"
+                                    <input type="radio" name="payment_method" value="DA"
                                         class="text-blue-600 focus:ring-blue-500 border-gray-300">
                                     <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Kartu Kredit</div>
-                                        <div class="text-xs text-gray-500">Visa, Mastercard, dll</div>
+                                        <div class="text-sm font-medium text-gray-900">DANA</div>
+                                        <div class="text-xs text-gray-500">E-wallet</div>
                                     </div>
                                 </label>
 
                                 <label
                                     class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="e_wallet"
+                                    <input type="radio" name="payment_method" value="OV"
                                         class="text-blue-600 focus:ring-blue-500 border-gray-300">
                                     <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">E-Wallet</div>
-                                        <div class="text-xs text-gray-500">OVO, DANA, GoPay, dll</div>
-                                    </div>
-                                </label>
-
-                                <label
-                                    class="flex items-center space-x-3 cursor-pointer border rounded-lg p-2 hover:border-blue-500 transition">
-                                    <input type="radio" name="payment_method" value="cod"
-                                        class="text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">Cash on Delivery (COD)</div>
-                                        <div class="text-xs text-gray-500">Bayar saat barang diterima</div>
+                                        <div class="text-sm font-medium text-gray-900">OVO</div>
+                                        <div class="text-xs text-gray-500">E-wallet</div>
                                     </div>
                                 </label>
                                 @endif
