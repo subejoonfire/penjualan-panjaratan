@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Keranjang Belanja - Penjualan Panjaratan')
+@section('title', 'Keranjang Belanja - ' . env('MAIL_FROM_NAME', 'Penjualan Panjaratan'))
 
 @section('content')
 <div class="py-3 sm:py-6">
@@ -59,7 +59,7 @@
                                         </h4>
                                         <p class="text-xs text-gray-600">oleh {{ $detail->product->seller->nickname ??
                                             $detail->product->seller->username }}</p>
-                                        <p class="text-xs text-gray-500">{{ $detail->product->category->category }}</p>
+                                        <p class="text-xs text-gray-500">{{ $detail->product->category ? $detail->product->category->category : 'Kategori Tidak Ditemukan' }}</p>
 
                                         <div class="mt-1 flex items-center justify-between">
                                             <span class="text-sm font-bold text-blue-600">
@@ -128,7 +128,7 @@
                                     </h4>
                                     <p class="text-sm text-gray-600 truncate">oleh {{ $detail->product->seller->nickname
                                         ?? $detail->product->seller->username }}</p>
-                                    <p class="text-sm text-gray-500 truncate">{{ $detail->product->category->category }}
+                                    <p class="text-sm text-gray-500 truncate">{{ $detail->product->category ? $detail->product->category->category : 'Kategori Tidak Ditemukan' }}
                                     </p>
 
                                     <div class="mt-2 flex flex-row items-center gap-4">

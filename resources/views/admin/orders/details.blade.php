@@ -116,7 +116,7 @@
             </div>
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-gray-900 truncate">{{ $item->product->productname }}</p>
-                <p class="text-sm text-gray-500">{{ $item->product->category->category }}</p>
+                                        <p class="text-sm text-gray-500">{{ $item->product->category ? $item->product->category->category : 'Kategori Tidak Ditemukan' }}</p>
                 <p class="text-sm text-gray-500">Penjual: {{ $item->product->seller->username }}</p>
             </div>
             <div class="text-right">

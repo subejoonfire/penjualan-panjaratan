@@ -17,9 +17,9 @@
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <a href="{{ route('products.category', $product->category) }}"
+                        <a href="{{ $product->category ? route('products.category', $product->category) : '#' }}"
                             class="text-gray-700 hover:text-blue-600">
-                            {{ $product->category->category }}
+                            {{ $product->category ? $product->category->category : 'Kategori Tidak Ditemukan' }}
                         </a>
                     </div>
                 </li>
@@ -74,9 +74,9 @@
                     <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
                         <span class="flex items-center">
                             <i class="fas fa-tag mr-1"></i>
-                            <a href="{{ route('products.category', $product->category) }}"
+                            <a href="{{ $product->category ? route('products.category', $product->category) : '#' }}"
                                 class="text-blue-600 hover:text-blue-500">
-                                {{ $product->category->category }}
+                                {{ $product->category ? $product->category->category : 'Kategori Tidak Ditemukan' }}
                             </a>
                         </span>
                         <span class="flex items-center">

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Daftar - Penjualan Panjaratan</title>
+    <title>Daftar - {{ env('MAIL_FROM_NAME', 'Penjualan Panjaratan') }}</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +26,7 @@
                     Buat Akun Anda
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">
-                    Bergabunglah dengan marketplace Penjualan Panjaratan
+                    Bergabunglah dengan marketplace {{ env('MAIL_FROM_NAME', 'Penjualan Panjaratan') }}
                 </p>
             </div>
 

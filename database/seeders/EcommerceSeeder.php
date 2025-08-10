@@ -376,7 +376,7 @@ class EcommerceSeeder extends Seeder
                 'Produk Baru Tersedia'
             ],
             'system' => [
-                'Selamat Datang di Penjualan Panjaratan',
+                'Selamat Datang di ' . env('MAIL_FROM_NAME', 'Penjualan Panjaratan'),
                 'Update Sistem Terbaru',
                 'Promo Spesial Bulan Ini'
             ]

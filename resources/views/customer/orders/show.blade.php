@@ -147,7 +147,7 @@
                                         </a>
                                     </h4>
                                                                             <p class="text-sm text-gray-500">Penjual: {{ $item->product->seller->nickname ?? $item->product->seller->username }}</p>
-                                    <p class="text-sm text-gray-500">Kategori: {{ $item->product->category->category
+                                    <p class="text-sm text-gray-500">Kategori: {{ $item->product->category ? $item->product->category->category : 'Kategori Tidak Ditemukan'
                                         }}</p>
                                 </div>
                                 <div class="text-right">

@@ -122,7 +122,7 @@ class WishlistController extends Controller
                 'price' => $product->productprice,
                 'price_formatted' => number_format($product->productprice),
                 'stock' => $product->productstock,
-                'category' => $product->category->category,
+                'category' => $product->category ? $product->category->category : 'Kategori Tidak Ditemukan',
                 'seller' => [
                     'id' => $product->seller->id,
                     'name' => $product->seller->nickname ?? $product->seller->username,
