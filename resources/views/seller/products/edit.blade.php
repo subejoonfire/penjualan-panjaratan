@@ -379,7 +379,7 @@ $sortedImages = $product->images->sortByDesc('is_primary');
             <!-- Form Actions -->
             <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
                 <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-                    <a href="{{ route('products.show', $product) }}"
+                    <a href="{{ route('products.show', ['product' => $product->id]) }}"
                         class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm text-center">
                         <i class="fas fa-eye mr-1"></i>
                         Pratinjau Produk

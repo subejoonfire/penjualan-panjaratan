@@ -137,7 +137,7 @@
                             </div>
 
                             <div class="flex space-x-2">
-                                <a href="{{ route('products.show', $product) }}" 
+                                <a href="{{ route('products.show', ['product' => $product->id]) }}" 
                                     class="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
                                     View Details
                                 </a>
