@@ -191,10 +191,16 @@
 
             <div class="flex flex-col gap-2 mt-2">
                 <div class="flex gap-2 w-full">
+                    @if($product && $product->is_active)
                     <a href="{{ route('products.show', $product) }}"
                         class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
                         Lihat
                     </a>
+                    @else
+                    <span class="flex-1 bg-gray-100 text-gray-400 px-2 py-1.5 rounded text-xs font-medium text-center cursor-not-allowed">
+                        Lihat
+                    </span>
+                    @endif
                     <a href="{{ route('seller.products.edit', $product) }}"
                         class="flex-1 {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }} px-2 py-1.5 rounded text-xs font-medium text-center">
                         Edit

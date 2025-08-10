@@ -379,11 +379,18 @@ $sortedImages = $product->images->sortByDesc('is_primary');
             <!-- Form Actions -->
             <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
                 <div class="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+                    @if($product && $product->is_active)
                     <a href="{{ route('products.show', $product) }}"
                         class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm text-center">
                         <i class="fas fa-eye mr-1"></i>
                         Pratinjau Produk
                     </a>
+                    @else
+                    <span class="text-gray-400 text-xs sm:text-sm text-center cursor-not-allowed">
+                        <i class="fas fa-eye mr-1"></i>
+                        Pratinjau Produk (Tidak Aktif)
+                    </span>
+                    @endif
                 </div>
                 <div
                     class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
