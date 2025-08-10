@@ -107,7 +107,7 @@ $sortedImages = $product->images->sortByDesc('is_primary');
                     <h3 class="text-sm sm:text-base md:text-lg font-medium text-blue-900 truncate">{{
                         $product->productname }}</h3>
                     <p class="text-xs sm:text-sm text-blue-700">
-                        {{ $product->category->category }} •
+                        {{ $product->category ? $product->category->category : 'Kategori Tidak Ditemukan' }} •
                         Dibuat {{ $product->created_at->format('d M Y') }} •
                         {{ $product->images->count() }} gambar
                     </p>

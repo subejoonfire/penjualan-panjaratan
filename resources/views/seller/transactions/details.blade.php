@@ -329,7 +329,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <h5 class="text-sm font-medium text-gray-900 truncate">{{ $item->product->productname }}</h5>
-                    <p class="text-xs text-gray-500 mt-1">{{ $item->product->category->category }}</p>
+                                            <p class="text-xs text-gray-500 mt-1">{{ $item->product->category ? $item->product->category->category : 'Kategori Tidak Ditemukan' }}</p>
                     <div class="mt-2 flex items-center justify-between">
                         <p class="text-sm text-gray-600">{{ $item->quantity }}x</p>
                         <p class="text-sm font-medium text-gray-900">Rp {{ number_format($item->productprice) }}</p>

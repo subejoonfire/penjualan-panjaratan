@@ -26,7 +26,7 @@ class SendVerificationWaJob implements ShouldQueue
         if ($user) {
             $token = $user->phone_verification_token;
             $phone = $user->phone;
-            $message = "Kode verifikasi WhatsApp Anda: $token\nPenjualan Panjaratan";
+            $message = "Kode verifikasi WhatsApp Anda: $token\n" . env('MAIL_FROM_NAME', 'Penjualan Panjaratan');
             $fonnteToken = env('FONNTE_TOKEN');
             Http::withHeaders([
                 'Authorization' => $fonnteToken,

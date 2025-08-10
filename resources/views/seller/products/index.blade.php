@@ -103,53 +103,54 @@
 
         <!-- Products Grid -->
         @if($products->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+        <div class="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3 md:gap-6">
             @foreach($products as $product)
+            @if($product && $product->id)
             <div
                 class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full {{ !$product->is_active ? 'opacity-75' : '' }}">
                 <!-- Product Image -->
                 <div class="relative aspect-w-1 aspect-h-1 bg-gray-200">
                     @if($product->primaryImage)
                     <img src="{{ url('storage/'.$product->primaryImage->image) }}" alt="{{ $product->productname }}"
-                        class="w-full h-36 object-cover">
+                        class="w-full h-24 md:h-36 object-cover">
                     @else
-                    <div class="w-full h-48 flex items-center justify-center">
-                        <i class="fas fa-image text-gray-400 text-2xl"></i>
+                    <div class="w-full h-24 md:h-48 flex items-center justify-center">
+                        <i class="fas fa-image text-gray-400 text-lg md:text-2xl"></i>
                     </div>
                     @endif
                     @if(!$product->is_active)
                     <div class="absolute inset-0 bg-gray-900 bg-opacity-20"></div>
                     @endif
                     <!-- Status Badge -->
-                    <div class="absolute top-2 left-2">
+                    <div class="absolute top-1 md:top-2 left-1 md:left-2">
                         <span
-                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            class="inline-flex items-center px-1 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
                         </span>
                     </div>
                     <!-- Stock Badge -->
                     @if($product->productstock <= 0) <div
-                        class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                        class="absolute top-1 md:top-2 right-1 md:right-2 bg-red-600 text-white text-xs px-1 md:px-2 py-0.5 md:py-1 rounded">
                         Habis
                 </div>
                 @elseif($product->productstock <= 10) <div
-                    class="absolute top-2 right-2 bg-yellow-600 text-white text-xs px-2 py-1 rounded">
+                    class="absolute top-1 md:top-2 right-1 md:right-2 bg-yellow-600 text-white text-xs px-1 md:px-2 py-0.5 md:py-1 rounded">
                     Stok Terbatas
             </div>
             @endif
         </div>
 
         <!-- Product Info & Actions -->
-        <div class="flex flex-col flex-1 justify-between p-3">
+        <div class="flex flex-col flex-1 justify-between p-2 md:p-3">
             <div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem]">
+                <h3 class="text-xs md:text-sm font-semibold text-gray-900 mb-1 line-clamp-2 min-h-[2rem] md:min-h-[2.5rem]">
                     {{ $product->productname }}
                     @if(!$product->is_active)
                     <span class="text-xs text-red-500 font-normal">(Tidak Aktif)</span>
                     @endif
                 </h3>
-                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
-                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
+                <p class="text-xs text-gray-600 mb-1 hidden md:block">{{ $product->category ? $product->category->category : 'Kategori Tidak Ditemukan' }}</p>
+                <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[1.5rem] md:min-h-[2rem] hidden md:block">
                     @php
                     $desc = strip_tags($product->productdescription);
                     $words = explode(' ', $desc);
@@ -160,12 +161,12 @@
                     {{ $desc }}
                 </p>
                 <div class="mb-2">
-                    <span class="text-sm font-bold text-blue-600">
+                    <span class="text-xs md:text-sm font-bold text-blue-600">
                         Rp {{ number_format($product->productprice) }}
                     </span>
                 </div>
                 <!-- Rating and Sales -->
-                <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center justify-between mb-2 hidden md:flex">
                     <div class="flex items-center">
                         @php
                         $avgRating = $product->reviews->avg('rating') ?? 0;
@@ -184,25 +185,32 @@
                     </div>
                 </div>
                 <!-- Stock Info -->
-                <div class="text-xs text-gray-500 mb-2">
+                <div class="text-xs text-gray-500 mb-2 hidden md:block">
                     Stok: {{ $product->productstock }} • {{ $product->images->count() }} gambar
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 mt-2">
-                <div class="flex gap-2 w-full">
-                    <a href="{{ route('products.show', $product) }}"
-                        class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
-                        Lihat
-                    </a>
-                    <a href="{{ route('seller.products.edit', $product) }}"
-                        class="flex-1 {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }} px-2 py-1.5 rounded text-xs font-medium text-center">
-                        Edit
-                    </a>
+            <div class="flex flex-col gap-1 md:gap-2 mt-2">
+                <div class="flex gap-1 md:gap-2 w-full">
+                    @if($product && $product->id)
+                        <a href="{{ route('products.show', $product) }}"
+                            class="flex-1 bg-gray-100 text-gray-700 px-1 md:px-2 py-1 md:py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
+                            Lihat
+                        </a>
+                        <a href="{{ route('seller.products.edit', $product) }}"
+                            class="flex-1 {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }} px-1 md:px-2 py-1 md:py-1.5 rounded text-xs font-medium text-center">
+                            Edit
+                        </a>
+                    @else
+                        <span class="flex-1 bg-gray-300 text-gray-500 px-2 py-1.5 rounded text-xs font-medium text-center">
+                            Produk Tidak Valid
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+    @endif
     @endforeach
 </div>
 </div>

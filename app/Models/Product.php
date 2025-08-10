@@ -11,6 +11,16 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    /**
      * The attributes that are mass assignable.
      * Model untuk produk
      *
@@ -164,6 +174,10 @@ class Product extends Model
                 WHERE cd.idproduct = products.id
                 AND o.status = "delivered"
             )')
-        ]);
+        ])->withCount(['cartDetails as sold_count_alt' => function ($query) {
+            $query->whereHas('cart.order', function ($q) {
+                $q->where('status', 'delivered');
+            });
+        }]);
     }
 }

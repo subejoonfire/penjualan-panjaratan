@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kode Reset Password - Penjualan Panjaratan</title>
+    <title>Kode Reset Password - {{ env('MAIL_FROM_NAME', 'Penjualan Panjaratan') }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -108,7 +108,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">Penjualan Panjaratan</div>
+            <div class="logo">{{ env('MAIL_FROM_NAME', 'Penjualan Panjaratan') }}</div>
             <h1 class="title">Reset Password</h1>
         </div>
 
@@ -145,13 +145,13 @@
 
             <p>Jika Anda mengalami kesulitan, silakan hubungi tim support kami.</p>
 
-            <p>Terima kasih,<br><strong>Tim Penjualan Panjaratan</strong></p>
+            <p>Terima kasih,<br><strong>Tim {{ env('MAIL_FROM_NAME', 'Penjualan Panjaratan') }}</strong></p>
         </div>
 
         <div class="footer">
             <p>
                 Email ini dikirim secara otomatis. Mohon jangan membalas email ini.<br>
-                © {{ date('Y') }} Penjualan Panjaratan. Semua hak dilindungi.
+                © {{ date('Y') }} {{ env('MAIL_FROM_NAME', 'Penjualan Panjaratan') }}. Semua hak dilindungi.
             </p>
         </div>
     </div>
