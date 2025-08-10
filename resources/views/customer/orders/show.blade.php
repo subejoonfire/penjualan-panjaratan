@@ -141,7 +141,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h4 class="text-sm font-medium text-gray-900">
-                                        <a href="{{ route('products.show', $item->product) }}"
+                                        <a href="{{ route('products.show', ['product' => $item->product->id]) }}"
                                             class="hover:text-blue-600">
                                             {{ $item->product->productname }}
                                         </a>

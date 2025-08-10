@@ -466,7 +466,7 @@
                         <div class="mt-2 flex items-center justify-between">
                             <span class="text-xs text-gray-500">{{ $relatedProduct->seller->nickname ??
                                 $relatedProduct->seller->username }}</span>
-                            <a href="{{ route('products.show', $relatedProduct) }}"
+                            <a href="{{ route('products.show', ['product' => $relatedProduct->id]) }}"
                                 class="text-blue-600 hover:text-blue-500 text-sm">
                                 Lihat
                             </a>

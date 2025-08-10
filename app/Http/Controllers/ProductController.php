@@ -321,7 +321,7 @@ class ProductController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->productname,
-                    'url' => route('products.show', $product)
+                    'url' => route('products.show', ['product' => $product->id])
                 ];
             });
 
@@ -393,7 +393,7 @@ class ProductController extends Controller
                     'image' => $product->images->count() > 0 
                         ? asset('storage/' . $product->images->first()->image)
                         : null,
-                    'url' => route('products.show', $product),
+                    'url' => route('products.show', ['product' => $product->id]),
                     'created_at' => $product->created_at->diffForHumans(),
                     'avg_rating' => $product->reviews()->avg('rating') ?? 0,
                     'reviews_count' => $product->reviews()->count(),
@@ -456,7 +456,7 @@ class ProductController extends Controller
                     'image' => $product->images->count() > 0 
                         ? asset('storage/' . $product->images->first()->image)
                         : null,
-                    'url' => route('products.show', $product),
+                    'url' => route('products.show', ['product' => $product->id]),
                     'created_at' => $product->created_at->diffForHumans(),
                     'avg_rating' => $product->reviews()->avg('rating') ?? 0,
                     'reviews_count' => $product->reviews()->count(),
