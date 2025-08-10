@@ -39,7 +39,7 @@ class Product extends Model
     // Relasi ke Category (Many to One)
     public function category()
     {
-        return $this->belongsTo(Category::class, 'idcategories');
+        return $this->belongsTo(Category::class, 'idcategories')->withTrashed();
     }
 
     // Relasi ke User sebagai seller (Many to One)

@@ -148,7 +148,7 @@
                     <span class="text-xs text-red-500 font-normal">(Tidak Aktif)</span>
                     @endif
                 </h3>
-                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
+                <p class="text-xs text-gray-600 mb-1">{{ optional($product->category)->category ?? 'Tanpa Kategori' }}</p>
                 <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
                     @php
                     $desc = strip_tags($product->productdescription);
