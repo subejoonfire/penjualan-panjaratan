@@ -138,7 +138,7 @@ class DashboardController extends Controller
     public function products(Request $request)
     {
         $user = Auth::user();
-        $query = $user->products()->with(['category', 'images'])->withSoldCount();
+        $query = $user->products()->with(['category', 'images']);
 
         // Filter by category
         if ($request->filled('category')) {

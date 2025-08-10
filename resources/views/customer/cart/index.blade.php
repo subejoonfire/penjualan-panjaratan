@@ -52,10 +52,14 @@
                                     <!-- Product Details -->
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-xs font-medium text-gray-900 mb-1 leading-tight">
-                                            <a href="{{ route('products.show', $detail->product) }}"
-                                                class="hover:text-blue-600">
-                                                {{ Str::limit($detail->product->productname, 30) }}
-                                            </a>
+                                            @if($detail->product && $detail->product->id)
+                                                <a href="{{ route('products.show', $detail->product) }}"
+                                                    class="hover:text-blue-600">
+                                                    {{ Str::limit($detail->product->productname, 30) }}
+                                                </a>
+                                            @else
+                                                <span class="text-gray-500">Produk Tidak Ditemukan</span>
+                                            @endif
                                         </h4>
                                         <p class="text-xs text-gray-600">oleh {{ $detail->product->seller->nickname ??
                                             $detail->product->seller->username }}</p>
@@ -121,10 +125,14 @@
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-base md:text-lg font-medium text-gray-900 truncate">
-                                        <a href="{{ route('products.show', $detail->product) }}"
-                                            class="hover:text-blue-600">
-                                            {{ $detail->product->productname }}
-                                        </a>
+                                        @if($detail->product && $detail->product->id)
+                                            <a href="{{ route('products.show', $detail->product) }}"
+                                                class="hover:text-blue-600">
+                                                {{ $detail->product->productname }}
+                                            </a>
+                                        @else
+                                            <span class="text-gray-500">Produk Tidak Ditemukan</span>
+                                        @endif
                                     </h4>
                                     <p class="text-sm text-gray-600 truncate">oleh {{ $detail->product->seller->nickname
                                         ?? $detail->product->seller->username }}</p>
