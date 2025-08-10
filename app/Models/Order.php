@@ -23,6 +23,7 @@ class Order extends Model
         'status',
         'shipping_address',
         'status_updated_at',
+        'notes',
     ];
 
     /**
