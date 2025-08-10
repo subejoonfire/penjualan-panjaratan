@@ -30,7 +30,7 @@ class PasswordResetCode extends Mailable
     public function build()
     {
         return $this->view('emails.password-reset-code')
-                    ->subject('Kode Reset Password - Penjualan Panjaratan')
+                    ->subject('Kode Reset Password - ' . env('MAIL_FROM_NAME', 'Penjualan Panjaratan'))
                     ->with([
                         'user' => $this->user,
                         'resetCode' => $this->resetCode,

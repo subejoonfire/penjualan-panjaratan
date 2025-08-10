@@ -229,7 +229,7 @@
 
                             <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
                                 <span>{{ $product->seller->nickname ?? $product->seller->username }}</span>
-                                <span>{{ $product->category->category }}</span>
+                                <span>{{ $product->category ? $product->category->category : 'Kategori Tidak Ditemukan' }}</span>
                             </div>
 
                             <div class="flex space-x-2">

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Pesanan #' . $order->order_number . ' - Penjualan Panjaratan')
+@section('title', 'Detail Pesanan #' . $order->order_number . ' - ' . env('MAIL_FROM_NAME', 'Penjualan Panjaratan'))
 
 @section('content')
 <div class="py-6">
