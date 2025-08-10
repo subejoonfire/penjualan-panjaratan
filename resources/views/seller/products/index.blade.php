@@ -105,6 +105,7 @@
         @if($products->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
             @foreach($products as $product)
+            @if($product && $product->id)
             <div
                 class="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full {{ !$product->is_active ? 'opacity-75' : '' }}">
                 <!-- Product Image -->
@@ -191,18 +192,25 @@
 
             <div class="flex flex-col gap-2 mt-2">
                 <div class="flex gap-2 w-full">
-                    <a href="{{ route('products.show', $product) }}"
-                        class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
-                        Lihat
-                    </a>
-                    <a href="{{ route('seller.products.edit', $product) }}"
-                        class="flex-1 {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }} px-2 py-1.5 rounded text-xs font-medium text-center">
-                        Edit
-                    </a>
+                    @if($product && $product->id)
+                        <a href="{{ route('products.show', $product) }}"
+                            class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
+                            Lihat
+                        </a>
+                        <a href="{{ route('seller.products.edit', $product) }}"
+                            class="flex-1 {{ !$product->is_active ? 'bg-gray-400 text-gray-200 hover:bg-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700' }} px-2 py-1.5 rounded text-xs font-medium text-center">
+                            Edit
+                        </a>
+                    @else
+                        <span class="flex-1 bg-gray-300 text-gray-500 px-2 py-1.5 rounded text-xs font-medium text-center">
+                            Produk Tidak Valid
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+    @endif
     @endforeach
 </div>
 </div>
