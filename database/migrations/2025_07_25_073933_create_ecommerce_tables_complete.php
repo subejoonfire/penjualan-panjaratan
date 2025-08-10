@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Migration untuk semua tabel aplikasi e-commerce Penjualan Panjaratan
+     * Migration untuk semua tabel aplikasi e-commerce Bintang Timbul
      */
     public function up(): void
     {

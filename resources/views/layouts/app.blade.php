@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Penjualan Panjaratan')</title>
+    <title>@yield('title', config('app.name'))</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,53 +26,53 @@
     @stack('styles')
 </head>
 
-<body class="bg-gray-50 font-sans antialiased">
+<body class="bg-black text-gray-200 font-sans antialiased">
     <div class="min-h-screen flex flex-col">
         @guest
         <!-- Guest Navigation Bar (Desktop & Mobile) -->
-        <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
+        <nav class="bg-black shadow-lg border-b border-yellow-700 desktop-nav">
             <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <!-- Logo & Brand -->
                     <div class="flex items-center">
                         <a href="/" class="flex items-center">
-                            <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
-                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
+                            <i class="fas fa-store text-2xl text-yellow-500 mr-3"></i>
+                            <span class="text-xl font-bold text-yellow-400">{{ config('app.name') }}</span>
                         </a>
                     </div>
                     <!-- Auth Buttons -->
                     <div class="flex items-center space-x-4">
                         <a href="{{ route('login') }}"
-                            class="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Masuk</a>
+                            class="px-4 py-2 rounded-md bg-yellow-600 text-black font-semibold hover:bg-yellow-500 transition">Masuk</a>
                         <a href="{{ route('register') }}"
-                            class="px-4 py-2 rounded-md bg-white border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition">Daftar</a>
+                            class="px-4 py-2 rounded-md bg-transparent border border-yellow-500 text-yellow-400 font-semibold hover:bg-yellow-500/10 transition">Daftar</a>
                     </div>
                 </div>
             </div>
         </nav>
         <!-- Mobile Guest Nav Bar -->
-        <nav class="mobile-nav-bar" style="display: none;">
+        <nav class="mobile-nav-bar" style="display: none; background: #000; border-bottom: 1px solid #d97706;">
             <a href="/" class="mobile-nav-item group">
-                <i class="fas fa-store text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                <i class="fas fa-store text-gray-400 group-hover:text-yellow-400 transition-colors duration-200"></i>
                 <span
-                    class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 text-xs mt-1">Beranda</span>
+                    class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-yellow-400 transition-all duration-300 text-xs mt-1">Beranda</span>
             </a>
             <a href="{{ route('login') }}" class="mobile-nav-item group">
                 <i
-                    class="fas fa-sign-in-alt text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                    class="fas fa-sign-in-alt text-gray-400 group-hover:text-yellow-400 transition-colors duration-200"></i>
                 <span
-                    class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 text-xs mt-1">Masuk</span>
+                    class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-yellow-400 transition-all duration-300 text-xs mt-1">Masuk</span>
             </a>
             <a href="{{ route('register') }}" class="mobile-nav-item group">
-                <i class="fas fa-user-plus text-gray-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+                <i class="fas fa-user-plus text-gray-400 group-hover:text-yellow-400 transition-colors duration-200"></i>
                 <span
-                    class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-blue-600 transition-all duration-300 text-xs mt-1">Daftar</span>
+                    class="mobile-nav-label opacity-0 group-hover:opacity-100 group-hover:text-yellow-400 transition-all duration-300 text-xs mt-1">Daftar</span>
             </a>
         </nav>
         @endguest
         @auth
         @php $notVerified = auth()->user()->role === 'customer' && (!auth()->user()->isEmailVerified() || !auth()->user()->isWaVerified()); @endphp
-        <nav class="mobile-nav-bar" style="display: none;">
+        <nav class="mobile-nav-bar" style="display: none; background: #000; border-bottom: 1px solid #d97706;">
             @if($notVerified)
                 <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i>
@@ -193,14 +193,14 @@
             </div>
         </div>
         <!-- Desktop Nav -->
-        <nav class="bg-white shadow-lg border-b border-gray-200 desktop-nav">
+        <nav class="bg-black shadow-lg border-b border-yellow-700 desktop-nav">
             <div class="w-full px-2 sm:px-4 lg:px-6 xl:px-8">
                 <div class="flex justify-between h-16">
                     <!-- Logo & Brand -->
                     <div class="flex items-center">
                         <a href="{{ route('profile') }}" class="flex items-center">
-                            <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
-                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
+                            <i class="fas fa-store text-2xl text-yellow-500 mr-3"></i>
+                            <span class="text-xl font-bold text-yellow-400">{{ config('app.name') }}</span>
                         </a>
                     </div>
                     @if($notVerified)
@@ -234,7 +234,7 @@
                     <div class="hidden md:flex items-center gap-10">
                         @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}"
-                            class="group flex flex-col items-center {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-gray-600' }}">
+                            class="group flex flex-col items-center {{ request()->routeIs('admin.dashboard') ? 'text-yellow-400' : 'text-gray-400' }}">
                             <i
                                 class="fas fa-tachometer-alt text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
                             <span
@@ -242,37 +242,37 @@
                                 Utama</span>
                         </a>
                         <a href="{{ route('admin.users.index') }}"
-                            class="group flex flex-col items-center {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-gray-600' }}">
+                            class="group flex flex-col items-center {{ request()->routeIs('admin.users.*') ? 'text-yellow-400' : 'text-gray-400' }}">
                             <i
-                                class="fas fa-users text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
+                                class="fas fa-users text-lg group-hover:text-yellow-400 transition-colors duration-200"></i>
                             <span
-                                class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Pengguna</span>
+                                class="text-xs font-semibold group-hover:text-yellow-400 transition-colors duration-200">Pengguna</span>
                         </a>
                         <a href="{{ route('admin.products.index') }}"
-                            class="group flex flex-col items-center {{ request()->routeIs('admin.products.*') ? 'text-blue-600' : 'text-gray-600' }}">
-                            <i class="fas fa-box text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
+                            class="group flex flex-col items-center {{ request()->routeIs('admin.products.*') ? 'text-yellow-400' : 'text-gray-400' }}">
+                            <i class="fas fa-box text-lg group-hover:text-yellow-400 transition-colors duration-200"></i>
                             <span
-                                class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Produk</span>
+                                class="text-xs font-semibold group-hover:text-yellow-400 transition-colors duration-200">Produk</span>
                         </a>
                         <a href="{{ route('admin.categories.index') }}"
-                            class="group flex flex-col items-center {{ request()->routeIs('admin.categories.*') ? 'text-blue-600' : 'text-gray-600' }}">
-                            <i class="fas fa-list text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
+                            class="group flex flex-col items-center {{ request()->routeIs('admin.categories.*') ? 'text-yellow-400' : 'text-gray-400' }}">
+                            <i class="fas fa-list text-lg group-hover:text-yellow-400 transition-colors duration-200"></i>
                             <span
-                                class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Kategori</span>
+                                class="text-xs font-semibold group-hover:text-yellow-400 transition-colors duration-200">Kategori</span>
                         </a>
                         <a href="{{ route('admin.orders.index') }}"
-                            class="group flex flex-col items-center {{ request()->routeIs('admin.orders.*') ? 'text-blue-600' : 'text-gray-600' }}">
+                            class="group flex flex-col items-center {{ request()->routeIs('admin.orders.*') ? 'text-yellow-400' : 'text-gray-400' }}">
                             <i
-                                class="fas fa-shopping-cart text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
+                                class="fas fa-shopping-cart text-lg group-hover:text-yellow-400 transition-colors duration-200"></i>
                             <span
-                                class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Pesanan</span>
+                                class="text-xs font-semibold group-hover:text-yellow-400 transition-colors duration-200">Pesanan</span>
                         </a>
                         <a href="{{ route('admin.transactions.index') }}"
-                            class="group flex flex-col items-center {{ request()->routeIs('admin.transactions.*') ? 'text-blue-600' : 'text-gray-600' }}">
+                            class="group flex flex-col items-center {{ request()->routeIs('admin.transactions.*') ? 'text-yellow-400' : 'text-gray-400' }}">
                             <i
-                                class="fas fa-credit-card text-lg group-hover:text-blue-600 transition-colors duration-200"></i>
+                                class="fas fa-credit-card text-lg group-hover:text-yellow-400 transition-colors duration-200"></i>
                             <span
-                                class="text-xs font-semibold group-hover:text-blue-600 transition-colors duration-200">Transaksi</span>
+                                class="text-xs font-semibold group-hover:text-yellow-400 transition-colors duration-200">Transaksi</span>
                         </a>
                         @elseif(auth()->user()->isSeller())
                         <a href="{{ route('seller.dashboard') }}"
@@ -352,7 +352,7 @@
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open; if(open) loadDesktopNotifications()"
-                                class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+                                class="relative p-2 text-gray-300 hover:text-white focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
                                 <span id="notification-count-desktop"
                                     class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"
@@ -361,9 +361,9 @@
 
                             <!-- Notification Dropdown -->
                             <div x-show="open" @click.away="open = false" x-transition x-cloak
-                                class="absolute right-0 mt-2 notification-dropdown bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                                <div class="px-4 py-2 border-b border-gray-200">
-                                    <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
+                                class="absolute right-0 mt-2 notification-dropdown bg-black rounded-md shadow-lg py-1 z-50 border border-yellow-700">
+                                <div class="px-4 py-2 border-b border-yellow-700">
+                                    <h3 class="text-sm font-medium text-yellow-400">Notifikasi</h3>
                                 </div>
                                 <div id="notificationList" class="max-h-64 overflow-y-auto">
                                     <!-- Notifications will be loaded here -->
@@ -374,17 +374,17 @@
                                 <div class="px-4 py-2 border-t border-gray-200">
                                     @if(auth()->user()->isAdmin())
                                     <a href="{{ route('admin.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                        class="block text-sm text-yellow-400 hover:text-yellow-300 text-center">
                                         Lihat Semua Notifikasi
                                     </a>
                                     @elseif(auth()->user()->isSeller())
                                     <a href="{{ route('seller.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                        class="block text-sm text-yellow-400 hover:text-yellow-300 text-center">
                                         Lihat Semua Notifikasi
                                     </a>
                                     @else
                                     <a href="{{ route('customer.notifications.index') }}"
-                                        class="block text-sm text-blue-600 hover:text-blue-500 text-center">
+                                        class="block text-sm text-yellow-400 hover:text-yellow-300 text-center">
                                         Lihat Semua Notifikasi
                                     </a>
                                     @endif
@@ -462,9 +462,9 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white border-t border-gray-200 py-6">
+        <footer class="bg-black border-t border-yellow-700 py-6">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center text-gray-500 text-sm">
+                <div class="text-center text-gray-400 text-sm">
                     <p>&copy; {{ date('Y') }} Harlan Muradi. All rights reserved.</p>
                 </div>
             </div>
