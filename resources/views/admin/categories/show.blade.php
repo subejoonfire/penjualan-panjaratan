@@ -171,7 +171,7 @@
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-sm font-medium text-gray-900 truncate">
-                                            <a href="{{ route('products.show', $product) }}"
+                                            <a href="{{ route('products.show', ['product' => $product->id]) }}"
                                                 class="hover:text-blue-600">
                                                 {{ $product->productname }}
                                             </a>
@@ -281,7 +281,7 @@
                                     @foreach($category->products()->latest()->take(5)->get() as $product)
                                     <div class="flex items-center justify-between py-2">
                                         <div class="flex-1">
-                                            <a href="{{ route('products.show', $product) }}"
+                                            <a href="{{ route('products.show', ['product' => $product->id]) }}"
                                                 class="text-sm text-blue-600 hover:text-blue-500 truncate block">
                                                 {{ $product->productname }}
                                             </a>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Penjualan Panjaratan')</title>
+    <title>@yield('title', config('app.name'))</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +37,7 @@
                     <div class="flex items-center">
                         <a href="/" class="flex items-center">
                             <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
-                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
+                            <span class="text-xl font-bold text-gray-800">{{ config('app.name') }}</span>
                         </a>
                     </div>
                     <!-- Auth Buttons -->
@@ -200,7 +200,7 @@
                     <div class="flex items-center">
                         <a href="{{ route('profile') }}" class="flex items-center">
                             <i class="fas fa-store text-2xl text-blue-600 mr-3"></i>
-                            <span class="text-xl font-bold text-gray-800">Penjualan Panjaratan</span>
+                            <span class="text-xl font-bold text-gray-800">{{ config('app.name') }}</span>
                         </a>
                     </div>
                     @if($notVerified)
@@ -352,7 +352,7 @@
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open; if(open) loadDesktopNotifications()"
-                                class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+                                class="relative p-2 text-gray-300 hover:text-white focus:outline-none">
                                 <i class="fas fa-bell text-lg"></i>
                                 <span id="notification-count-desktop"
                                     class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[1.25rem] h-5 flex items-center justify-center"

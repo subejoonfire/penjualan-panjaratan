@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Keranjang Belanja - Penjualan Panjaratan')
+@section('title', 'Keranjang Belanja - ' . config('app.name'))
 
 @section('content')
 <div class="py-3 sm:py-6">
@@ -52,7 +52,7 @@
                                     <!-- Product Details -->
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-xs font-medium text-gray-900 mb-1 leading-tight">
-                                            <a href="{{ route('products.show', $detail->product) }}"
+                                            <a href="{{ route('products.show', ['product' => $detail->product->id]) }}"
                                                 class="hover:text-blue-600">
                                                 {{ Str::limit($detail->product->productname, 30) }}
                                             </a>
@@ -121,7 +121,7 @@
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-base md:text-lg font-medium text-gray-900 truncate">
-                                        <a href="{{ route('products.show', $detail->product) }}"
+                                        <a href="{{ route('products.show', ['product' => $detail->product->id]) }}"
                                             class="hover:text-blue-600">
                                             {{ $detail->product->productname }}
                                         </a>

@@ -130,7 +130,7 @@ class WishlistController extends Controller
                 'image' => $product->images->count() > 0 
                     ? asset('storage/' . $product->images->first()->image)
                     : null,
-                'url' => route('products.show', $product),
+                'url' => route('products.show', ['product' => $product->id]),
                 'created_at' => $wishlist->created_at->diffForHumans(),
                 'avg_rating' => $product->reviews()->avg('rating') ?? 0,
                 'reviews_count' => $product->reviews()->count(),

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Penjualan Panjaratan</title>
+        <title>{{ config('app.name') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -24,7 +24,7 @@
             <div class="max-w-md w-full space-y-8">
                 <div class="text-center">
                     <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                        Selamat Datang di Penjualan Panjaratan
+                        Selamat Datang di {{ config('app.name') }}
                     </h1>
                     <p class="text-lg text-gray-600 mb-8">
                         Platform e-commerce terpercaya untuk kebutuhan belanja online Anda
@@ -56,7 +56,7 @@
 
                 <div class="text-center">
                     <p class="text-sm text-gray-500">
-                        &copy; {{ date('Y') }} Penjualan Panjaratan. Semua hak dilindungi.
+                        &copy; {{ date('Y') }} {{ config('app.name') }}. Semua hak dilindungi.
                     </p>
                 </div>
             </div>

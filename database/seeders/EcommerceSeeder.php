@@ -24,7 +24,7 @@ class EcommerceSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Seeder untuk mengisi data dummy aplikasi e-commerce Penjualan Panjaratan
+     * Seeder untuk mengisi data dummy aplikasi e-commerce Bintang Timbul
      */
     public function run(): void
     {
@@ -376,7 +376,7 @@ class EcommerceSeeder extends Seeder
                 'Produk Baru Tersedia'
             ],
             'system' => [
-                'Selamat Datang di Penjualan Panjaratan',
+                'Selamat Datang di ' . config('app.name'),
                 'Update Sistem Terbaru',
                 'Promo Spesial Bulan Ini'
             ]

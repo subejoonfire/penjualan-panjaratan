@@ -148,7 +148,7 @@
                     <span class="text-xs text-red-500 font-normal">(Tidak Aktif)</span>
                     @endif
                 </h3>
-                <p class="text-xs text-gray-600 mb-1">{{ $product->category->category }}</p>
+                <p class="text-xs text-gray-600 mb-1">{{ optional($product->category)->category ?? 'Tanpa Kategori' }}</p>
                 <p class="text-xs text-gray-500 mb-2 line-clamp-2 min-h-[2rem]">
                     @php
                     $desc = strip_tags($product->productdescription);
@@ -191,7 +191,7 @@
 
             <div class="flex flex-col gap-2 mt-2">
                 <div class="flex gap-2 w-full">
-                    <a href="{{ route('products.show', $product) }}"
+                    <a href="{{ route('products.show', ['product' => $product->id]) }}"
                         class="flex-1 bg-gray-100 text-gray-700 px-2 py-1.5 rounded text-xs font-medium hover:bg-gray-200 text-center">
                         Lihat
                     </a>

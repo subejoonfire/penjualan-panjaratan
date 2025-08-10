@@ -1,4 +1,4 @@
-# Penjualan Panjaratan - E-commerce Application
+# Bintang Timbul - E-commerce Application
 
 Aplikasi e-commerce lengkap yang dibangun dengan Laravel 11, menampilkan sistem multi-role dengan fitur modern dan responsive menggunakan Tailwind CSS.
 
