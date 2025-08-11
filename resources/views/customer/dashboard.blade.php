@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Pembeli - Penjualan Panjaratan')
+@section('title', 'Dashboard Pembeli - ' . config('app.name'))
 
 @section('content')
 <div class="py-3 sm:py-6">

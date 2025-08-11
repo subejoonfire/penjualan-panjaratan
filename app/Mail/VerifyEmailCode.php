@@ -20,7 +20,7 @@ class VerifyEmailCode extends Mailable
 
     public function build()
     {
-        return $this->subject('Verifikasi Email - Penjualan Panjaratan')
+        return $this->subject('Verifikasi Email - ' . config('app.name'))
             ->view('emails.verify-email-code');
     }
 }
