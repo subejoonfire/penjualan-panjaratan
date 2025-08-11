@@ -392,7 +392,7 @@ class PasswordResetController extends Controller
     {
         $message = "🔐 *KODE RESET PASSWORD*\n\n";
         $message .= "Kode reset password Anda: *{$token}*\n\n";
-        $message .= "Gunakan kode ini untuk mereset password akun Penjualan Panjaratan Anda.\n";
+        $message .= "Gunakan kode ini untuk mereset password akun " . config('app.name') . " Anda.\n";
         $message .= "⏰ Kode berlaku selama 15 menit.\n\n";
         $message .= "⚠️ Jangan bagikan kode ini kepada siapa pun.\n";
         $message .= "🔒 Jika Anda tidak meminta reset password, abaikan pesan ini.";

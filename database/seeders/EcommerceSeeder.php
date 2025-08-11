@@ -24,7 +24,7 @@ class EcommerceSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Seeder untuk mengisi data dummy aplikasi e-commerce Penjualan Panjaratan
+     * Seeder untuk mengisi data dummy aplikasi e-commerce {{ config('app.name') }}
      */
     public function run(): void
     {
@@ -72,10 +72,11 @@ class EcommerceSeeder extends Seeder
      */
     private function seedUsers($faker)
     {
+        $domain = config('app.domain');
         // Admin user
         User::create([
             'username' => 'admin',
-            'email' => 'admin@panjaratan.com',
+            'email' => 'admin@' . $domain,
             'phone' => '081234567890',
             'verification_token' => null,
             'phone_verification_token' => null,
@@ -90,7 +91,7 @@ class EcommerceSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             User::create([
                 'username' => "seller{$i}",
-                'email' => "seller{$i}@panjaratan.com",
+                'email' => "seller{$i}@" . $domain,
                 'phone' => $faker->phoneNumber,
                 'verification_token' => null,
                 'phone_verification_token' => null,
@@ -106,7 +107,7 @@ class EcommerceSeeder extends Seeder
         for ($i = 1; $i <= 20; $i++) {
             User::create([
                 'username' => "customer{$i}",
-                'email' => "customer{$i}@panjaratan.com",
+                'email' => "customer{$i}@" . $domain,
                 'phone' => $faker->phoneNumber,
                 'verification_token' => null,
                 'phone_verification_token' => null,
@@ -376,7 +377,7 @@ class EcommerceSeeder extends Seeder
                 'Produk Baru Tersedia'
             ],
             'system' => [
-                'Selamat Datang di Penjualan Panjaratan',
+                'Selamat Datang di ' . config('app.name'),
                 'Update Sistem Terbaru',
                 'Promo Spesial Bulan Ini'
             ]
